@@ -1,6 +1,32 @@
 \chapter{Introduction}
 Hello \cite{greenwade93}
-\section{Objectives}
+\section{Motivation}
+    Reinforcement and Imitation Learning are the two most popular \textbf{[ref?]} ways for robots to learn new tasks. In such scenarios they are usually fitted with cameras that allows them to judge and "see" their environment. These cameras can be mounted in many configurations such as: mounted on their wrists, heads, shoulders, or in some cases placed around the environment that the robot is interacting to allow the entire scene to be observed.
 
-\section{Challenges}
+    % Maybe give some references to stuff read here about where the cameras are mounted in different projects
+
+    On this visual information we can train policies for robots using Neural Networks -of various architectures to fit our needs- using these cameras. However, due to the nature of these cameras being static, with respect to the robots movement, our observation space is usually limited to the these rigid cameras. In contrasts, us humans use our eyes (which acting as a head mounted camera) allows us to observe the world around us and move our heads to find the most optimal position of our eyes that would allow us to gain the most information about the task at hand. 
+
+    %%%% =========== INSERT HERE
+    \textbf{================ INSERT HERE} Here we can talk about the different camera poses thing from the linear.app : Interim report > Introduction, and tie it to the mini-conclusion on the next paragraph
+
+    % Not sure if the following nicely connects and flows with the above paragraphs??
+    Having a robot with finer control over its visual inputs' positioning during policy learning and execution might allow a robot to learn certain tasks better and achieve better visuomotor control over its limbs for the given tasks. \textbf{not sure about this para at all REREAD} 
+
+    % Mention the abundance of research in active vision and IL/RL separately but not really together??
+        
+\section{Objectives}
+    % NOT sure about the hints in the pparanthesis
+    The main objective of this project then is to investigate whether a robot can be made to learn an active vision policy around the task it is currently being instructed (Imitation) or is currently exploring with come reward (Reinforcement).
+
+    %% //NOTE: This section might completely disappear depending on where we get to, I want to first find a way to say that moving the camera is indeed useful and helps to make the robot learn certain tasks better.
+    We are therefore proposing three ways to investigate this:
+    \begin{enumerate}
+        \item Robot learns a policy as normal. Then during policy execution, the robot uses 3D-reasoning and forward planning, in order to predict its optimal pose so that the object(s) of interest are clearly visible and not occluded by other objects.
+        \item The robot randomly moves its camera around during the policy learning in order to generate a range of different camera viewpoints (for the same robot states). When the policy is deployed, the uncertainty of the policy \textbf{(?? Using an ensemble method)} can be used to guide the camera towards regions with low uncertainty.
+        \item In simulation, reinforcement learning is used to train a policy that directly controls the camera, for any given task and object, using randomly generated "pseudo-tasks". Then after training a robot on a task using human demonstrations in the real world. Two policies will be deployed: the main policy controlling the robot's hand, and the policy controlling the robot's camera.
+    \end{enumerate}
+
+    Following on from the results of a predetermined and shared test suite we can then determine what is the most promising model out of the three and 
+\section{Challenges} % NOt sure if I need challenges? will come back to this
 \section{Contributions}
