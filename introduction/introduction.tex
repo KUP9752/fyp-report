@@ -1,20 +1,29 @@
 \chapter{Introduction}
-Hello \cite{greenwade93}
 \section{Motivation}
     
-    Reinforcement and Imitation Learning are the two most popular \textbf{[ref?]} ways for robots to learn new tasks. In such scenarios they are usually fitted with cameras that allows them to judge and "see" their environment. These cameras can be mounted in many configurations such as: mounted on their wrists, heads, shoulders, or in some cases placed around the environment that the robot is interacting to allow the entire scene to be observed. All in efforts of making sure that 
+  % //TODO add more papers to where cameras are placed as I read more papers
 
-    % Maybe give some references to stuff read here about where the cameras are mounted in different projects
+  Reinforcement and Imitation Learning are the two most popular ways for robots to learn new tasks. In such scenarios they are usually fitted with cameras that allows them to judge and ``see'' their environment. These cameras can be mounted in many configurations: Mounted on their wrists\cite{chi2024UMIinthewild,openXEmbodimentRoboticLearning2024}, over the shoulder\cite{}, or in some cases placed around the environment\cite{} that the robot is interacting to allow the entire scene to be observed. And these are not necessarily mutually exclusive, one can combine one or more of the mounting systems\cite{exploringActiveVision2024chuang} all in efforts to ensure the robot while collecting data and learning a task has the most unobstructed and complete information in order to ``understand'' scenes.
 
-    On this visual information we can train policies for robots using Neural Networks -of various architectures to fit our needs- using these cameras. However, due to the nature of these cameras being static, with respect to the robots movement, our observation space is usually limited to the these rigid cameras. In contrasts, us humans use our eyes (which acting as a head mounted camera) allows us to observe the world around us and move our heads to find the most optimal position of our eyes that would allow us to gain the most information about the task at hand. 
+  % Maybe give some references to stuff read here about where the cameras are mounted in different projects
 
-    %%%% =========== INSERT HERE
-    \textbf{================ INSERT HERE} Here we can talk about the different camera poses thing from the linear.app : Interim report > Introduction, and tie it to the mini-conclusion on the next paragraph
+  On this visual information we can train control policies for robots using Neural Networks\cite{spyros1995nnStateOfTheArt, Schmidhuber2015nn} -of differing architectures- that are fit for the task we need our robot to do. However, these methods of mounting cameras comes with various disadvantages:
+  
+  \textbf{Static Cameras} Environment observing static cameras, such as over-the-shoulder mounted cameras\cite{??} mean that the robot is confined to its environment and occlusions are still possible depending on the angles and the number of such cameras placed.
+    
+  \textbf{Camera-in-hand} This method can suffer from similar issues. As the gripper is oriented to execute a task, the viewpoints the camera is exposed to will change. This dependency means that select tasks that are inherently occluding, once the gripper is engaged; for example, screwing in a lightbulb \textbf{give some other examples}. This means that optimal learning cannot be achieved for such a robot. As we get partial observability of the Region of Interest (ROI) at best and complete occlusion of the ROI at worst.
+    
+  In contrast to the above, us humans use our eyes which can be operated independently from our arms. So, a possible remedy of the above issues is having a free moving camera alongside the gripper. This human-like setup -with the grippers as the arms and the camera arm as the neck, head and eyes- now allows our robot to find optimal camera poses to the tasks at hand and gain the most information about a scene
+  
 
-    % Not sure if the following nicely connects and flows with the above paragraphs??
-    Having a robot with finer control over its visual inputs' positioning during policy learning and execution might allow a robot to learn certain tasks better and achieve better visuomotor control over its limbs for the given tasks. \textbf{not sure about this para at all REREAD} 
+  % //TODO (??)Talk about hand engineered tasks maybe?
 
-    % Mention the abundance of research in active vision and IL/RL separately but not really together??
+  This now means that the challenge shifts to be that of an \emph{Active Vision} one. This is a highly active area of research in robotics and mostly tackled through synchronous video with teleoperation\cite{exploringActiveVision2024chuang,?}, where a human ``pilot'' will control the robot through some sort of interface, like a virtual reality (VR) headset. so the robot can learn to move its vision input 
+
+  % Not sure if the following nicely connects and flows with the above paragraphs??
+  Having a robot with finer control over its visual inputs' positioning during policy learning and execution might allow a robot to learn certain tasks better and achieve better visuomotor control over its limbs for the given tasks. \textbf{not sure about this para at all REREAD} 
+
+  % Mention the abundance of research in active vision and IL/RL separately but not really together??
         
 \section{Objectives}
     % NOT sure about the hints in the pparanthesis
