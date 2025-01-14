@@ -1,0 +1,4 @@
+## ignore build artefacts
+main*
+## but don't ignore main.tex
+!main.tex
