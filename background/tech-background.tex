@@ -47,7 +47,10 @@
     \end{bmatrix}
     \]
     where each row of the matrix sums up to 1, due to the nature of probabilities. A tuple of a set of states and a transition matrix/function \(\llangle S, P \rrangle\) make up a \textbf{Markov Process} (or Markov Chain)
-    
+
+    \subsubsection{Actions, A}
+    This is the set of all possible actions that are available to the robot in each state. Depending on the context of the task, actions can be discrete or continuous.
+
     \subsubsection{Reward Function, R}
     This is the scalar feedback signal. It ensures that the agent's learning is based on steps it is taking over time, so $R_t$ is how well the agent is doing at step $t$. It is defined as:
 
@@ -68,8 +71,6 @@
     \]
     \todo{define value functions and bellman either before or after action}
 
-  \subsubsection{Actions, A}
-    This is the set of all possible actions that are available to the robot in each state. Depending on the context of the task, actions can be discrete or continuous.
+  Therefore, a \emph{Markov Decision Process} is a tuple \(\langle S, A, P, R, \gamma \rangle\) as the parts are defined above.
 
 
-  So, a \emph{Markov Decision Process} is a tuple \(\langle S, A, P, R, \gamma \rangle\)
