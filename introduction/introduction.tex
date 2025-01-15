@@ -3,7 +3,7 @@
     
   % //TODO add more papers to where cameras are placed as I read more papers
 
-  Reinforcement and Imitation Learning are the two most popular ways for robots to learn new tasks. In such scenarios they are usually fitted with cameras that allows them to judge and ``see'' their environment. These cameras can be mounted in many configurations: Mounted on their wrists \cite{chi2024UMIinthewild,openXEmbodimentRoboticLearning2024}, over the shoulder \cite{}, or in some cases placed around the environment \cite{} that the robot is interacting to allow the entire scene to be observed. And these are not necessarily mutually exclusive, one can combine one or more of the mounting systems \cite{exploringActiveVision2024chuang} all in efforts to ensure the robot while collecting data and learning a task has the most unobstructed and complete information in order to ``understand'' scenes.
+  Reinforcement and Imitation Learning are the two most popular ways for robots to learn new tasks. In such scenarios they are usually fitted with cameras that allows them to judge and ``see'' their environment. These cameras can be mounted in many configurations: Mounted on their wrists \cite{chi2024UMIinthewild,openXEmbodimentRoboticLearning2024}, over the shoulder \cite{??}, or in some cases placed around the environment \cite{?} that the robot is interacting to allow the entire scene to be observed. And these are not necessarily mutually exclusive, one can combine one or more of the mounting systems \cite{exploringActiveVision2024chuang} all in efforts to ensure the robot while collecting data and learning a task has the most unobstructed and complete information in order to ``understand'' scenes.
 
   % Maybe give some references to stuff read here about where the cameras are mounted in different projects
 
@@ -29,21 +29,21 @@
     %% //NOTE: This section might completely disappear depending on where we get to, I want to first find a way to say that moving the camera is indeed useful and helps to make the robot learn certain tasks better.
     We are therefore proposing three ways to investigate this:
     \begin{enumerate}
-        \item Robot learns a policy as normal. Then during policy execution, the robot uses 3D-reasoning and forward planning, in order to predict its optimal pose so that the object(s) of interest are clearly visible and not occluded by other objects.
-        \item The robot randomly moves its camera around during the policy learning in order to generate a range of different camera viewpoints (for the same robot states). When the policy is deployed, the uncertainty of the policy \textbf{(?? Using an ensemble method)} can be used to guide the camera towards regions with low uncertainty.
-        \item In simulation, reinforcement learning is used to train a policy that directly controls the camera, for any given task and object, using randomly generated "pseudo-tasks". Then after training a robot on a task using human demonstrations in the real world. Two policies will be deployed: the main policy controlling the robot's hand, and the policy controlling the robot's camera.
-    \end{enumerate}
+      \item Robot learns a policy as normal. Then during policy execution, the robot uses 3D-reasoning and forward planning, in order to predict its optimal pose so that the object(s) of interest are clearly visible and not occluded by other objects.
+      \item The robot randomly moves its camera around during the policy learning in order to generate a range of different camera viewpoints (for the same robot states). When the policy is deployed, the uncertainty of the policy \textbf{(?? Using an ensemble method)} can be used to guide the camera towards regions with low uncertainty.
+      \item In simulation, reinforcement learning is used to train a policy that directly controls the camera, for any given task and object, using randomly generated "pseudo-tasks". Then after training a robot on a task using human demonstrations in the real world. Two policies will be deployed: the main policy controlling the robot's hand, and the policy controlling the robot's camera.
+\end{enumerate}
 
-    Following on from the results of a predetermined test suite we can then determine what is the most promising model out of the three and develop them further.
-\section{Scope} 
+Following on from the results of a predetermined test suite we can then determine what is the most promising model out of the three and develop them further.
+\section{Scope}
 % //TODO:
 \todo{Not sure if this is needed for Interim report, will come back}
 
 \begin{itemize}
-  \item Types of tasks the project will cover 
-  \item assumptions, camera, robot, arm types etc
-  \item predetermined test suite maybe?
-  \item distinction between control policies for the hand arm (policy for task) and the camera (optimal view)
+	\item Types of tasks the project will cover
+	\item assumptions, camera, robot, arm types etc
+	\item predetermined test suite maybe?
+	\item distinction between control policies for the hand arm (policy for task) and the camera (optimal view)
 \end{itemize}
 
 % \section{Contributions}
