@@ -1,10 +1,39 @@
-\section{Technical Background}
-\subsection{End-to-End Learning for Robot Control}
+\section{End-to-End Learning for Robot Control}
 
   End-to-end refers to a robot learning approach where the robot determines certain \textbf{policies} (actions to perform a certain task) from raw inputs from the action space. The action space can include anything that we think the robot may benefit form knowing. This means the 
   robot learns to map sensory inputs directly to motor commands, bypassing the need for intermediate steps such as feature extraction or state estimation. This approach leverages deep learning techniques \cite{Schmidhuber2015nn}, particularly convolutional neural networks (CNNs) and recurrent neural networks (RNNs), to process high-dimensional sensory data and generate appropriate actions. Which can then be used in techniques like Reinforcement Learning \todo{link section when done} or Imitation Learning. \todo{link section when done} Therefore, recent advancements in machine learning technologies has also reshaped the field of robotics and moved it forward \cite{Pierson18082017,newbury2023graspSynthReview,liu2021DRLminireview}.
 
-  This contrasts with the classical approaches. Classical robotics involves separating the behaviour of a robot into smaller tasks, where each task is managed by a distinct module and the system is functional when the pipeline comes together. Although good at precisely executing repetitive tasks, this approach requires complex and often handcrafted solutions for each module. This can lead to difficulties in scaling and adapting to new tasks or environments. So the cutting-edge research in robotics concerns end-to-end systems in making multi-modal robots. \todo{is multi-modal right?}
+  \missingfigure{add 2 figures as a small outline like a blackbox + a few steps}
+
+  This contrasts with the classical approaches\todo{add refs here}. Classical robotics involves separating the behaviour of a robot into smaller tasks, where each task is managed by a distinct module and the system is functional when the pipeline comes together. Although good at precisely executing repetitive tasks, this approach requires complex and often handcrafted solutions for each module. This can lead to difficulties in scaling and adapting to new tasks or environments. 
   
-\subsection{Mathematical Foundations}
+  Therefore, the cutting-edge research in robotics concerns end-to-end systems in making multi-modal robots \todo{is multi-modal right?} that are capable of complex decision-making given some sort of environment.
   
+\section{Mathematical Foundations}
+  In scenarios involving autonomous acting the capability of a robot to reason to navigate complex problems or dynamic environments plays a central role. This means that such a system must make a sequence of decisions that impact later outcomes. Markov Decision Processes (MDPs) provide a mathematical framework for modelling decisions in environments where the probabilistic outcomes are influenced by actions of a robot. A formally defined MDP will have the following parts \cite{silver2015}:
+
+  \subsection{Markov Decision Processes}
+    \subsubsection{The Markov Property}
+      A state $S_t$ is \emph{Markov} if and only if:
+      \[ 
+        \mathbb{P} \left[S_{t+1} \mid S_t\right] = \mathbb{P}\left[ S_{t+1} \mid S_1, \ldots, S_t\right]
+      \]
+
+      % \todo{maybe make this a lemma type table??}
+      This property ensures that all relevant information from the history is captured within the state. So once the state is knows the past states can be discarded. Making the current state a sufficient statistic for the future \cite{silver2015}
+
+    \subsubsection{State, S}
+      The system must be able to process all different configurations of the environment. So the state will encapsulate the surroundings through raw sensory inputs (e.g. images, force sensors) in a high-level representation and will capture all relevant information available \cite{Sutton1998} which might be needed to make an informed decision at a particular time step.
+    
+    \subsubsection{Actions, A}
+      These are the possible actions that are available to the robot in each state. Depending on the context of the task, actions can be discrete or continuous.
+    
+    \subsubsection{State Transition Matrix, P}
+      This matrix defines the 
+    
+    \subsubsection{Reward Function, R}
+    
+    \subsubsection{Discount Factor, $\gamma$} 
+
+
+  So, a \emph{Markov Decision Process} is a tuple \(\langle S, A, P, R, \gamma \rangle\)
