@@ -2,3 +2,5 @@
 main*
 ## but don't ignore main.tex
 !main.tex
+
+*.log
