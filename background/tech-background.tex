@@ -10,7 +10,8 @@
   Therefore, the cutting-edge research in robotics concerns end-to-end systems in making multi-modal robots \todo{is multi-modal right?} that are capable of complex decision-making given some sort of environment.
 
 \section{Reinforcement Learning (RL)}
-  One of the tried and tested methods of end-to-end learning approaches is a branch under machine learning called \emph{Reinforcement Learning (RL)}.
+  One of the tried and tested methods of end-to-end learning approaches is a branch under machine learning called \emph{Reinforcement Learning (RL)}. \todo{is it a branch under machine learning?}
+  \missingfigure{add the classic agent state reward action diagram}
 
   RL's main focus is training robots, which are called \emph{agents} in making decisions by interacting with the environment. The key objective is to teach a \emph{policy} to the agent that maximises the overall reward -usually defined by the task and involves a \emph{teacher}. The agent will explore, the possibly actions it can take through trail and error, while learning from the feedback given to it by the reward signal and its environment.
 
@@ -33,7 +34,7 @@
    % \todo{maybe make this a lemma type table??}
     This property ensures that all relevant information from the history is captured within the state. So once the state is knows the past states can be discarded. Making the current state a sufficient statistic for the future \cite{silver2015}.
 
-    \subsubsection{State Transition Matrix, P}
+  \subsubsection{State Transition Matrix, P}
     This matrix defines the transition probabilities from all states $s$ to all successor states $s'$, so:
     
     \[ P_{ss'} = \mathbb{P} \left[S_{t+1} = s'  \mid S_t = s\right]\] 
@@ -48,29 +49,68 @@
     \]
     where each row of the matrix sums up to 1, due to the nature of probabilities. A tuple of a set of states and a transition matrix/function \(\llangle S, P \rrangle\) make up a \textbf{Markov Process} (or Markov Chain)
 
-    \subsubsection{Actions, A}
+  \subsubsection{Actions, A}
     This is the set of all possible actions that are available to the robot in each state. Depending on the context of the task, actions can be discrete or continuous.
 
-    \subsubsection{Reward Function, R}
+  \subsubsection{Reward Function, R}
     This is the scalar feedback signal. It ensures that the agent's learning is based on steps it is taking over time, so $R_t$ is how well the agent is doing at step $t$. It is defined as:
 
     \[R_s = \mathbb{E} \left[R_{t+1} \mid S_t = s\right]\]
     
     This allows the robot to eventually converge to a solution that maximises the cumulative rewards (the \emph{returns}) for the actions it has taken. 
-    
-    \subsubsection{Discount Factor, $\gamma$}
+  
+  \subsubsection{Discount Factor, $\gamma$}
     This is mechanism to control the importance of future rewards. Sampled as: \(\gamma \in \left[0, 1\right]\), means that immediate reward is prioritised and while reward form longer sequence of actions decays, avoiding infinite cycles in Markov Chains.
 
-    Combining the reward function and the discount factor we can defined the \emph{return}, $G_t$ as the total dicounted reward from time-step $t$:
+    Combining the reward function and the discount factor we can defined the \emph{return}, $G_t$ as the total discounted reward from time-step $t$:
 
     \[ 
-      \begin{aligned}
+    \begin{aligned}
       G_t &= R_{t+1} + \gamma R_{t+2} + \ldots \\ 
       &= \sum_{k=0}^{\inf}\gamma^k R_{t+k+1} 
     \end{aligned}
     \]
-    \todo{define value functions and bellman either before or after action}
+    
+    Therefore, a \emph{Markov Decision Process} is a tuple \(\langle S, A, P, R, \gamma \rangle\) as the parts are defined above.
+    
+    
+  \subsubsection{Policy, $\pi$}
+    The higher-level goal of any RL system is to learn an optimal policy \(\pi \left( a \mid s\right) = \mathbb{P} \left[A_t = a \mid S_t = s\right]\) which aims to maximise the return. Policies fully define the behaviour of the agent. As seen by the function's type \(\pi: S \rightarrow A \) they only depend on the current state and are time independent \( A_t \sim \pi\left( \cdot \mid S_t\right), \forall t > 0 \)
+    
+  \subsubsection{Value Functions}
+    On top of these we define two calue function, \emph{state-value}: the expeted return starting from state $s$, and then following policy $\pi$:
 
-  Therefore, a \emph{Markov Decision Process} is a tuple \(\langle S, A, P, R, \gamma \rangle\) as the parts are defined above.
+    \[ v_\pi \left(s\right) = \mathbb{E} = \left[G_t \mid S_t = s\right]\]
+
+    and the \emph{action-value} function, which is the expected return starting from state $s$, taking action $a$, and then continuing a policy $\pi$:
+
+    \[ q_\pi \left(s, a\right) = \mathbb{E} \left[ G_t \mid S_t = s, A_t = a\right]\]
 
 
+    while the optimal versions can be defined as:
+    \[v_* \left(s\right) = \underset{\pi}{\max} \ v_\pi \left(s\right)\]
+
+    \[q_* \left(s, a\right) = \underset{\pi}{\max} \ q_\pi \left(s, a\right)\]
+    
+    The optimal means the best possible performance can be achieved in the MDP and it can be considered ``solved'' once we find these optimal functions.
+
+    \todo{should I define the bellman function?}
+
+\subsection{Different RL Models}
+  The flavours of different Reinforcement Learning models can be broadly categorised into 2 types: \textbf{Model-Based} and \textbf{Model-Free}
+
+
+\subsection{Model-Based RL}
+  Model based approaches involve methods of creating an internal model and representation of the state the agent is interacting with. It usually involves two main steps: dynamics and model learning, then planning-learning in that model \cite{MAL-086}. This allows the agent to plan ahead in its environment and improve sample efficiency \cite{wu23robotLearn,liu2021DRLminireview}.
+
+
+
+
+
+\subsection{Model-Free RL}
+  This collection of models attempt to learn a policy directly by trial and error, without explicitly modelling the environments dynamics. Usually preffered when the environments is too complex or too costly to model.
+  \subsubsection{Value-Based}
+  \subsubsection{Policy-Based}
+  \subsubsection{Actor-Teacher}
+
+  Hydrid methods are also a viability, where the characteristics from each can be conbined [ref?]

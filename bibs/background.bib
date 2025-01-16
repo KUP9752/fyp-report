@@ -42,6 +42,24 @@ URL = {
 
 }
 
+% data efficiency
+@InProceedings{wu23robotLearn,
+  title = 	 {DayDreamer: World Models for Physical Robot Learning},
+  author =       {Wu, Philipp and Escontrela, Alejandro and Hafner, Danijar and Abbeel, Pieter and Goldberg, Ken},
+  booktitle = 	 {Proceedings of The 6th Conference on Robot Learning},
+  pages = 	 {2226--2240},
+  year = 	 {2023},
+  editor = 	 {Liu, Karen and Kulic, Dana and Ichnowski, Jeff},
+  volume = 	 {205},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {14--18 Dec},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v205/wu23c/wu23c.pdf},
+  url = 	 {https://proceedings.mlr.press/v205/wu23c.html},
+  abstract = 	 {To solve tasks in complex environments, robots need to learn from experience. Deep reinforcement learning is a common approach to robot learning but requires a large amount of trial and error to learn, limiting its deployment in the physical world. As a consequence, many advances in robot learning rely on simulators. On the other hand, learning inside of simulators fails to capture the complexity of the real world, is prone to simulator inaccuracies, and the resulting behaviors do not adapt to changes in the world. The Dreamer algorithm has recently shown great promise for learning from small amounts of interaction by planning within a learned world model, outperforming pure reinforcement learning in video games. Learning a world model to predict the outcomes of potential actions enables planning in imagination, reducing the amount of trial and error needed in the real environment. However, it is unknown whether Dreamer can facilitate faster learning on physical robots. In this paper, we apply Dreamer to 4 robots to learn online and directly in the real world, without any simulators. Dreamer trains a quadruped robot to roll off its back, stand up, and walk from scratch and without resets in only 1 hour. We then push the robot and find that Dreamer adapts within 10 minutes to withstand perturbations or quickly roll over and stand back up. On two different robotic arms, Dreamer learns to pick and place objects from camera images and sparse rewards, approaching human-level teleoperation performance. On a wheeled robot, Dreamer learns to navigate to a goal position purely from camera images, automatically resolving ambiguity about the robot orientation. Using the same hyperparameters across all experiments, we find that Dreamer is capable of online learning in the real world, which establishes a strong baseline. We release our infrastructure for future applications of world models to robot learning.}
+}
+
+
 @ARTICLE{newbury2023graspSynthReview,
   author={Newbury, Rhys and Gu, Morris and Chumbley, Lachlan and Mousavian, Arsalan and Eppner, Clemens and Leitner, Jürgen and Bohg, Jeannette and Morales, Antonio and Asfour, Tamim and Kragic, Danica and Fox, Dieter and Cosgun, Akansel},
   journal={IEEE Transactions on Robotics}, 
@@ -102,4 +120,78 @@ URL = {
   booktitle={Machine Intelligence 15},
   year={1995},
   url={https://api.semanticscholar.org/CorpusID:10738655}
+}
+
+% model based RL
+@article{MAL-086,
+url = {http://dx.doi.org/10.1561/2200000086},
+year = {2023},
+volume = {16},
+journal = {Foundations and Trends® in Machine Learning},
+title = {Model-based Reinforcement Learning: A Survey},
+doi = {10.1561/2200000086},
+issn = {1935-8237},
+number = {1},
+pages = {1-118},
+author = {Thomas M. Moerland and Joost Broekens and Aske Plaat and Catholijn M. Jonker}
+}
+
+% on policy RL experiments
+@misc{andrychowicz2020onpolicyRL,
+      title={What Matters In On-Policy Reinforcement Learning? A Large-Scale Empirical Study}, 
+      author={Marcin Andrychowicz and Anton Raichuk and Piotr Stańczyk and Manu Orsini and Sertan Girgin and Raphael Marinier and Léonard Hussenot and Matthieu Geist and Olivier Pietquin and Marcin Michalski and Sylvain Gelly and Olivier Bachem},
+      year={2020},
+      eprint={2006.05990},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2006.05990}, 
+}
+
+% Q-Lrning algorithm
+@article{Watkins1992,
+  author    = {Christopher J. C. H. Watkins and Peter Dayan},
+  title     = {Q-learning},
+  journal   = {Machine Learning},
+  year      = {1992},
+  volume    = {8},
+  number    = {3},
+  pages     = {279--292},
+  doi       = {10.1007/BF00992698},
+  url       = {https://doi.org/10.1007/BF00992698},
+  issn      = {1573-0565}
+}
+
+% Fitted Qlearning
+@InProceedings{10.1007/11564096_32FittedQLearning,
+author="Riedmiller, Martin",
+editor="Gama, Jo{\~a}o
+and Camacho, Rui
+and Brazdil, Pavel B.
+and Jorge, Al{\'i}pio M{\'a}rio
+and Torgo, Lu{\'i}s",
+title="Neural Fitted Q Iteration -- First Experiences with a Data Efficient Neural Reinforcement Learning Method",
+booktitle="Machine Learning: ECML 2005",
+year="2005",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="317--328",
+abstract="This paper introduces NFQ, an algorithm for efficient and effective training of a Q-value function represented by a multi-layer perceptron. Based on the principle of storing and reusing transition experiences, a model-free, neural network based Reinforcement Learning algorithm is proposed. The method is evaluated on three benchmark problems. It is shown empirically, that reasonably few interactions with the plant are needed to generate control policies of high quality.",
+isbn="978-3-540-31692-3"
+}
+
+
+
+
+% uses DQN to great success
+@article{Mnih2015,
+  author    = {Mnih, Volodymyr and Kavukcuoglu, Koray and Silver, David and Rusu, Andrei A. and Veness, Joel and Bellemare, Marc G. and Graves, Alex and Riedmiller, Martin and Fidjeland, Andreas K. and Ostrovski, Georg and Petersen, Stig and Beattie, Charles and Sadik, Amir and Antonoglou, Ioannis and King, Helen and Kumaran, Dharshan and Wierstra, Daan and Legg, Shane and Hassabis, Demis},
+  title     = {Human-level control through deep reinforcement learning},
+  journal   = {Nature},
+  volume    = {518},
+  number    = {7540},
+  pages     = {529--533},
+  year      = {2015},
+  month     = {February},
+  doi       = {10.1038/nature14236},
+  url       = {https://doi.org/10.1038/nature14236}
 }
