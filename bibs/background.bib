@@ -205,6 +205,8 @@ URL = {
   abstract = {This paper reviews exploration techniques in deep reinforcement learning. Exploration techniques are of primary importance when solving sparse reward problems. In sparse reward problems, the reward is rare, which means that the agent will not find the reward often by acting randomly. In such a scenario, it is challenging for reinforcement learning to learn rewards and actions association. Thus more sophisticated exploration methods need to be devised. This review provides a comprehensive overview of existing exploration approaches, which are categorised based on the key contributions as: reward novel states, reward diverse behaviours, goal-based methods, probabilistic methods, imitation-based methods, safe exploration and random-based methods. Then, unsolved challenges are discussed to provide valuable future research directions. Finally, the approaches of different categories are compared in terms of complexity, computational effort and overall performance.}
 }
 
+
+
 % model based RL
 @article{MAL-086,
 url = {http://dx.doi.org/10.1561/2200000086},
@@ -309,4 +311,129 @@ isbn="978-3-540-31692-3"
   month     = {February},
   doi       = {10.1038/nature14236},
   url       = {https://doi.org/10.1038/nature14236}
+}
+%% ======= Imitation
+
+@inproceedings{bakker1996robot,
+  title={Robot see, robot do: An overview of robot imitation},
+  author={Bakker, Paul and Kuniyoshi, Yasuo and others},
+  booktitle={AISB96 Workshop on Learning in Robots and Animals},
+  volume={5},
+  pages={3--11},
+  year={1996}
+}
+
+@article{HUANG2023104691,
+title = {To imitate or not to imitate: Boosting reinforcement learning-based construction robotic control for long-horizon tasks using virtual demonstrations},
+journal = {Automation in Construction},
+volume = {146},
+pages = {104691},
+year = {2023},
+issn = {0926-5805},
+doi = {https://doi.org/10.1016/j.autcon.2022.104691},
+url = {https://www.sciencedirect.com/science/article/pii/S0926580522005611},
+author = {Lei Huang and Zihan Zhu and Zhengbo Zou},
+keywords = {Construction robot, Reinforcement learning, Virtual reality},
+abstract = {Construction robots controlled using reinforcement learning (RL) have recently emerged, showing higher adaptability and self-learning intelligence over pre-programmed and teleoperated robots. This work aims to train RL-based construction robots to learn long-horizon tasks with few exploration steps. We propose an approach that collects expert demonstrations in virtual reality, which are then added in the RL loop to assist with learning long-horizon construction tasks. Additionally, we utilize a hierarchical training strategy to generalize control policies to new policies that handle complex scenarios. For evaluation, we implement the approach for picking and installing window panels in simulation. In experiments, all 10 agents trained with virtual demonstrations delivered the task with success rates over 95%. Moreover, these 10 agents generalized their control policies and handled randomized window panels with success rates over 90%. The results confirm the effectiveness of our approach in boosting construction robots’ performance over long-horizon tasks.}
+}
+
+
+% LfD
+@article{ARGALL2009469,
+title = {A survey of robot learning from demonstration},
+journal = {Robotics and Autonomous Systems},
+volume = {57},
+number = {5},
+pages = {469-483},
+year = {2009},
+issn = {0921-8890},
+doi = {https://doi.org/10.1016/j.robot.2008.10.024},
+url = {https://www.sciencedirect.com/science/article/pii/S0921889008001772},
+author = {Brenna D. Argall and Sonia Chernova and Manuela Veloso and Brett Browning},
+keywords = {Learning from demonstration, Robotics, Machine learning, Autonomous systems},
+abstract = {We present a comprehensive survey of robot Learning from Demonstration (LfD), a technique that develops policies from example state to action mappings. We introduce the LfD design choices in terms of demonstrator, problem space, policy derivation and performance, and contribute the foundations for a structure in which to categorize LfD research. Specifically, we analyze and categorize the multiple ways in which examples are gathered, ranging from teleoperation to imitation, as well as the various techniques for policy derivation, including matching functions, dynamics models and plans. To conclude we discuss LfD limitations and related promising areas for future research.}
+}
+
+% supervised learning
+@article{hastie2009overview,
+  title={Overview of supervised learning},
+  author={Hastie, Trevor and Tibshirani, Robert and Friedman, Jerome and Hastie, Trevor and Tibshirani, Robert and Friedman, Jerome},
+  journal={The elements of statistical learning: Data mining, inference, and prediction},
+  pages={9--41},
+  year={2009},
+  publisher={Springer}
+}
+
+@incollection{cunningham2008supervised,
+  title={Supervised learning},
+  author={Cunningham, P{\'a}draig and Cord, Matthieu and Delany, Sarah Jane},
+  booktitle={Machine learning techniques for multimedia: case studies on organization and retrieval},
+  pages={21--49},
+  chapter = {2},
+  year={2008},
+  publisher={Springer}
+}
+
+% IL explanation
+@misc{attia2018globaloverviewimitationlearning,
+      title={Global overview of Imitation Learning}, 
+      author={Alexandre Attia and Sharone Dayan},
+      year={2018},
+      eprint={1801.06503},
+      archivePrefix={arXiv},
+      primaryClass={stat.ML},
+      url={https://arxiv.org/abs/1801.06503}, 
+}
+
+% DAgger
+@misc{ross2011reductionimitationlearningstructured,
+      title={A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning}, 
+      author={Stephane Ross and Geoffrey J. Gordon and J. Andrew Bagnell},
+      year={2011},
+      eprint={1011.0686},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/1011.0686}, 
+}
+
+% IL BC stuff
+@article{pomerlau1991neco.1991.3.1.88,
+    author = {Pomerleau, Dean A.},
+    title = {Efficient Training of Artificial Neural Networks for Autonomous Navigation},
+    journal = {Neural Computation},
+    volume = {3},
+    number = {1},
+    pages = {88-97},
+    year = {1991},
+    month = {03},
+    abstract = {The ALVINN (Autonomous Land Vehicle In a Neural Network) project addresses the problem of training artificial neural networks in real time to perform difficult perception tasks. ALVINN is a backpropagation network designed to drive the CMU Navlab, a modified Chevy van. This paper describes the training techniques that allow ALVINN to learn in under 5 minutes to autonomously control the Navlab by watching the reactions of a human driver. Using these techniques, ALVINN has been trained to drive in a variety of circumstances including single-lane paved and unpaved roads, and multilane lined and unlined roads, at speeds of up to 20 miles per hour.},
+    issn = {0899-7667},
+    doi = {10.1162/neco.1991.3.1.88},
+    url = {https://doi.org/10.1162/neco.1991.3.1.88},
+    eprint = {https://direct.mit.edu/neco/article-pdf/3/1/88/812106/neco.1991.3.1.88.pdf},
+}
+
+
+
+%IL survey good stuff (in the folder as well)
+@misc{zare2023surveyimitationlearningalgorithms,
+      title={A Survey of Imitation Learning: Algorithms, Recent Developments, and Challenges}, 
+      author={Maryam Zare and Parham M. Kebria and Abbas Khosravi and Saeid Nahavandi},
+      year={2023},
+      eprint={2309.02473},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2309.02473}, 
+}
+
+
+%controlling covaraite shift in BC
+@misc{mehta2024stablebccontrollingcovariateshift,
+      title={Stable-BC: Controlling Covariate Shift with Stable Behavior Cloning}, 
+      author={Shaunak A. Mehta and Yusuf Umut Ciftci and Balamurugan Ramachandran and Somil Bansal and Dylan P. Losey},
+      year={2024},
+      eprint={2408.06246},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2408.06246}, 
 }

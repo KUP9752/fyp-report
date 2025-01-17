@@ -1,0 +1,81 @@
+\section{Mathematical Foundations}
+
+  In scenarios involving autonomous acting, the capability of a an robot to reason and navigate complex problems or dynamic environments plays a central role. So in any RL system the agent must make a sequence of decisions that impact later outcomes. Markov Decision Processes (MDPs) provide a mathematical framework for modelling decisions in environments where the probabilistic outcomes are influenced by actions of such an agent. A formally defined MDP will have the following parts \cite{silver2015}:
+
+\subsection{Markov Decision Processes}
+  \subsubsection{State, S}
+    The system must be able to process all different configurations of the environment. So the state will encapsulate the surroundings through raw sensory inputs (e.g. images, force sensors) in a high-level representation and will capture all relevant information available \cite{Sutton1998} which might be needed to make an informed decision at a particular time step.
+
+  \subsubsection{The Markov Property}
+    A state $S_t$ is \emph{Markov} if and only if:
+    \[
+      \mathbb{P} \left[S_{t+1} \mid S_t\right] = \mathbb{P}\left[ S_{t+1} \mid S_1, \ldots, S_t\right]
+    \]
+
+   % \todo{maybe make this a lemma type table??}
+    This property ensures that all relevant information from the history is captured within the state. So once the state is knows the past states can be discarded. Making the current state a sufficient statistic for the future \cite{silver2015}.
+
+  \subsubsection{State Transition Matrix, P}
+    This matrix defines the transition probabilities from all states $s$ to all successor states $s'$, so:
+    
+    \[ P_{ss'} = \mathbb{P} \left[S_{t+1} = s'  \mid S_t = s\right]\] 
+    and 
+    
+    \[ P =
+    \begin{bmatrix}
+      P_{11} & \cdots & P_{1n} \\ 
+      \vdots & & \vdots\\
+      P_{n1} & \cdots & P_{nn}
+    \end{bmatrix}
+    \]
+    where each row of the matrix sums up to 1, due to the nature of probabilities. A tuple of a set of states and a transition matrix/function \(\llangle S, P \rrangle\) make up a \textbf{Markov Process} (or Markov Chain)
+
+  \subsubsection{Actions, A}
+    This is the set of all possible actions that are available to the robot in each state. Depending on the context of the task, actions can be discrete or continuous.
+
+  \subsubsection{Reward Function, R}
+    This is the scalar feedback signal. It ensures that the agent's learning is based on steps it is taking over time, so $R_t$ is how well the agent is doing at step $t$. It is defined as:
+
+    \[R_s = \mathbb{E} \left[R_{t+1} \mid S_t = s\right]\]
+    
+    This allows the robot to eventually converge to a solution that maximises the cumulative rewards (the \emph{returns}) for the actions it has taken. 
+  
+  \subsubsection{Discount Factor, $\gamma$}
+    This is mechanism to control the importance of future rewards. Sampled as: \(\gamma \in \left[0, 1\right]\), means that immediate reward is prioritised and while reward form longer sequence of actions decays, avoiding infinite cycles in Markov Chains.
+
+    Combining the reward function and the discount factor we can defined the \emph{return}, $G_t$ as the total discounted reward from time-step $t$:
+
+    \[ 
+    \begin{aligned}
+      G_t &= R_{t+1} + \gamma R_{t+2} + \ldots \\ 
+      &= \sum_{k=0}^{\inf}\gamma^k R_{t+k+1} 
+    \end{aligned}
+    \]
+    
+    Therefore, a \emph{Markov Decision Process} is a tuple \(\langle S, A, P, R, \gamma \rangle\) as the parts are defined above.
+    
+    
+  \subsubsection{Policy, $\pi$}
+    The higher-level goal of any RL system is to learn an optimal policy \(\pi \left( a \mid s\right) = \mathbb{P} \left[A_t = a \mid S_t = s\right]\) which aims to maximise the return. Policies fully define the behaviour of the agent. As seen by the function's type \(\pi: S \rightarrow A \) they only depend on the current state and are time independent \( A_t \sim \pi\left( \cdot \mid S_t\right), \forall t > 0 \)
+    
+  \subsubsection{Value Functions}
+    On top of these we define two value function, \emph{state-value}: the expected return starting from state $s$, and then following policy $\pi$:
+
+    \[ v_\pi \left(s\right) = \mathbb{E} = \left[G_t \mid S_t = s\right]\]
+
+    and the \emph{action-value} function, which is the expected return starting from state $s$, taking action $a$, and then continuing a policy $\pi$:
+
+    \[ q_\pi \left(s, a\right) = \mathbb{E} \left[ G_t \mid S_t = s, A_t = a\right]\]
+
+
+    while the optimal versions can be defined as:
+    \[v_* \left(s\right) = \underset{\pi}{\max} \ v_\pi \left(s\right)\]
+
+    \[q_* \left(s, a\right) = \underset{\pi}{\max} \ q_\pi \left(s, a\right)\]
+    
+    The optimal means the best possible performance can be achieved in the MDP and it can be considered ``solved'' once we find these optimal functions.
+
+    \todo{should I define the bellman function?}
+
+    \subsection{Exploration and Exploitation}
+    \todo{this is left for tmr man, I had enough gotta finish the model flavours}
