@@ -78,7 +78,7 @@
     The higher-level goal of any RL system is to learn an optimal policy \(\pi \left( a \mid s\right) = \mathbb{P} \left[A_t = a \mid S_t = s\right]\) which aims to maximise the return. Policies fully define the behaviour of the agent. As seen by the function's type \(\pi: S \rightarrow A \) they only depend on the current state and are time independent \( A_t \sim \pi\left( \cdot \mid S_t\right), \forall t > 0 \)
     
   \subsubsection{Value Functions}
-    On top of these we define two calue function, \emph{state-value}: the expeted return starting from state $s$, and then following policy $\pi$:
+    On top of these we define two value function, \emph{state-value}: the expected return starting from state $s$, and then following policy $\pi$:
 
     \[ v_\pi \left(s\right) = \mathbb{E} = \left[G_t \mid S_t = s\right]\]
 
@@ -103,7 +103,27 @@
   Reinforcement learning, can be used to train a variety of agents that is not limited by physical robots. It can learn to play video-games \cite{comi2018} , automation tasks \cite{}, in natural language processing \cite{paulus2017deepreinforcedmodelabstractive}, applications  in healthcare (where RL is categorised as dynamic treatment regimes) for use in chronic diseases or critical care \cite{yu2020reinforcementlearninghealthcaresurvey} and lastly -most importantly for us- learning movement behaviours for robots \cite{}.
   \todo{add more sources and citations}
   
-  Along with this widespread use, comes differing methods of utilising the RL framework. The likes of which can be broadly classified into two types: \textbf{Model-Based} and \textbf{Model-Free}.
+  A fundamental challenge in utilising RL is the constant act of balancing \textbf{exploration} and \textbf{exploration}. A trade-off must be made in the chosen model \todo{model might not be the right word here as it hints at model-based?}
+  \begin{enumerate}
+    \item \textbf{Exploration:}
+    This is when the agent decides to \emph{explore} new actions that might potentially lead to better long-term outcomes. An issue this can cause is that the time it takes to explore all possibilities might not be feasible. But crucial to utilise in in problems with sparse reward models \cite{}
+    \item \textbf{Exploitation:}
+    When the agent prioritises short-term, immediate rewards by exploiting its current knowledge. For example, taking an agent playing a video game; if a high score was found the agent might be unaware that a higher score can be achieved with a different set of moves. 
+  \end{enumerate}
+
+  The trade-offs must be balanced between the two in any RL algorithm or model while considered sampling efficiencies and ease of training \cite{liu2019simpleexplorationsampleefficient}. To relate it back to a robotics example, too much exploration might lead to inefficient training and instability; while too much reliance on exploitation might lead to suboptimal behaviours in the movement of a robot executing a task. 
+
+  Some common strategies are:
+  \begin{itemize}
+    \item $\epsilon$-Greedy:
+    \item Decay $\epsilon$-Greedy:
+    \item Upper Confidence Bound (UCB):
+    \item Thompson Sampling
+    \item Intrinsic Motivation (Curiosity-Driven Exploration):
+    \todo{find sources and confirm and give quick details about pros/cons?}
+  \end{itemize}
+  
+  Along with this widespread use and elemental challenges, comes differing methods of utilising the RL framework. The likes of which can be broadly classified into two types: \textbf{Model-Based} and \textbf{Model-Free}.
   
   \subsection{Model-Based RL}
   Model based approaches involve methods of creating an internal model and representation of the state the agent is interacting with. It usually involves two main steps: learning the dynamics of the model, then planning and learning within it \cite{MAL-086}. These models have underlying principals of the Markov Decision Process.
