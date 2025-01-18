@@ -38,14 +38,39 @@ And an interesting side product is the reward function that the model predicts a
 
 However, there are also drawbacks. One of the most prominent being the solution complexity disproportionately grows compared tot eh problem size \cite{ARORA2021103500}. each iteration is dominated by the complexity of solving the underlying MDP with the currently learnt reward function, which is polynomial in size of its parameters. Which are exponential in the number of dimensions of the state vector. On top of this as the problem size increases the sample complexity must also increase, meaning the expert should cover more trajectories in the training set for sufficient coverage of the state space and the optimal prediction of the underlying reward.
 
-\section{IL in Practice}
 
-\todo{do this section, mention robotics etc but also hint few-shot learning to be covered later in related work maybe if not just fo here, in-the-wild learning}
+\section{IL in Robotics}
+\todo[color=red]{REMOVE}
+Similar to RF, the applications of IL can be quite wide. However, for our purposes areas concerning robotics are the most important.
+\todo{not sure about including few-shot, human interactive learning, self-supervised etc here? maybe should be in related work??K}
 
+
+\section{Imitation or Reinforcement?}
+As explored until here, both of these learning system break into multiple branches within themselves and have differing qualities which must be matched with the task to perform the learning as efficiently and optimally as possible. Here is the highlighted strengths and use cases:
+
+% make "h!" if this causes issues
+\begin{table}[h!]
+  \centering
+    \begin{tabularx}{\textwidth}{|X|X|}
+    \hline
+    \textbf{Reinforcement Learning} & \textbf{Imitation Learning} \\
+    \hline
+    Interacts with real environment & Quicker learning with expert demonstrations \\
+    Suitable for autonomous exploration tasks & No need to design a reward function \\
+    Can be unstable or slow to converge & Limited by quality of expert data \\
+    Adaptable to diverse tasks & Possibility of bad generalisations with unseen data, constrained to experts' guidance \\
+    \hline
+    \end{tabularx}
+\end{table}
+\todo{not sure amybe remove the table}
+
+Therefore, while they each offer unique advantages, they also come with their own limitations. While RL allows for breadth in exploration of the problem, IL allows speedy learning but is coupled critically to the quality and quantity or those demonstrations. 
+
+However, there are mixed approaches aiming to combing the strengths of these methods while aiming to mitigate some of their individual weaknesses.
+\todo[color=green]{check! IRL is IRL a hybrid approach?}
 
 \subsection{Hybrid Approaches}
-\todo{sohuld this be under IL, maybe just a section?}
-Building on top of these ideas of IL and RL, there are also hybrid approaches that spawn from the combination of some ideas outlined earlier
+
 
 \subsubsection{Offline Reinforcement Learning}
 This ideas extends the \emph{data-driven} paradigm of IL and composes it with traditional RL approaches. As opposed to Online Reinforcement Learning, which iteratively collects experience and interacts with a given environment which is then used to improve the policy for the next episodes of iteration. This can be impractical due to data collection being costly (e.g. in robotics and healthcare domains) and sometimes dangerous (like autonomous driving). 
@@ -54,3 +79,8 @@ So offline RL, relies on previously collected data instead of fresh environmenta
 
 \subsubsection{Fighting Distributional Shifts: DAgger}
 Another interesting solution to the problem mentioned above \ref{para:covariate-shift} is the Dataset Aggregation (DAgger) \cite{ross2011reductionimitationlearningstructured}. \todo{explain what dagger does to fight covariate shifts}
+
+\subsubsection{Generative Adversarial Imitiatl Learning}
+\cite{ho2016generativeadversarialimitationlearning}
+
+\subsubsection{Deep Q Learning from Demonstrations (DQLfD)}
