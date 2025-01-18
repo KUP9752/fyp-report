@@ -127,8 +127,21 @@ Therefore, choice of camera model significantly affects how a robot can perceive
     One of the trajectories that can be taken in improving such static models is to take inspiration from what makes humans good visual learners. We also face issues like occlusions in day-to-day life and one advantage we have is that our vision is \textbf{active.}
     
   \subsection{Active Vision (AV)}
+    Physical robots, by actively controlling their cameras \cite{Aloimonos1988}, as well as using attention and focus mechanisms to identify the relevant parts of the environment. This, by introducing another level of decision making in the form of where and what to perceive, enables the robot to move and act more intelligently within the space provided. This approach is mostly beneficial in applications such as: autonomous navigation, multi-robot control and human-robot interactions. \cite{breazeal2001hri}
     
-    Physical robots, by actively controlling their cameras \cite{Aloimonos1988}, as well as using attention and focus mechanisms to identify the relevant parts of the environment. This, by introducing another level of decision making in the form of where and what to perceive enables the robot to move and act more intelligently within the space it is given.
+    \subsection{Principles of Active Vision}
+    Traditional static vision enhanced by incorporating camera and viewpoint optimisations into the perception systems. Some principles include:
+    \begin{itemize}
+      \item \textbf{Gaze Control:} This is the fundamental idea of active vision. Move the camera and the viewpoint, (ideally) to regions of interest.
+      \item \textbf{Next-Best-View Planning:} Strategically adjusting the camera to maximise the visual information the robot acquires. They often use \emph{attention mechanisms} which ensure they focus on the specific items or areas \cite{Burusa_2024} while ignoring the other cluttering information in the scene. 
+      \item \textbf{Task-Driven Perception:} Optimising the visual input to the task at hand by using methods like \emph{next-best-pose} to ensure the robot stays focused on task-specific manipulations.
+    \end{itemize}
+    Some combinations of these fundamental ideas, fitting them to the use-case means our robot can acquire better observations of the space instead of relying on prior human knowledge to strategically pre-place the camera where it would most benefit the task, or later external manipulations, such as, researcher figuring out semi-manually where a better pose would be during testing and moving the camera between sets of tests.
+    \todo{not sure if this reads as I want it}
+
+  \subsection{Active Vision in Practice}
+  \todo{applications and methods}
+  \subsection{Challenges and Lead onto related work}
+  \todo{this might even be a subsubsection of above}
+
     
-    \subsection{AV Beneficiary Tasks}
-    \todo{surely nothing else here boil down to related work?}
