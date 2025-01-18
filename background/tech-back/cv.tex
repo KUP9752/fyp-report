@@ -1,0 +1,58 @@
+\section{Computer Vision in Robotics}
+On top of the various training and learning algorithms, another cornerstone of fully autonomous robot movement is computer vision. Through the integration of visual sensors (and possibly others to support and reinforce this perception) and advanced image processing techniques, robots can be taught to identify surroundings and make informed decisions. 
+
+Although autonomisation is possible without vision, having a generalisable view of an environment or task allows the robots actions to also be generic executors. Take for example a factory robot assembling cars. It can be efficiently made automatic without any complicated models, and with just a simple algorithm. However this means that the environment (i.e the car parts, and maybe the work-area layout) must be presented in identical configurations for each episodic repetition of the task.
+As the focus in robotics is shifting towards generic dynamically moving robots, adapting to their environments, vision becomes an inevitable sending medium.
+
+\subsection{The Camera Model}
+Camera models are essential for vision. As us humans perceive the world in an analogue manner through light, the robot must also be able to interpret its surroundings the same way. A \emph{camera} is a device that captures light in a scene and a \emph{camera model} is therefore defined to be the how that analogue information is mapped onto a 2D coordinates in a mathematical manner \cite{zhang2021cameramodels}. 
+
+An essential process when using a camera is calibration. This is required so that we can normalise what the robot ``sees'' and using some pre-defined criteria (such as a known object or pattern) so that we can be assured the information the camera provides is within a specified degree of confidence. This uncertainty range should be as low as possible as tasks like localisation, mapping and object interactions in robotics usually require precise camera measurements.
+
+While calibrating we need to have some idea of physical properties of the camera (\emph{intrinsic}) and information about the mappings of the scene (\emph{extrinsic}).
+
+\subsubsection{Intrinsic Parameters}
+\label{subsubsec:intrinsic}
+
+These cover the internal characteristics of the camera, and how the captured three dimensional (3D) world data will be projected down onto the two dimensional (2D) image plane.
+Some important parameters are:
+
+\begin{itemize}
+  \item \textbf{Focal Length ($f$):} The distance netween the camera lens and the image sensor. Determines field of view (FOV) and required for scaling the scene.
+  \item \textbf{Principal Point (c):} Point of intersection for the optical axis and image plane. Usually at the centre of the image.
+  \item \textbf{Skew (s):} Non-orthogonality factor of the sensor axes of the camera. (Often assumed to be zero.)\todo{cite or remove?}
+  \item \textbf{Distortion Coefficients:} Some parameters for distortion correction. Important for camera model systems like cameras with fish-eye lenses \cite{king1989history}
+\end{itemize}
+
+\missingfigure{maybe a photo with all of these on it if that is possible}
+
+\subsubsection{Extrinsic Parameters}
+Extrinsic parameters represent the physical placement of the camera in the scenes. Such as the position and orientation of the camera in the scene. Using these values we can map  3D representation of the world the camera sees (which is in world coordinates) into the camera coordinate system.
+\\
+
+\subsection {The Pin-Hole Camera}
+One of the most foundational and widely used models to describe this calibration is the pin-hole (or the  \emph{projective}) camera model. 
+
+\subsubsection{Mathematics Behind Pin-Hole}
+The light passes through a single point, called the camera centre, $C$, before it is projected onto the 2D image plane (giving the name pin-hole). 
+% // TODO\missingfigure{include classic image, steal from https://www.oreilly.com/library/view/programming-computer-vision/9781449341916/ch04.html#:~:text=The%20pin-hole%20camera%20model%20(or%20sometimes%20projective%20camera%20model,a%20dark%20box%20or%20room.
+% }
+A 3D point $\textbf{X}$ is projected onto image point $\textbf{x}$ using the equation:
+\[\lambda \textbf{x} = P\textbf{X}\]
+where $P$ is the a 3x4 matrix called the camera (or \emph{projection}) matrix and $\textbf{X}$ is 1x4 and has four elements in homogenous coordinates, \(\textbf{X} = [x, y, z, w]\) and $\lambda$ is the inverse depth of the 3D point. Which can be needed if we want all coordinates to be homogenous with the last value ($w$) normalised to $1$.
+
+The Camera Matrix, P can will all calibration values for the camera. so:
+\[P = K \left[R \mid t\right] \]
+
+R is the (3x3) rotational matrix describing the orientation of the camera, and t a (3x1) translational vector describing the position of C.
+Also the intrinsic calibration matrix, K, will encode camera attributes discussed above.
+\[
+  K = 
+  \begin{bmatrix}
+    \alpha f & s & c_x \\
+    0 & f & c_y \\
+    0 & 0 & 1
+  \end{bmatrix}
+\]
+
+Where the values are from \ref{subsubsec:intrinsic} and $\alpha$ is the aspect ratio used for non-square pixel elements (usually safe to assume $a=1$).

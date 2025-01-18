@@ -12,7 +12,7 @@
 
 
 \subsection{Behavioural Cloning (BC)}
-\label{subseq:bc}
+\label{subsec:bc}
  Behavioural Cloning (BC) approaches achieve this goal by  mimicking the action given to it by training a model that predicts the function between the state and the actions taken  \cite{pomerlau1991neco.1991.3.1.88, ross2011reductionimitationlearningstructured}. The expert behaviour will be recorded as a set of demonstrations (or \emph{trajectories} for a moving robot) $\tau^* = \lbrace(s_i^*, a_i^*)\rbrace_{i = 0}^N$ (for $N$ total demonstrations). Where the demonstrations are state-action pairs and \emph{$*$} meaning \emph{expert or optimal}.
  Then using supervised learning methods and treating the demonstrations as the training \todo{and test?} data we can predict a policy $\pi_\theta\left(a | s\right)$ along with a loss function $L \left( a_i^*, \pi_\theta\left(s_i^*\right) \right)$ \todo{loss function is typically MSE or cross-entropy loss for discrete actions} which we can minimise to extract the optimal policy. 
 
@@ -25,7 +25,8 @@
 \subsection{Inverse Reinforcement Learning (IRL)}
 Building on top of mimicking action, Inverse Reinforcement Learning (IRL) aims to recover the underlying reward function that the expert is unknowingly optimising for in the demonstrations. So once the reward function is learnt agent can optimise for it and derive the required optimal policy for the task.
 
-As before in \ref{subseq:bc}, this method will be provided the expert demonstrations $\tau^*$. Although, this time the model will assume the expert is acting according to some unknown reward function $R\left(s, a\right)$. And differently to BC, IRL methods aim to estiamte this reward function which can later be used to derive the optimal policy.
+ 
+As before in \ref{subsec:bc}, this method will be provided the expert demonstrations $\tau^*$. Although, this time the model will assume the expert is acting according to some unknown reward function $R\left(s, a\right)$. And differently to BC, IRL methods aim to estiamte this reward function which can later be used to derive the optimal policy.
 
 \todo{ examples -> Maximum entropy IRL and GAIL Ho 2016}
 
