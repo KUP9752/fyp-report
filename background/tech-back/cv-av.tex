@@ -116,6 +116,7 @@ Therefore, choice of camera model significantly affects how a robot can perceive
       Within real life dynamic environments, on top of the lighting changes, object are often partially or sometimes fully occluded from where the robot might be placed or moving in the environment. 
       One of the simple solutions to this is to introduce multiple views for the robot. Similar in idea to \emph{n-view} from \ref{subsubsec:nview}, having more cameras, usually some around the scene and some on different parts of a robot (e.g. wrist-mounted, head-mounted, mounted around the scene \ldots) allows for robustness against occlusions and introduce multiple different angles for efficiency in learning. 
       However, one big drawback is that the state space can easily explode increasing training times and inferring speeds. On top of that, depending on the task and the robot multi viewpoint systems might not be feasible, for example, the environment might not be as clearly defined, making the such cameras an impossibility. There are other solutions such as temporal consistency \cite{lai2018learningblindvideotemporal} which can also be extended for us in robotics, such as here \cite{billington2007using, yang2021reactive}.
+      \todo{maybe some figures here from tasks like searching drawer etc.}
 
     \subsubsection{Real-Time Processing}
     Another convoluted problem in vision to robotics is that, novel advancements are usually resource intensive and then scaled down once proven. Many autonomous real-time  applications such as autonomous driving, drone navigation need provably quick decision making in order to be safe to use. Therefore computational bottlenecks or unoptimised approaches requiring time and computational resources might not immediately fit a robotics use case.
@@ -125,8 +126,9 @@ Therefore, choice of camera model significantly affects how a robot can perceive
     \\\\
     One of the trajectories that can be taken in improving such static models is to take inspiration from what makes humans good visual learners. We also face issues like occlusions in day-to-day life and one advantage we have is that our vision is \textbf{active.}
     
+  \subsection{Active Vision (AV)}
     
-
-
+    Physical robots, by actively controlling their cameras \cite{Aloimonos1988}, as well as using attention and focus mechanisms to identify the relevant parts of the environment. This, by introducing another level of decision making in the form of where and what to perceive enables the robot to move and act more intelligently within the space it is given.
     
-
+    \subsection{AV Beneficiary Tasks}
+    \todo{surely nothing else here boil down to related work?}
