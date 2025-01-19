@@ -32,9 +32,21 @@
 
   \subsubsection{Predictive Control}
   Instead of allowing random exploration of the viewpoint space we can also train models that predict the next best view using techniques such as Entropy-based viewpoint selection and Bayesian optimisations with the use of prior information such as the knowledge of the scene, object models' geometry and symmetries \cite{dhami2023prednbvpredictionguidednextbestview3d,breyer2022closedloopnextbestviewplanningtargetdriven}
-
-  \subsection{AV Applications}
-
-
+  \\\\
+  With these implementation strategies we can use active learning for tasks such as:
+  \begin{itemize}
+    \item \textbf{Dexterous manipulation robots} (i.e. grasping robots), where a eye-in-hand camera (maybe) coupled with depth sensing can refine its understanding of its surroundings and actively adjust views to avoid occlusions. 
+    \item \textbf{Autonomous navigation,} mobile robots can use approaches like Active SLAM \cite{} \todo{find the active SLAM paper again}, to map their environments and refine their understanding of it constantly. Some examples may be aerial drones continuously exploring and learning more about different regions \cite{}.
+    \item \textbf{Human-robot interactions,} social robots can be made to keep eye contact or learn to track human mannerisms from gestures and expressions to make them more realistic in interactions.
+  \end{itemize}
     
-  \subsection{Challenges and Lead onto related work}
+  \subsection{Challenges}
+  Despite all the discussed possibilities, Active Vision still remains fairly theoretical and unexplored compared to other areas of robotics. Although, the ideas have been floating around in computing circles for almost three decades, there are several challenges that need to be overcome for active vision to be viable for all its possible applications.
+  \begin{enumerate}
+    \item \textbf{Computational Complexity:}
+    \item \textbf{Sensor, Hardware and Environmental Limitations:}
+    \item \textbf{Integrations with other Sensing Mediums:}
+    \todo{complete this section}
+  \end{enumerate}
+
+  \todo{write the connecting bit here that transitions us to related work}
