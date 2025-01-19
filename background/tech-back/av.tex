@@ -1,0 +1,40 @@
+\section{Active Vision (AV)}
+    Physical robots, by actively controlling their cameras \cite{Aloimonos1988}, as well as using attention and focus mechanisms to identify the relevant parts of the environment. This, by introducing another level of decision making in the form of where and what to perceive, enables the robot to move and act more intelligently within the space provided. This approach is mostly beneficial in applications such as: autonomous navigation, multi-robot control and human-robot interactions. \cite{breazeal2001hri}
+    
+  \subsection{Principles of Active Vision}
+  Traditional static vision enhanced by incorporating camera and viewpoint optimisations into the perception systems. Some principles include:
+  \begin{itemize}
+    \item \textbf{Gaze Control:} This is the fundamental idea of active vision. Move the camera and the viewpoint, (ideally) to regions of interest.
+    \item \textbf{Next-Best-View Planning:} Strategically adjusting the camera to maximise the visual information the robot acquires. They often use \emph{attention mechanisms} which ensure they focus on the specific items or areas \cite{Burusa_2024} while ignoring the other cluttering information in the scene. These attention mechanisms can be \emph{spatial}, focusing on regions of interest; or \emph{temporal}: used with tracking moving objects.
+    \item \textbf{Task-Driven Perception:} Optimising the visual input to the task at hand by using methods like \emph{next-best-pose} to ensure the robot stays focused on task-specific manipulations.
+  \end{itemize}
+  Some combinations of these fundamental ideas, fitting them to the use-case means our robot can acquire better observations of the space instead of relying on prior human knowledge to strategically pre-place the camera where it would most benefit the task, or later external manipulations, such as, researcher figuring out semi-manually where a better pose would be during testing and moving the camera between sets of tests.
+  \todo{not sure if this reads as I want it}
+
+  \subsection{Back To Markov}
+  \subsubsection{Partially Observable Markov Decision 
+  \label{subsec:pomdp}
+  Processes (POMDPs)}
+  Adding on to the definitions above in \ref{subsec:mdp}, we now require \emph{Partially Observable Markov Decision Processes (POMDPs)} 
+  which is an extension of MDPs where it is defined as a 7-tuple \cite{thrun2002probabilistic,placed2023surveyactivesimultaneouslocalization}: 
+  \[\langle S, A, \mathcal{Z}, \xi_S, \xi_{\mathcal{Z}}, E, \gamma \rangle \]
+  
+  in addition to earlier, the state transition function \( \xi_S ~\colon~ S \times A \rightarrow \Pi\left(S\right)\) and $\Pi\left(S\right)$ is the space of probability density functions (pdf) over $S$. The observation space $\mathcal{Z}$, and the conditional likelihood of making any of those observations \(\xi_{\mathcal{Z}} ~\colon~ S \rightarrow \Pi\left(Z\right)\) where $\Pi\left(\mathcal{Z}\right)$ is the space of pdfs over $\mathcal{Z}$.
+  Differently to the fully observable case, agents here cannot reliably know their own true state. So, they maintain an internal \emph{belief} system (historic), $b_t\left(s_t\right)$ which represents the posterior probability over states at time $t$, given the available data collected up until that time. \(b_t\left(s_t\right) \triangleeq  \mathbb{P}\left(s_t \mid z_{1 \colon t}, a_{1 \colon t - 1}\right)\) where the given is the history, $h$.
+  \\\\
+  Introducing this belief system we can now model active tasks which rely on exploring the space for the optimal states and selecting an action that decreases the uncertainty in the belief state, leading to actively informed decison-making.
+
+  \subsection{Active Vision in Practice}
+  There are a number of ways to implement active vision in practice. Some common methods are:
+
+  \subsubsection{RL for Active Perception}
+    Framing this problem as a decision-making one, so: ``Where should the agent face to maximise reward'' allows us to come up with a policy which can learn where to look next, optimise the pose of the camera to minimise uncertainty in decisions and adapt to different environments \cite{rothbucher2011,zhangembodied}. Which can then be modelled as a POMDP system and solved as classical RL, giving us a way to control the gaze during a tasks execution.
+
+  \subsubsection{Predictive Control}
+  Instead of allowing random exploration of the viewpoint space we can also train models that predict the next best view using techniques such as Entropy-based viewpoint selection and Bayesian optimisations with the use of prior information such as the knowledge of the scene, object models' geometry and symmetries \cite{dhami2023prednbvpredictionguidednextbestview3d,breyer2022closedloopnextbestviewplanningtargetdriven}
+
+  \subsection{AV Applications}
+
+
+    
+  \subsection{Challenges and Lead onto related work}

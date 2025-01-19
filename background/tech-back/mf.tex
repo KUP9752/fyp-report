@@ -3,6 +3,7 @@
   In scenarios involving autonomous acting, the capability of a an robot to reason and navigate complex problems or dynamic environments plays a central role. So in any RL system the agent must make a sequence of decisions that impact later outcomes. Markov Decision Processes (MDPs) provide a mathematical framework for modelling decisions in environments where the probabilistic outcomes are influenced by actions of such an agent. A formally defined MDP will have the following parts \cite{silver2015}:
 
 \subsection{Markov Decision Processes}
+  \label{subsec:mdp}
   \subsubsection{State, S}
     The system must be able to process all different configurations of the environment. So the state will encapsulate the surroundings through raw sensory inputs (e.g. images, force sensors) in a high-level representation and will capture all relevant information available \cite{Sutton1998} which might be needed to make an informed decision at a particular time step.
 
@@ -28,7 +29,7 @@
       P_{n1} & \cdots & P_{nn}
     \end{bmatrix}
     \]
-    where each row of the matrix sums up to 1, due to the nature of probabilities. A tuple of a set of states and a transition matrix/function \(\llangle S, P \rrangle\) make up a \textbf{Markov Process} (or Markov Chain)
+    where each row of the matrix sums up to 1, due to the nature of probabilities. A tuple of a set of states and a transition matrix/function \(\langle S, P \rangle\) make up a \textbf{Markov Process} (or Markov Chain)
 
   \subsubsection{Actions, A}
     This is the set of all possible actions that are available to the robot in each state. Depending on the context of the task, actions can be discrete or continuous.
