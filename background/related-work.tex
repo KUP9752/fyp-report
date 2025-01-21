@@ -72,5 +72,18 @@ where $\mathcal{O}$ and $\mathcal{O}'$ represent the observation spaces at times
 Another important contribution here is the use of augmented trajectories again. Similar to \cite{papagiannis2024milesmakingimitationlearning}, demonstration trajectories are augmented in a \emph{viewpoint-aware} manner to expand the learning set by sampling the observations and discovering key frames. It does this while the viewpoint can be moved, meaning the samples getting generated between time frame $T_t$ and $T-{t+1}$ (where $T$ is a trajectory) can have different views, which aids the camera policy in progressive movements. This is done for keyframes for both camera movement and gripper pose, for the two policies.
 
 \subsubsection{Closed-Loop Next-Best-View Planning for Target-Driven Grasping}
-Similar in idea, \emph{Breyer et al.} explore yet another grasping task (although first-person-view this time) this time
+Similar in idea, \emph{Breyer et al.} explore yet another grasping task (although first-person-view this time) this time. They augment classic grasp synthesis tasks that are mostly reliant on deep learning approaches, which suffer depending on the visual information it has available. Similar to \emph{Wang et al.}, they interact with the environment in an asynchronous manner within a fixed rate. They determine the best candidates for grasping then compute the next-best-view with its associated information gain. 
+The information gain metric, allows the system to explore viewpoints in the neighbourhood of the current view and estimate what might be ideal for the grasping, so tis bridges the rewards of the two policies. This again is made possible through the assumption that a task is object dependent hence the model receives bounding boxes and the geometry of the subject of the task.
+
+However, the interesting takeaway from their system is an early stopping mechanisms, due to the nature of exploration and scan views multiple can be found with a thorough explorations. These stopping conditions include, timeouts (and due to time-framing, limited number of policy updates), minimum thresholding on the information gain so that no unnecessary exploration is done where  hte estimated IG might be lower; and finally, convergence, when the VGN (\todo{explain grasp network}) outputs converge the exploration will stop. 
+\todo{reread and have a look}
+
+
+Therefore, the importance of their research is highlighted in the robustness of their system and the balance they managed to strike between exploration and exploitation. 
+
 \todo{talk about attention and active perception}
+
+\subsection{Segue title}
+In summary, work in the field of active vision usually follows an attention metric which is guided by a reward system, which usually depends on some priors. The need for priors, although, can be mitigated by providing more demonstrations, this complicated the test setups and operations, as these must be manual demonstrations. Therefore, a common approach is to create augmented data and broaden the horizon of the agent through the exploration of that synthetic space.
+
+Combining these ideas shows us that active vision policy adjustments are not only possible during polichy execution but also very promising way to advance the field.
