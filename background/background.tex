@@ -13,11 +13,12 @@
 \chapter{Related Work}
   In this chapter we will discuss:
   \begin{enumerate}
-    \item papers
-    \item Vision-action robot manipulation:
-    \item Grasp Synthesis with AV Methods paper. Heuristic and ML (self-supervised and Q learning) approaches compares to other algorithms as well as real life most optimal solutions for evaluation.Q-learning performs worse in real life tests, mostly due to differences in the depth sensor acting differently. shows 3d heuristic performs better compared to ML and naive algorithmic approaches. ML is more sensitive to sensor noise so the heuristic approaches generalise better to the real world from simulations.
-    \item Closed-Loop NBV Planning for target-driven grasping. This paper talks about active exploration of the space, during test time. policies are already trained (system called MoveIt is used) at every it generates the best grasp candidate and the next best view along with the information gain. Then depending on the stopping criteria it will execute this task, or check the next-best-view found. Stopping criteria to balance exploration and exploitation. Example of exploration and reasoning to find the optimal pose, number 1 from 1.2 Objectives. Downsides is that it requires prior information about the target object's bounding box. Mostly heuristic I think
+    \item Current research in robotics with active vision and derivatives.
+    \item Some limitations of active vision it the current landscape.
+    \item How different techniques can be leveraged to fit full vision policies together
+    \item Some comparison of test-time and action-time vision\todo{wanted to do this, but might integrate this into plan or a segue into plan later}
+    % \item Grasp Synthesis with AV Methods paper. Heuristic and ML (self-supervised and Q learning) approaches compares to other algorithms as well as real life most optimal solutions for evaluation.Q-learning performs worse in real life tests, mostly due to differences in the depth sensor acting differently. shows 3d heuristic performs better compared to ML and naive algorithmic approaches. ML is more sensitive to sensor noise so the heuristic approaches generalise better to the real world from simulations.
+    % \item Closed-Loop NBV Planning for target-driven grasping. This paper talks about active exploration of the space, during test time. policies are already trained (system called MoveIt is used) at every it generates the best grasp candidate and the next best view along with the information gain. Then depending on the stopping criteria it will execute this task, or check the next-best-view found. Stopping criteria to balance exploration and exploitation. Example of exploration and reasoning to find the optimal pose, number 1 from 1.2 Objectives. Downsides is that it requires prior information about the target object's bounding box. Mostly heuristic I think
   \end{enumerate}
 \input{background/related-work}
 
-\todo{note for evaluation, section on real-life testing and simulation tsting separately, to observe potential differences}
