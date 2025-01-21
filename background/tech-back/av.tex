@@ -22,7 +22,9 @@
   in addition to earlier, the state transition function \( \xi_S ~\colon~ S \times A \rightarrow \Pi\left(S\right)\) and $\Pi\left(S\right)$ is the space of probability density functions (pdf) over $S$. The observation space $\mathcal{Z}$, and the conditional likelihood of making any of those observations \(\xi_{\mathcal{Z}} ~\colon~ S \rightarrow \Pi\left(Z\right)\) where $\Pi\left(\mathcal{Z}\right)$ is the space of pdfs over $\mathcal{Z}$.
   Differently to the fully observable case, agents here cannot reliably know their own true state. So, they maintain an internal \emph{belief} system (historic), $b_t\left(s_t\right)$ which represents the posterior probability over states at time $t$, given the available data collected up until that time. \(b_t\left(s_t\right) \triangleeq  \mathbb{P}\left(s_t \mid z_{1 \colon t}, a_{1 \colon t - 1}\right)\) where the given is the history, $h$.
   \\\\
-  Introducing this belief system we can now model active tasks which rely on exploring the space for the optimal states and selecting an action that decreases the uncertainty in the belief state, leading to actively informed decison-making.
+  Introducing this belief system we can now model active tasks which rely on exploring the space for the optimal states and selecting an action that decreases the uncertainty in the belief state, leading to actively informed decision-making.
+
+  \todo{MAYBE? note on synchronoous and asynchronous active vision from the "observe then act" paper}
 
   \subsection{Active Vision in Practice}
   There are a number of ways to implement active vision in practice. Some common methods are:
