@@ -1,6 +1,6 @@
 \section{Mathematical Foundations}
 
-  In scenarios involving autonomous acting, the capability of a an robot to reason and navigate complex problems or dynamic environments plays a central role. So in any RL system the agent must make a sequence of decisions that impact later outcomes. Markov Decision Processes (MDPs) provide a mathematical framework for modelling decisions in environments where the probabilistic outcomes are influenced by actions of such an agent. A formally defined MDP will have the following parts \cite{silver2015}:
+  In scenarios involving autonomous acting, the capability of a an robot to reason and navigate complex problems or dynamic environments plays a central role. So in any RL system the agent must make a sequence of decisions that impact later outcomes. Markov Decision Processes (MDPs) provide a mathematical framework for modelling decisions in environments where the probabilistic outcomes are influenced by actions of such an agent. A formally defined MDP will have the following parts:
 
 \subsection{Markov Decision Processes}
   \label{subsec:mdp}
@@ -32,19 +32,19 @@
     where each row of the matrix sums up to 1, due to the nature of probabilities. A tuple of a set of states and a transition matrix/function \(\langle S, P \rangle\) make up a \textbf{Markov Process} (or Markov Chain)
 
   \subsubsection{Actions, A}
-    This is the set of all possible actions that are available to the robot in each state. Depending on the context of the task, actions can be discrete or continuous.
+    This is the set of all possible actions that are available to the robot in each state. Depending on the context of the task, actions can be discrete or continuous. Related back to robotics: state-based systems like RL for solving games will be discrete, while the movement of a physical robot is generally a continuous action.
 
   \subsubsection{Reward Function, R}
-    This is the scalar feedback signal. It ensures that the agent's learning is based on steps it is taking over time, so $R_t$ is how well the agent is doing at step $t$. It is defined as:
+    A scalar feedback signal which ensures that the agent's learning is based on steps it is taking over time, so $R_t$ is how well the agent is doing at step $t$. It is defined as:
 
     \[R_s = \mathbb{E} \left[R_{t+1} \mid S_t = s\right]\]
     
     This allows the robot to eventually converge to a solution that maximises the cumulative rewards (the \emph{returns}) for the actions it has taken. 
   
   \subsubsection{Discount Factor, $\gamma$}
-    This is mechanism to control the importance of future rewards. Sampled as: \(\gamma \in \left[0, 1\right]\), means that immediate reward is prioritised and while reward form longer sequence of actions decays, avoiding infinite cycles in Markov Chains.
+    Mechanism to control the importance of future rewards. Sampled as: \(\gamma \in \left[0, 1\right]\), means that immediate reward is prioritised while reward form longer sequence of actions will decay in priority. Helping avoid infinite cycles in Markov Chains.
 
-    Combining the reward function and the discount factor we can defined the \emph{return}, $G_t$ as the total discounted reward from time-step $t$:
+    Combining the reward function and the discount factor we can define the \emph{return}, $G_t$ as the total discounted reward from time-step $t$:
 
     \[ 
     \begin{aligned}
@@ -57,7 +57,7 @@
     
     
   \subsubsection{Policy, $\pi$}
-    The higher-level goal of any RL system is to learn an optimal policy \(\pi \left( a \mid s\right) = \mathbb{P} \left[A_t = a \mid S_t = s\right]\) which aims to maximise the return. Policies fully define the behaviour of the agent. As seen by the function's type \(\pi: S \rightarrow A \) they only depend on the current state and are time independent \( A_t \sim \pi\left( \cdot \mid S_t\right), \forall t > 0 \)
+    The higher-level goal of any RL system is to learn an optimal policy \(\pi \left( a \mid s\right) = \mathbb{P} \left[A_t = a \mid S_t = s\right]\) which aims to maximise the return. Policies fully define the behaviour of the agent. As seen by the function's type \(\pi: S \rightarrow A \); they only depend on the current state and are time independent \( A_t \sim \pi\left( \cdot \mid S_t\right), \forall t > 0 \).
     
   \subsubsection{Value Functions}
     On top of these we define two value function, \emph{state-value}: the expected return starting from state $s$, and then following policy $\pi$:
@@ -74,8 +74,7 @@
 
     \[q_* \left(s, a\right) = \underset{\pi}{\max} \ q_\pi \left(s, a\right)\]
     
-    The optimal means the best possible performance can be achieved in the MDP and it can be considered ``solved'' once we find these optimal functions.
+    The optimal means the best possible performance can be achieved in the MDP and it can be considered ``solved'' once we find these optimal functions. Solutions to these will help estimate a mapping for a robot to its best-case movement within its current state.
 
-    \todo{should I define the bellman function?}
 
     
