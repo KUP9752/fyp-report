@@ -51,5 +51,27 @@ As we are mainly concerned about active vision our tasks should include:
 \end{enumerate}
 
 \subsubsection{In Simulation}
-These tasks might look like the following.
+These tasks might look like the following in Figure \ref{fig:threesims}.
 \todo{enter some pictures from the siumulation for a basic nav, grasp and searching task}
+
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/eval-plan/reach-sim.png}
+    \caption{Simple Simulated reaching task made in pybullet where the green orb is the target area, taken from \cite{aumjaud2020reinforcement}}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.32\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{assets/eval-plan/grasp-sim.png}
+      \caption{An example grasping task from RLBench \cite{james2019rlbenchrobotlearningbenchmark}}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.32\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{assets/eval-plan/search-sim.png}
+      \caption{An example searching task from \cite{liang2022searchbasedtaskplanninglearned}}
+  \end{minipage}
+  \caption{Three Possible simulation tests, easiest level with no occlusions}\label{fig:threesims}
+\end{figure}

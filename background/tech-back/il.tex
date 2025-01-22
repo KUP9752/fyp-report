@@ -73,11 +73,11 @@ This ideas extends the \emph{data-driven} paradigm of IL and composes it with tr
 So offline RL, relies on previously collected data instead of fresh environmental interaction \cite{levine2020offlinereinforcementlearningtutorial}. With help from advancements in deep learning, it has been made possible to create generalisable \emph{decision making engines} \cite{levine2020offlinereinforcementlearningtutorial} if sufficient prior data can be obtained.
 
 \subsubsection{Fighting Distributional Shifts: DAgger}
-Another interesting solution to the problem mentioned above \ref{para:covariate-shift} is the Dataset Aggregation (DAgger) \cite{ross2011reductionimitationlearningstructured}. \todo{explain what dagger does to fight covariate shifts}
+Another interesting solution to the problem mentioned above \ref{para:covariate-shift} is the Dataset Aggregation (DAgger) \cite{ross2011reductionimitationlearningstructured}. This is used to fight distribution shifts in standard BC \ref{sec:bc}. A policy is trained on expert demonstrations by because of the shift, there may be non-encountered states during deployment. So, DAgger iteratively collects new data; this new data, in the form or state-action pairs gets added to the training and gradually improves robustness of a policy against novel situations. Although, the constant expert supervision, while generating new data makes it costly for real-world applications; or where a algorithmic reward system is not in place.
 
 \subsubsection{Generative Adversarial Imitation Learning (GAIL)}\label{sec:gail}
 
 GAIL \cite{ho2016generativeadversarialimitationlearning}  takes inspiration form Generative Adversarial Networks (GANs) \cite{goodfellow2014generativeadversarialnetworks} and can create model-free algorithms for IL in robots. GANs are deep learning models for generative tasks, they are mainly given a distribution of data and can generate synthetic data from following that distribution. For IL, they are useful for creating useful samples for self-supervision.
 
-\subsubsection{Deep Q Learning from Demonstrations (DQLfD)}
-\todo{not sure, remove?}
+% \subsubsection{Deep Q Learning from Demonstrations (DQLfD)}
+% \todo{not sure, remove?}
