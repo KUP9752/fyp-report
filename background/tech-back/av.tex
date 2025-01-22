@@ -1,15 +1,16 @@
 \section{Active Vision (AV)}
-    Physical robots, by actively controlling their cameras \cite{Aloimonos1988}, as well as using attention and focus mechanisms to identify the relevant parts of the environment. This, by introducing another level of decision making in the form of where and what to perceive, enables the robot to move and act more intelligently within the space provided. This approach is mostly beneficial in applications such as: autonomous navigation, multi-robot control and human-robot interactions. \cite{breazeal2001hri}
+    Physical robots, by actively controlling their cameras \cite{Aloimonos1988}, as well as using attention and focus mechanisms; can identify the relevant parts of an environment. This, by introducing another level of decision making in the form of: \textbf{where} and \textbf{what} to perceive, enables the robot to move and act more intelligently within the space provided. This approach is mostly beneficial in applications such as: autonomous navigation, multi-robot control and human-robot interactions. \cite{breazeal2001hri}.
+    \todo[color=green]{more citations for the examples?}
     
   \subsection{Principles of Active Vision}
-  Traditional static vision enhanced by incorporating camera and viewpoint optimisations into the perception systems. Some principles include:
+  Traditional static vision can be enhanced by incorporating camera and viewpoint optimisations into the perception systems. Some principles include:
   \begin{itemize}
     \item \textbf{Gaze Control:} This is the fundamental idea of active vision. Move the camera and the viewpoint, (ideally) to regions of interest.
     \item \textbf{Next-Best-View Planning:} Strategically adjusting the camera to maximise the visual information the robot acquires. They often use \emph{attention mechanisms} which ensure they focus on the specific items or areas \cite{Burusa_2024} while ignoring the other cluttering information in the scene. These attention mechanisms can be \emph{spatial}, focusing on regions of interest; or \emph{temporal}: used with tracking moving objects.
-    \item \textbf{Task-Driven Perception:} Optimising the visual input to the task at hand by using methods like \emph{next-best-pose} to ensure the robot stays focused on task-specific manipulations.
+    \item \textbf{Task-Driven Perception:} Optimising the visual input to the task at hand by using methods like \emph{next-best-pose} to ensure the robot stays focused on task-specific manipulations, such as keeping its gripped in the correct pose before reaching an object.
   \end{itemize}
-  Some combinations of these fundamental ideas, fitting them to the use-case means our robot can acquire better observations of the space instead of relying on prior human knowledge to strategically pre-place the camera where it would most benefit the task, or later external manipulations, such as, researcher figuring out semi-manually where a better pose would be during testing and moving the camera between sets of tests.
-  \todo{not sure if this reads as I want it}
+
+  Some combinations of these fundamental ideas, fitting them to the use-case means a robot can acquire better observations of the space instead of relying on prior human knowledge to strategically pre-place the camera where it would most benefit the task.
 
   \subsection{Back To Markov}
   \subsubsection{Partially Observable Markov Decision 
@@ -24,13 +25,15 @@
   \\\\
   Introducing this belief system we can now model active tasks which rely on exploring the space for the optimal states and selecting an action that decreases the uncertainty in the belief state, leading to actively informed decision-making.
 
-  \todo{MAYBE? note on synchronoous and asynchronous active vision from the "observe then act" paper}
-
+  
   \subsection{Active Vision in Practice}
-  There are a number of ways to implement active vision in practice. Some common methods are:
+  There are a number of ways to implement active vision in practice. The two main temporal aspects are \emph{synchronous} and \emph{asynchronous} vision-action models \cite{divyaHandEyeCoordsination}. Synchronous models need to make real-time decisions on the next action based on the current observation information. This can be challenging in practice as the sensing mediums must be well coordinated and the observation may not contain informative information yet, causing issues with capabilities of a model
+
+  A more realistic model is the asynchronous one. It is more human-like in the sense that decisions in movement and viewpoint usually do not occur simultaneously, although quickly we usually adjust our views then act. So this creates a nice vision to action pipeline that can be more effective for agents learning active vision policies.
+  
 
   \subsubsection{RL for Active Perception}
-    Framing this problem as a decision-making one, so: ``Where should the agent face to maximise reward'' allows us to come up with a policy which can learn where to look next, optimise the pose of the camera to minimise uncertainty in decisions and adapt to different environments \cite{rothbucher2011,zhangembodied}. Which can then be modelled as a POMDP system and solved as classical RL, giving us a way to control the gaze during a tasks execution.
+    Framing this problem as a decision-making one, so: ``Where should the agent face to maximise reward?'' allows us to come up with a policy which can learn where to look next, optimise the pose of the camera to minimise uncertainty in decisions and adapt to different environments \cite{rothbucher2011,zhangembodied}. Which can then be modelled as a POMDP system to then be solved as classical RL, giving us a way to control the gaze during a tasks execution.
 
   \subsubsection{Predictive Control}
   Instead of allowing random exploration of the viewpoint space we can also train models that predict the next best view using techniques such as Entropy-based viewpoint selection and Bayesian optimisations with the use of prior information such as the knowledge of the scene, object models' geometry and symmetries \cite{dhami2023prednbvpredictionguidednextbestview3d,breyer2022closedloopnextbestviewplanningtargetdriven}
@@ -38,18 +41,17 @@
   With these implementation strategies we can use active learning for tasks such as:
   \begin{itemize}
     \item \textbf{Dexterous manipulation robots} (i.e. grasping robots), where a eye-in-hand camera (maybe) coupled with depth sensing can refine its understanding of its surroundings and actively adjust views to avoid occlusions. 
-    \item \textbf{Autonomous navigation,} mobile robots can use approaches like Active SLAM \cite{} \todo{find the active SLAM paper again}, to map their environments and refine their understanding of it constantly. Some examples may be aerial drones continuously exploring and learning more about different regions \cite{}.
+    \item \textbf{Autonomous navigation,} mobile robots can use approaches like Active SLAM \cite{s23198097}, to map their environments and refine their understanding of it constantly. Some examples may be aerial drones continuously exploring and learning more about different regions \cite{drones6040085}.
     \item \textbf{Human-robot interactions,} social robots can be made to keep eye contact or learn to track human mannerisms from gestures and expressions to make them more realistic in interactions.
   \end{itemize}
     
   \subsection{Challenges}
-  Despite all the discussed possibilities, Active Vision still remains fairly theoretical and unexplored compared to other areas of robotics. Although, the ideas have been floating around in computing circles for almost three decades, there are several challenges that need to be overcome for active vision to be viable for all its possible applications.
+  Despite all the discussed possibilities, Active Vision still remains fairly theoretical and unexplored compared to other areas of robotics. Although, the ideas have been floating around in computing circles for almost three decades, there are several challenges that need to be overcome for active vision to be viable for all its possible applications. These issues include:
   \begin{enumerate}
-    \item \textbf{Computational Complexity:}
-    \item \textbf{Sensor, Hardware and Environmental Limitations:}
-    \item \textbf{Integrations with other Sensing Mediums:}
-    \todo{complete this section}
+    \item \textbf{Computational Complexity}
+    \item \textbf{Sensor, Hardware and Environmental Limitations}
+    \item \textbf{Integrations with other Sensing Mediums
+    }
   \end{enumerate}
-\todo{some few-shot is mentioned in cv.tex but sohuld it be here or explained further here?}
-  \todo{self supervision stuff here to be referenced later}
-  \todo{write the connecting bit here that transitions us to related work}
+
+  Although, these cannot be classified as \emph{solved} there are some approaches in tackling this active vision perspective of robotics which we will review in the next chapter.
