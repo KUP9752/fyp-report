@@ -1,5 +1,4 @@
-\section{Reinforcement Learning (RL)}
-\label{sec:rl}
+\section{Reinforcement Learning (RL)}\label{sec:rl}
   One of the tried and tested methods of end-to-end learning approaches is a branch under machine learning called \emph{Reinforcement Learning (RL)}. 
 
   \missingfigure{add the classic agent state reward action diagram}
@@ -37,7 +36,7 @@
   Along with this widespread use and elemental challenges, comes differing methods of utilising the RL framework. The likes of which can be broadly classified into two types: \textbf{Model-Based} and \textbf{Model-Free}.
   
   \subsection{Model-Based RL}
-  Model based approaches involve methods of creating an internal model and representation of the state the agent is interacting with. It usually involves two main steps: learning the dynamics of the model, then planning and learning within it \cite{MAL-086}. These models have underlying principals of the Markov Decision Process (\ref{subsec:mdp}).
+  Model based approaches involve methods of creating an internal model and representation of the state the agent is interacting with. It usually involves two main steps: learning the dynamics of the model, then planning and learning within it \cite{MAL-086}. These models have underlying principals of the Markov Decision Process (\ref{sec:mdp}).
 
   Main power of this approach comes from its simulated core. As fewer real interactions can allow it to have a higher sample efficiency \cite{liu2021DRLminireview,wu23robotLearn}, meaning the amount of experience needed (mostly relating to time spent) to learn optimal policies is quite low, and good policies can be quickly learnt.
 
@@ -49,12 +48,7 @@
   \todo{verify this is true and check some sources}
 
   \subsubsection{Applications in Robotics}
-  These methods can be used for motion planning, trajectory optimisation and learning from limited interactions (few-shot learning?? \todo[color=red]{not sure abt few-shotm and should this part also be shortened removed?})
-    \begin{itemize}
-      \item Monte Carlo Tree Search (MCTS): Used in planning based systems.
-      \item Probabilistic Inference for Learning Control (PILCO): Similar uses but reduces sample complexity \cite{Deisenroth2011PILCO}.
-      \item MuZero: Combines model-based approaches with deep learning. \todo[color=green]{cite here}
-    \end{itemize}
+  These methods can be used for motion planning, trajectory optimisation and learning from limited interactions, some common methods are: Monte Carlo Tree Search (MCTS),Probabilistic Inference for Learning Control (PILCO) \cite{Deisenroth2011PILCO}, MuZero: Combines model-based approaches with deep learning.\todo[color=green]{cite here}
   
   \subsection{Model-Free RL}
   This collection of schemes attempt to learn a policy directly by trial and error, without explicitly modelling the environments dynamics. Usually preferred when the environment is too complex or too costly to model.
@@ -65,39 +59,24 @@
   \subsubsection{Value-Based}
     These techniques aim to learn the value of states (or an estimate for the value of states) and actions. So they learn the $v_\pi$ or $q_\pi$ function. which can then be used to extract the optimal policy $\pi_*$ for deciding the actions.
 
-    Such systems are mainly used for simple navigation tasks, basic motor control and arm reaching scenarios.
-
-    \begin{itemize}
-      \item Q-Learning (Off-Policy): Learns the optimal action-value function.
-      \item Deep Q-Network (DQN) (Off-Policy)
-      \item SARSA (On-Policy)
-      \todo[color=red]{check the correctness of the above and remove or not?}
-    \end{itemize}
+    Such systems are mainly used for simple navigation tasks, basic motor control and arm reaching scenarios. Some example methods are: Q-Learning [Off-Policy], Deep Q-Networks (DQN) [Off-Policy], SARSA [On-Policy] \todo{citations}
 
   \subsubsection{Policy-Based}
   This on the other hand learn a policy directly. Bypassing the need to learn the values of states or actions completely. This can be helpful if the state space and/or the action space are quite large. For example, if the action space was infinite, then value-based approaches would not be feasible as all actions must be tried to find the best, which makes directly learning the policy is the only possible approach.
 
-  These systems are for more complex control tasks, such as dexterous limb manipulation, robot hand grasping.
-
-    \begin{itemize}
-      \item REINFORCE (On-Policy)
-      \item Proximal Policy Optimisation (PPO) (On-Policy)
-      \item Trust Region Policy Optimisation (TRPO) (On-Policy)
-      \todo[color=green]{as before check and explain and cite}
-    \end{itemize}
+  These systems are for more complex control tasks, such as dexterous limb manipulation, robot hand grasping. Some exmaples are: REINFORCE [On-Policy], Proximal Policy Optimisation (PRO) [On-Policy], Trust Region Policy Optimisation (TRPO) [On-Policy] \todo{citations}
 
   \subsubsection{Actor-Teacher} 
-  \todo{definitely add this, hint at IL}
+  The main idea in this approach is the agent improves its policy from direct feedback from a \emph{teacher}, this teacher can be an external system that provides rewards or a complete manual system where the teacher is an ``expert human'' providing demonstrations (which goes into Imitation Learning, see \ref{sec:il}). Some common approaches are
+  \begin{itemize}
+    \item \textbf{Direct Action Supervision}: where the teacher suggest actions directly to the agent.
+    \item \textbf{Criticising Actions}: where the actions are suggested by the teacher.
+    \item \textbf{Shaped Rewards}: the teacher modifies the reward signal dynamically to encourage desirable behaviours.
+    \item \textbf{Curriculum Learning}: the teacher controls the difficulty of tasks over time to ease the learning of the agent.
+  \end{itemize}
   
-  \subsection{Hybrid Methods}
+  \subsubsection{Hybrid Approaches}
   Mixing the two together is also a viability, where the characteristics from each can be combined benefit from different guarantees each provides \cite{qu2020combiningmodelbasedmodelfreemethods}
-  \todo{definitely add more here}
-  \todo[color=red]{not sure about this chatgpt said: 
-  4. Hybrid Approaches
-  Hierarchical RL: Breaks complex tasks into sub-tasks (e.g., robot assembly tasks).
-  Curriculum Learning: Trains the robot on progressively harder tasks (e.g., training a legged robot to walk before running).
-  Multi-Agent RL: Used in swarm robotics and cooperative robotic tasks.}
-\\\\
   On top of the model dependence, the RL approach can be of two flavours:
 
   \subsection{On-Policy}
@@ -110,6 +89,6 @@
   In this case, the agent can utilise past experiences, regardless of the policy generated by the training. This recycling of information previously known makes the learning more efficient \cite{uehara2022reviewoffpolicyevaluationreinforcement}, as sample efficiency is increased.
   Having past experiences also means that the agent will need fewer exploration steps and less iterations because of these priors. Making this system efficient in deterministic environments \todo{not quite sure why, add here}
   
-  This however, brings instability in stochastic environments, and the the policy diverging due to incorporating outdated and possibly uninformative (at least at the present) data. Therefore, some sort of importance of older steps should be kept track of, and maybe even decayed like the discount factor from MDPs (\ref{subsec:mdp}) \todo{find evidence of decay, and link to earlier}
+  This however, brings instability in stochastic environments, and the the policy diverging due to incorporating outdated and possibly uninformative (at least at the present) data. Therefore, some sort of importance of older steps should be kept track of, and maybe even decayed like the discount factor from MDPs (\ref{sec:mdp}) \todo{find evidence of decay, and link to earlier}
   \\\\
   Both of these approaches can be combined with either \textbf{Model-Based} or \textbf{Model-Free} approaches. Because at the end of the day, making a good model is about picking the correct trade-offs that is relevant to the scenario of the problem we are attempting to solve.

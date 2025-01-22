@@ -13,10 +13,9 @@
   Some combinations of these fundamental ideas, fitting them to the use-case means a robot can acquire better observations of the space instead of relying on prior human knowledge to strategically pre-place the camera where it would most benefit the task.
 
   \subsection{Back To Markov}
-  \subsubsection{Partially Observable Markov Decision 
-  \label{subsec:pomdp}
-  Processes (POMDPs)}
-  Adding on to the definitions above in \ref{subsec:mdp}, we now require \emph{Partially Observable Markov Decision Processes (POMDPs)} 
+  \subsubsection{Partially Observable Markov Decision
+  Processes (POMDPs)}\label{sec:pomdp}
+  Adding on to the definitions above in \ref{sec:mdp}, we now require \emph{Partially Observable Markov Decision Processes (POMDPs)} 
   which is an extension of MDPs where it is defined as a 7-tuple \cite{thrun2002probabilistic,placed2023surveyactivesimultaneouslocalization}: 
   \[\langle S, A, \mathcal{Z}, \xi_S, \xi_{\mathcal{Z}}, E, \gamma \rangle \]
   
@@ -27,8 +26,7 @@
 
   
   \subsection{Active Vision in Practice}
-  There are a number of ways to implement active vision in practice. The two main temporal aspects are \emph{synchronous} and \emph{asynchronous} vision-action models \cite{divyaHandEyeCoordsination}. Synchronous models need to make real-time decisions on the next action based on the current observation information. This can be challenging in practice as the sensing mediums must be well coordinated and the observation may not contain informative information yet, causing issues with capabilities of a model
-  \label{subsubsec:asynch-synch}
+  There are a number of ways to implement active vision in practice. The two main temporal aspects are \emph{synchronous} and \emph{asynchronous} vision-action models \cite{divyaHandEyeCoordsination}. Synchronous models need to make real-time decisions on the next action based on the current observation information. This can be challenging in practice as the sensing mediums must be well coordinated and the observation may not contain informative information yet, causing issues with capabilities of a model\label{sec:asynch-synch}
 
   A more realistic model is the asynchronous one. It is more human-like in the sense that decisions in movement and viewpoint usually do not occur simultaneously, although quickly we usually adjust our views then act. So this creates a nice vision to action pipeline that can be more effective for agents learning active vision policies.
   

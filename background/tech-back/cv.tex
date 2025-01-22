@@ -11,8 +11,7 @@ An essential process when using a camera is calibration. This is required so tha
 
 While calibrating we need to have some idea of physical properties of the camera (\emph{intrinsic}) and information about the mappings of the scene (\emph{extrinsic}).
 
-\subsubsection{Intrinsic Parameters}
-\label{subsubsec:intrinsic}
+\subsubsection{Intrinsic Parameters}\label{sec:intrinsic}
 
 These cover the internal characteristics of the camera, and how the captured three dimensional (3D) world data will be projected down onto the two dimensional (2D) image plane.
 Some important parameters are:
@@ -58,7 +57,7 @@ Also the intrinsic calibration matrix, K, will encode camera attributes discusse
   f_x = \alpha f_y
 \]
 
-Where the values are from \ref{subsubsec:intrinsic} and $\alpha$ is the aspect ratio used for non-square pixel elements (usually safe to assume $a=1$).
+Where the values are from \ref{sec:intrinsic} and $\alpha$ is the aspect ratio used for non-square pixel elements (usually safe to assume $a=1$).
 
 A simple calibration method is to use a reference object, with known dimensions $dX and dY$. Then we can measure the distance from the camera to the object $dZ$. After obtaining the image we can measure the image plane size of our object $dx, dy$ in pixels and extract the focal point as:
 \missingfigure{add caluibration dots etc}
@@ -76,8 +75,7 @@ There are different lens models like the \emph{thin-lens} model which -opposing 
 Cameras providing different FOVs such as fish-eye or wide-angle cameras, for different degrees of vision. For example, 360-degree cameras for surveillance or autonomous driving. Where the distortion of the image must be corrected in processing.
 
 \subsubsection{Multiple Cameras}
-\emph{Stereo camera models} (Binocular vision) for depth measurement incorporation into the image. Two cameras which are a known distance apart can be used to perceive depth by computing the disparity between corresponding points in both images (triangulation) \cite{hamzah2016literature}. This can also be scaled to \emph{n-view stereo vision} to reduce occlusion problems while increasing redundancy in the number of viewpoints there are.
-\label{subsubsec:nview}
+\emph{Stereo camera models} (Binocular vision) for depth measurement incorporation into the image. Two cameras which are a known distance apart can be used to perceive depth by computing the disparity between corresponding points in both images (triangulation) \cite{hamzah2016literature}. This can also be scaled to \emph{n-view stereo vision} to reduce occlusion problems while increasing redundancy in the number of viewpoints there are.\label{sec:nview}
 
 \subsubsection{Active Depth Cameras}
 These go beyond stereo vision. Such as \emph{Time-of-Flight (ToF)} cameras that emit infra-red light and measure the time it takes to reflect back, and using speed of light in calculating the depth directly \cite{foix2011tof,zanuttigh2016time}. Or \emph{structured light} cameras that project a known pattern onto a surface and observe its deformation to calculate the depth. These two are usually more concise compared to stereo vision because they offer robust depth sensing regardless of surface textures or differing lighting conditions.
@@ -119,7 +117,7 @@ Therefore, choice of camera model significantly affects how a robot can perceive
     \subsubsection{Occlusions}
       Within real life dynamic environments, on top of the lighting changes, object are often partially or sometimes fully occluded from where the robot might be placed or moving in the environment.  One of the simple solutions to this is to introduce multiple views for the robot. 
       
-      Similar in idea to \emph{n-view} from \ref{subsubsec:nview}, having more cameras, usually some around the scene and some on different parts of a robot (e.g. wrist-mounted, head-mounted, or mounted around the scene) allows for robustness against occlusions and introduce multiple different angles for efficiency in learning. 
+      Similar in idea to \emph{n-view} from \ref{sec:nview}, having more cameras, usually some around the scene and some on different parts of a robot (e.g. wrist-mounted, head-mounted, or mounted around the scene) allows for robustness against occlusions and introduce multiple different angles for efficiency in learning. 
 
       However, one big drawback is that the state space can easily explode: increasing training times and inferring speeds. On top of that, depending on the task and the robot multi-viewpoint systems might not be feasible, for example, the environment might not be as clearly defined, making the such cameras an impossibility. There are other solutions such as temporal consistency \cite{lai2018learningblindvideotemporal} which can also be extended for use in robotics, such as here \cite{billington2007using, yang2021reactive}.
       \todo{maybe some figures here from tasks like searching drawer etc.}

@@ -46,11 +46,11 @@ However, another important part of \emph{MILES} is that force sensors are also i
 This is pivotal part of object-centric tasks. Because, if an agent knows what to focus on, then we can teach it a policy to learn to focus on specific subjects.
 
 \subsubsection{\emph{Observe Then Act}}
-Taking a third-person-view look to the classical grasping task, \emph{Wang et al.} aim to optimise this viewpoint based on the task goal \cite{wang2024observeactasynchronousactive}. They take a asynchronous viewpoint control approach (see \ref{subsubsec:asynch-synch}); this separation of the camera systems and the motor actions over time. Leading to less need for coordination between the two section and instead, the model focuses more on task-specific movements and distribute this coordination throughout the task. 
+Taking a third-person-view look to the classical grasping task, \emph{Wang et al.} aim to optimise this viewpoint based on the task goal \cite{wang2024observeactasynchronousactive}. They take a asynchronous viewpoint control approach (see \ref{sec:asynch-synch}); this separation of the camera systems and the motor actions over time. Leading to less need for coordination between the two section and instead, the model focuses more on task-specific movements and distribute this coordination throughout the task. 
 They, again, follow a few-shot learning approach. The model comprises of two separate agents, a next-best-view (NBV) agent for optimal viewpoints and next-best-pose (NBP) for determining the gripper's action based on the previous agent's output. Active perceptions is achieved by alternating between sensor and motor action interfaces in each episode; which then leads to the learning of the tasks. These tasks are usually of sequential nature as the asynchronous approach works best with such systems, as they discuss.
 \missingfigure{the neuron figure form the paper}
 
-They follow a POMDP (\ref{subsec:pomdp}) formulation to model the problem:
+They follow a POMDP (\ref{sec:pomdp}) formulation to model the problem:
 \[
   \langle \mathcal{O}, \mathcal{A}^c, P, \mathcal{A}^g, \mathcal{O}', P', R, \gamma \rangle
 \]
