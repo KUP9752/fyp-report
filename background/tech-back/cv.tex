@@ -23,26 +23,38 @@ Some important parameters are:
   \item \textbf{Distortion Coefficients:} Some parameters for distortion correction. Important for camera model systems like cameras with fish-eye lenses \cite{king1989history}
 \end{itemize}
 
-\missingfigure{maybe a photo with all of these on it if that is possible}
-
 \subsubsection{Extrinsic Parameters}
 Extrinsic parameters represent the physical placement of the camera in the scenes. Such as the position and orientation of the camera in the scene. Using these values we can map  3D representation of the world the camera sees (which is in world coordinates) into the camera coordinate system.
-\\
+\\\\
+The mapping of parameters to the camera view is shown in Figure \ref{fig:in-extrinsic}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{assets/background/in-extrinsic.png}
+  \caption{Intrinsic and extrinsic parameter mappings \cite{mphy0026camera}}\label{fig:in-extrinsic}
+\end{figure}
 
 \subsection {The Pin-Hole Camera}
 One of the most foundational and widely used models to describe this calibration is the \emph{pin-hole} (or the  \emph{projective}) camera model \cite{solem2012programming}. 
 
 \subsubsection{Mathematics Behind the Pin-Hole Model}
 The light passes through a single point, called the camera centre, $C$, before it is projected onto the 2D image plane (giving the name pin-hole). 
-% // TODO\missingfigure{include classic image, steal from https://www.oreilly.com/library/view/programming-computer-vision/9781449341916/ch04.html#:~:text=The%20pin-hole%20camera%20model%20(or%20sometimes%20projective%20camera%20model,a%20dark%20box%20or%20room.
-% }
-\missingfigure{as comment says}
+
+
 A 3D point $\textbf{X}$ is projected onto image point $\textbf{x}$ using the equation:
 \[\lambda \textbf{x} = P\textbf{X}\]
 where $P$ is the a 3x4 matrix called the camera (or \emph{projection}) matrix and $\textbf{X}$ is 1x4 and has four elements in homogenous coordinates, \(\textbf{X} = [x, y, z, w]\) and $\lambda$ is the inverse depth of the 3D point. Which can be needed if we want all coordinates to be homogenous with the last value ($w$) normalised to $1$.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\textwidth]{assets/background/pinhole-cam.jpg}
+  \caption{Pinhole camera model \cite{solem2012programming}}\label{fig:pinhole}
+\end{figure}
+
 The Camera Matrix, P can will all calibration values for the camera. so:
 \[P = K \left[R \mid t\right] \]
+
+\todo[color=green]{make a better image for final}
 
 R is the (3x3) rotational matrix describing the orientation of the camera, and t a (3x1) translational vector describing the position of C.
 Also the intrinsic calibration matrix, K, will encode camera attributes discussed above.
@@ -60,12 +72,18 @@ Also the intrinsic calibration matrix, K, will encode camera attributes discusse
 Where the values are from \ref{sec:intrinsic} and $\alpha$ is the aspect ratio used for non-square pixel elements (usually safe to assume $a=1$).
 
 A simple calibration method is to use a reference object, with known dimensions $dX and dY$. Then we can measure the distance from the camera to the object $dZ$. After obtaining the image we can measure the image plane size of our object $dx, dy$ in pixels and extract the focal point as:
-\missingfigure{add caluibration dots etc}
 
 \[ 
   f_x = \frac{dx}{dX} dZ , \hspace{1cm} f_y = \frac{dy}{dY}dZ
-\]
-\todo{make sure the math is on the same page as above or ref equation}
+  \]
+  
+Or we can use a calibration image to project and use that for calibration, see Figure \ref{fig:calin-dots}
+
+  \begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/background/checkered.jpeg}
+    \caption{Calibration pattern cite{Din2014ProjectorCalibration}}\label{fig:calin-dots}
+  \end{figure}
 
 \subsection{Other Camera Models for Robotics}
 The pin-hole camera system gives us an insight into the translation of captured light into interpretable data. Although, useful for theoretical analysis, real-world cameras deviate from this idealised system quite a lot.
@@ -120,15 +138,20 @@ Therefore, choice of camera model significantly affects how a robot can perceive
       Similar in idea to \emph{n-view} from \ref{sec:nview}, having more cameras, usually some around the scene and some on different parts of a robot (e.g. wrist-mounted, head-mounted, or mounted around the scene) allows for robustness against occlusions and introduce multiple different angles for efficiency in learning. 
 
       However, one big drawback is that the state space can easily explode: increasing training times and inferring speeds. On top of that, depending on the task and the robot multi-viewpoint systems might not be feasible, for example, the environment might not be as clearly defined, making the such cameras an impossibility. There are other solutions such as temporal consistency \cite{lai2018learningblindvideotemporal} which can also be extended for use in robotics, such as here \cite{billington2007using, yang2021reactive}.
-      \todo{maybe some figures here from tasks like searching drawer etc.}
-      \missingfigure{add comparison images (at least 2) of same scene but ith occlusions}
+      \todo[color=green]{maybe some figures here from tasks like searching drawer etc.}
+
+      \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/background/occlusion.png}
+        \caption{Example of an occluded object \cite{occlusionimage}}\label{fig:occlusion}
+      \end{figure}
+      \todo[color=green]{better image}
 
     \subsubsection{Real-Time Processing}
     Another convoluted problem in vision to robotics is that, novel advancements are usually resource intensive and then scaled down once proven. Many autonomous real-time  applications such as autonomous driving, drone navigation need provably quick decision making in order to be safe to use. Therefore computational bottlenecks or unoptimised approaches requiring time and computational resources might not immediately fit into a robotics use case.
 
     \subsubsection{Unseen Domain Generalisations}
-    Finally, another active area in robotics currently is issues such as \emph{few-shot} or even \emph{one-shot} learning, which aim to teach robots new and unseen policies with minimal new data. Or approaches such as self-supervised learning (such as here \cite{lim2022real2sim2real, huang2021robot}) to combine real and simulated data for optimising learning in new domains.
-    \todo{link to above few-shot stuff in IL}
+    Finally, another active area in robotics currently is issues such as \emph{few-shot} or even \emph{one-shot} learning see \ref{sec:few-shot}, which aim to teach robots new and unseen policies with minimal new data. Or approaches such as self-supervised learning (such as here \cite{lim2022real2sim2real, huang2021robot}) to combine real and simulated data for optimising learning in new domains.
     \\\\
     One of the trajectories that can be taken in improving such static models is to take inspiration from what makes humans good visual learners. We also face issues like occlusions in day-to-day life and one advantage we have is that our vision is \textbf{active.}
     

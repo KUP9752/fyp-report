@@ -33,6 +33,12 @@ Incorporating this into robot learning tasks usually takes the form of generatin
 
 This mimics exploration-based RL learning systems where given a list of trajectories from the expert behaviour,the agent will move to a pose near the demonstration and attempt to move itself back to original trajectory. In the process creating an augmented path that eventually joins with the ``correct'' one. As it collects sensor data along the path (per waypoint) it therefore, creates augmented data that can now be used to aid its training. So, it is self-supervised in the way it collects data. As no interaction is needed to correct the agent back to starting position or other environmental resets (assuming the learning tasks doesn't manipulate the scene in a non-recoverable way),
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{assets/rel-work/augmentation-miles.png}
+  \caption{Process of creating augmented training data \cite{papagiannis2024milesmakingimitationlearning}}\label{fig:aug-miles}
+\end{figure}
+
 This is achieved by training a separate policy for each task as a \emph{LSTM} (long-short term memory) network, based on Behavioural Cloning, which is a type of Recurrent Neural Network (RNN) which handles sequential data \cite{medsker2001recurrent}.This allows the policy to learn the gradually changing trajectory while remembering the steps taken in the past. On top of this no object pose priors are given to the network, meaning the networks learnt policies should be applicable to different object poses.
 
 However, another important part of \emph{MILES} is that force sensors are also included in the decision making policies. Which is not a make-or-break addition, as they conclude, the force modality sometimes helps the system achieve better accuracy when coupled with vision, and sometimes not. While just force -without vision, in a somewhat expected manner- performs quite badly in any of the evaluation tasks they have chosen. 
@@ -48,7 +54,11 @@ This is pivotal part of object-centric tasks. Because, if an agent knows what to
 \subsubsection{\emph{Observe Then Act}}
 Taking a third-person-view look to the classical grasping task, \emph{Wang et al.} aim to optimise this viewpoint based on the task goal \cite{wang2024observeactasynchronousactive}. They take a asynchronous viewpoint control approach (see \ref{sec:asynch-synch}); this separation of the camera systems and the motor actions over time. Leading to less need for coordination between the two section and instead, the model focuses more on task-specific movements and distribute this coordination throughout the task. 
 They, again, follow a few-shot learning approach. The model comprises of two separate agents, a next-best-view (NBV) agent for optimal viewpoints and next-best-pose (NBP) for determining the gripper's action based on the previous agent's output. Active perceptions is achieved by alternating between sensor and motor action interfaces in each episode; which then leads to the learning of the tasks. These tasks are usually of sequential nature as the asynchronous approach works best with such systems, as they discuss.
-\missingfigure{the neuron figure form the paper}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{assets/rel-work/ota-asynch-policy.png}
+  \caption{Comparison of regular RL and asynchronous active vision-action decision processes \cite{wang2024observeactasynchronousactive}}\label{fig:oat-neurons}
+\end{figure}
 
 They follow a POMDP (\ref{sec:pomdp}) formulation to model the problem:
 \[
@@ -69,14 +79,20 @@ where $\mathcal{O}$ and $\mathcal{O}'$ represent the observation spaces at times
 Another important contribution here is the use of augmented trajectories again. Similar to \cite{papagiannis2024milesmakingimitationlearning}, demonstration trajectories are augmented in a \emph{viewpoint-aware} manner to expand the learning set by sampling the observations and discovering key frames. It does this while the viewpoint is allowed to shift, meaning the samples getting generated between time frame $T_t$ and $T-{t+1}$ (where $T$ is a trajectory) can have different views, which aids the camera policy in progressive movements. This is done for keyframes for both camera movement and gripper pose, for the two policies.
 
 \subsubsection{Closed-Loop Next-Best-View Planning for Target-Driven Grasping}
-Similar in idea, \emph{Breyer et al.} explore yet another grasping task (although first-person-view this time) this time. They augment classic grasp synthesis tasks that are mostly reliant on deep learning approaches, which suffer depending on the visual information it has available. Similar to \emph{Wang et al.}, they interact with the environment in an asynchronous manner within a fixed rate. They determine the best candidates for grasping then compute the next-best-view with its associated information gain. 
+Similar in idea, \emph{Breyer et al.} explore yet another grasping task \cite{breyer2022closedloopnextbestviewplanningtargetdriven} (although first-person-view this time) this time. They augment classic grasp synthesis tasks that are mostly reliant on deep learning approaches, which suffer depending on the visual information it has available. Similar to \emph{Wang et al.}, they interact with the environment in an asynchronous manner within a fixed rate. They determine the best candidates for grasping then compute the next-best-view with its associated information gain. 
 The information gain metric, allows the system to explore viewpoints in the neighbourhood of the current view and estimate what might be ideal for the grasping, bridging the rewards of the two policies. This again is made possible through the assumption that a task is object dependent hence the model receives bounding boxes and the geometry of the subject of the task.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{assets/rel-work/target-grasp.png}
+  \caption{How the gripper perceives and finds best poses using object bounding box priors \cite{breyer2022closedloopnextbestviewplanningtargetdriven}}\label{fig:closedloop}
+\end{figure}
+\todo[color=green]{make a better image for final}
 
 However, the interesting takeaway from their system is an early stopping mechanism. Due to the nature of exploration multiple views can be scanned and many relevant ones can be identified by the system. Without stops, this algorithms may over explore and end up quite inefficient. These stopping conditions include: timeouts (and due to time-framing, limited number of policy updates), minimum thresholding on the information gain so that no unnecessary exploration is done where the estimated IG might be lower; and finally, convergence, when the Volumetric Grasp Network (VGN) \cite{breyer2021volumetricgraspingnetworkrealtime} outputs converge the exploration will stop. 
 
 Therefore, the importance of their research is highlighted in the robustness of their system and the balance they managed to strike between exploration and exploitation. 
 
-\todo[color=green]{talk about attention and active perception}
 
 \subsection{Outline}
 In summary, work in the field of active vision usually follows an attention metric which is guided by a reward system, usually depending on some priors. The need for priors, although, can be mitigated by providing more demonstrations, this complicates the test setups and operations. Therefore, a common approach is to create augmented data and broaden the horizon of the agent through the exploration of that synthetic space.

@@ -13,9 +13,11 @@
   Some combinations of these fundamental ideas, fitting them to the use-case means a robot can acquire better observations of the space instead of relying on prior human knowledge to strategically pre-place the camera where it would most benefit the task.
 
   \subsection{Back To Markov}
+  Earlier (in \ref{sec:mdp}), we discussed that the state in a MDP represents the complete description of the environment, with all the relevant information the agent can draw conclusions from. However, when vision gets involved, along with \emph{observations} it is likely that the entire state cannot be observed. Observations from a camera, on top of inherently being occluded by some objects, can be \textbf{noisy}, \textbf{indistinguishable} (to another state at that point in time, hence requiring some sort of sequential reasoning) and possibly \textbf{latent} due to processing overheads. So, we must be able to refine our understanding of the model to make sure we optimally understand the state.
+
   \subsubsection{Partially Observable Markov Decision
   Processes (POMDPs)}\label{sec:pomdp}
-  Adding on to the definitions above in \ref{sec:mdp}, we now require \emph{Partially Observable Markov Decision Processes (POMDPs)} 
+  We now define \emph{Partially Observable Markov Decision Processes (POMDPs)} 
   which is an extension of MDPs where it is defined as a 7-tuple \cite{thrun2002probabilistic,placed2023surveyactivesimultaneouslocalization}: 
   \[\langle S, A, \mathcal{Z}, \xi_S, \xi_{\mathcal{Z}}, E, \gamma \rangle \]
   
