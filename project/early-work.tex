@@ -25,7 +25,7 @@ Therefore, my model was fairly simple; the state, $S$ which is a \emph{4-tuple} 
 So, Using this knowing the space, I created an expert policy, \(\pi_{demo}\), which gives the key combinations that must be pressed by interpolating where the target is with respect to the agent. Using their coordinates this was pretty simple. So, I randomly generated some starting positions and made the agent play the game many times and got snapshots of the states and stored them in a labelled structure for training a model later. \(data: list\left[State, Action\right]\) where:
 \[
   State: tuple\left[float, float, float, flaot\right], 
-  hspace{1cm} Action: tuple\left[bool, bool, bool, bool\right]
+  \hspace{1cm} Action: tuple\left[bool, bool, bool, bool\right]
 \]
 as before. (Data loading was managed with dataframes and pickles for optimal GPU loading and speed)
 
