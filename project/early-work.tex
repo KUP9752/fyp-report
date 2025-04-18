@@ -4,7 +4,7 @@ Early steps I was advised to work on was, getting an idea of \emph{learning} in 
 \subsection{Structuring the Problem}
 Following those ideas I wanted to create a simple task to train a policy to teach a block to move towards the other block, on simple 2D rendered canvas. Essentially creating a two dimensional reaching task.
 
-\subsubsection{Designing the Problem} 
+\subsubsection{Problem Design} 
 I started with pygame \cite{pygame}, a python library that can be used to create 2D canvas with artifacts in it. But before rendering there are some things we have to define. I wanted to create a small\emph{ish} canvas to simulate the game in, with my player and target. I chose to make a $800 \times 600$ canvas and defined my blocks to be $20 \times 20$. Skipping the details the simple game was rendered as Figure \ref{fig:initial-canvas}, where the agent (blue) attempts to get to the target (red).
 
 \begin{figure}[h]
@@ -20,18 +20,18 @@ To make a policy that would play the game, there was a few things I needed; firs
 
 
 \subsubsection{Classification}
-Therefore, my model was fairly simple; the state, $S$ which is a \emph{4-tuple} $\langle float, float, float, float \rangle$ that holds -in order- $x$-coordinate of agent, $y$-coordinate of agent, $x$-coordinate of target and the $y$-coordinate of target. And due to the keypress nature of the system, the Action, $\mathcal{A}$ was also a \emph{4-tuple} $\langle boolean, boolean, boolean, boolean \rangle$ which was true or false to indicate if an arrow key was pressed, the positions in order are: \emph{Up, Down, Left} and \emph{Right}.
+Therefore, my model was fairly simple; the state, $S$ which is a \emph{4-tuple} $\langle float,~float,~float,~float \rangle$ that holds -in order- $x$-coordinate of agent, $y$-coordinate of agent, $x$-coordinate of target and the $y$-coordinate of target. And due to the keypress nature of the system, the Action, $\mathcal{A}$ was also a \emph{4-tuple} $\langle boolean,~boolean,~boolean,~boolean \rangle$ which was true or false to indicate if an arrow key was pressed, the positions in order are: \emph{Up, Down, Left} and \emph{Right}.
 
-So, Using this knowing the space, I created an expert policy, \(\pi_{demo}\), which gives the key combinations that must be pressed by interpolating where the target is with respect to the agent. Using their coordinates this was pretty simple. So, I randomly generated some starting positions and made the agent play the game many times and got snapshots of the states and stored them in a labelled structure for training a model later. \(data: list\left[State, Action\right]\) where:
+So, knowing the space, I created an expert policy, \(\pi_{demo}\), which gives the key combinations that must be pressed by interpolating where the target is with respect to the agent. Using their coordinates this was pretty simple. So, I randomly generated some starting positions and made the agent play the game many times and got snapshots of the states and stored them in a labelled structure for training a model later. \(data: list\left[State,~Action\right]\) where:
 \[
-  State: tuple\left[float, float, float, flaot\right], 
-  \hspace{1cm} Action: tuple\left[bool, bool, bool, bool\right]
+  State:~tuple\left[float,~float,~float,~flaot\right], 
+  \hspace{1cm} Action:~tuple\left[bool,~bool,~bool,~bool\right]
 \]
 as before. (Data loading was managed with dataframes and pickles for optimal GPU loading and speed)
 
 Therefore, combining the two, I trained a linear neural network with 3 layers in PyTorch \cite{pytorch} predict the key presses (the action) given the coordinates of the blocks (state).
 
-Without getting into implementation details, as this is early work, this worked pretty well. Every frame the state would be fed into the model and the model gives out the movement for that frame. Although, the movement was quite jagged because the classification was predicting key presses and the discrete actions were inherently un-smooth because a small change in a direction could prompt the model to change the  direction suddenly. A solution to this would be to get the direction change instead of a discrete movement direction. So, I pivoted to a regression model.
+Without getting into implementation details, as this is early work, this worked pretty well. Every frame the state would be fed into the model and the model gives out the movement for that frame. Although, the movement was quite jagged because the classification was predicting key presses and the discrete actions were inherently not smooth; because a small change in a direction could prompt the model to change the  direction suddenly. A solution to this would be to get the direction change instead of a discrete movement direction. So, I pivoted to a regression model.
 
 \subsubsection{Regression}
 Similarly, as the scope changing I had to change my model slightly. State remained the same, but the action is now defined to have the type: \(Action: tuple[float, float]\), reflecting the change in $x$ and the change in $y$ (\(\delta x , \delta y\)).
@@ -114,14 +114,64 @@ I took a simple procedural checkered approach where the canvas was divided into 
 I faced some issues with the model learning to avoid obstacles, the above policy for the no-obstacle case worked pretty well most of the time, however some select cases, such as there being an obstacle right between the agent and the target. 
 \todo{figure for this, maybe for final report.} 
 
-After some experimentation, I thought this might be because of the way I modelled the prediction system. Every frame expects a new movement to be generated, per the state given. This inherently has no history about where the agent was moving from. Similarly, the training data is also not ordered in any way, and it is frame corresponds to movement. Therefore, my model was essentially learning the underlying policy of the Euclidean distance heuristic used int he path finding and not extracting useful information about trajectories.
+After some experimentation, I thought this might be because of the way I modelled the prediction system. Every frame expects a new movement to be generated, per the state given. This inherently has no history about where the agent was moving from. Similarly, the training data is also not ordered in any way, and it is frame corresponds to movement. Therefore, my model was essentially learning the underlying policy of the Euclidean distance heuristic used in the path finding and not extracting useful information about trajectories. This could have been solved with a reinforcement learning approach, or a demonstration requesting apoproach. Where the agent can ask for a new demonstration once it gets stuck or certain amount of time passes \todo{not sure here, talk about new demonstration and why I didn't do this?}
 
 \subsubsection{Future of 2D: Sequence Models}
 My next approach was to play around with a model that would take in multiple frames and output either one or multiple moves in order to have this idea of a history.
 
-I experimented briefly with a \emph{sequence-to-model} primitively replicating a RNN, where it kept a 10 frame buffer along with the movement to predict the next movement. This idea seemed promising, however, my initial approaches were not fruitful, the models were suffering from a lot of empty episodes or repeated frames were causing erroneous learning. Therefore, I realised I had to pivot to non-concrete length sequences, such as transformer models accepting $n$ number of history frames with a max cap, rather than always needing the $x$ my fake-RNN was using (10 in my case). 
+I experimented briefly with a \emph{sequence-to-movement} model primitively replicating a RNN, where it kept a 10 frame buffer along with the movement to predict the next movement. This idea seemed promising, however, my initial approaches were not fruitful, the models were suffering from a lot of empty episodes or repeated frames were causing erroneous learning. Therefore, I realised I had to pivot to non-concrete length sequences, such as transformer models accepting $n$ number of history frames with a max cap, rather than always needing the $x$ my makeshift-RNN was using (10 in my case). 
 
 This is where I have currently left the 2D experimentation and moved onto starting some 3D approaches.
 
-\section{3D: CoppeliaSim and RLBench}
+\section{Transitioning to 3D}
+The move to 3D was slow, the jump from \emph{pygame} to a full blown physics simulation was a big leap and it came with its problems.
+
+\subsection{CoppeliaSim and RLBench}
+
+CoppeliaSim is a mostly open source simulation program that provides full access to its features through an educational license and RLBench is an in-house (Imperial) tool adapted to plug into CoppeliaSim through its python API interface (PyRep \cite{}) \todo{cite pyrep}. 
+
+There are many tutorials online to help learn how CoppeliaSim operates and designing some scenes \todo[color=green]{maybe cite some stuff here, not necessary}. However, RLBench is a harder beast to tame. Although the system is very smart and eliminates a lot of the manual work needed to be done before starting experimentation, it was now slightly out of date and I had many issues setting it up on my system.
+
+\subsection{Environment Issues}\todo{entire section needs a reread and structuring}
+One of the first large-scale issues I'd face in this project came here, quite early in its lifespan. I would soon learn robotics development is mostly done on Linux based machines and the journey to getting everything working would be quite long.
+
+\subsubsection{Windows Setup}
+I do most development work on Windows and WSL (Windows Subsystem for Linux) \cite{} and expecting this project to be fairly memory and graphic power hungry I though I'd setup everything on the Windows side. This caused a few issues with PyRep, this was becuase PyRep firstly expected to be running on Linux, and RLBench was having issues working.
+
+\subsubsection{WSL Setup}
+I thought this wouldn't be a problem, as WSL version 2 has been pretty good with GUI applications running on Linux and thought I could run Coppelia on there and still access any displays I might need. The translation layer between the operating systems might cause some slowing but there shouldn't be any major issues issue. Upon configuring everything as the installation guide suggested in RLBench and PyRep repositories. I had few issues linking object files downloaded with CoppeliaSim into the PyRep layer had some issues. After spending a lot of time researching issues, and coming across some online threads with similar issues (in different applications, so nothing was immediately applicable) I decided WSL must have been the problem and decided to move onto the next logical step.
+ 
+\subsubsection{Linux Virtual Machine}
+I had previously used Ubuntu a lot and even my WSL instance was running Ubuntu. As RLBench suggested Debian based systems, assuming they also developed it in Ubuntu, I created a Virtual Machine running it. After the entire setup process, I was finally able to get the instance running and finally managed to run one of the examples that gets downloaded when installing RLBench.
+
+However, I got hit by another issues fairly quickly, the rendering of Virtual Box was definitely going through some sort of translation through Windows and then the GPU (not even sure, maybe it was all CPU rendered) however, everything was extremely sluggish, and running the non-primitive examples even crashed my virtual machine instances a few times. At this point I realised I had to settle for the real deal and got to partitioning by storage drive.
+
+\subsubsection{Dual Booting}
+I had some issues partitioning the drive Windows was already installed, as it had making that its home and spread all around the disk. I currently had no ways of backing up my data and erasing my disk to completely wipe then partitioning before installing windows again. So, I ripped a spare drive I had in my old laptop and booted Linux form there. After running through the same setup steps, I was finally properly running RLBench. With one caveat, CoppeliaSim constantly complained that I was missing some video encoding binaries, though seemed to work perfectly fine; even when I fixed the binaries it would work but every once in a while pop up saying I was missing them. There were other small annoyances like this throughout the entirety of the experimentation but at least now it was working.
+
+\subsubsection{Campus Machines}
+I knew that a solution to all of my problems might have been using a machine at the labs. I thought an issue with that may have been that RLBench requests a lot of binary linking and editing which might have required and the troubleshooting wouldn't be as easy as doing it on my machine. Which could be resolved if I requested a machine to use, but I though my personal machine had the appropriate powerful hardware for a machine learning project and wanted to use that. So jumping through all these steps tool about an entire week, but was well worth it at the end.
+
+
+\subsection{Usability Issues}
+One of the major instability issues I had was because RLBench is about 5 years old now and CoppeliaSim has moved on in some parts, and I was not able to get exactly the same version of the simulator they had as well as exactly the same version of the libraries used when developing RLBench.
+
+\subsubsection{RLBench Codebase}
+As I started using RLBench other issues started popping up, PyRep was randomly failing calls to CoppeliaSim due to errors raised in RLBench due to unexpected types and hitting exceptions such as \emph{``Should not be here''} which was frustrating, but the solution was simple. Entirety of the RLBench source code is accessible, so instead of downloading it as a package I forked the repo and started fixing any issues as they started arising. Once trivial issues were getting fixed I also started using CoppeliaSim to make mockup tasks (to be outlined in the future \todo{linking!}) and create networks that would use the simulation to train.
+
+Around the time I started training some primitive models and learning more about these tools, I started hitting weirder errors, like the simulator constantly crashing, getting unexpected observation results (cameras such as overhead cameras  missing their input) and other weird issues. Spending even more time combing though some of the \emph{enourmous} codebase I would sometimes find issues to fix them, but it would routinely break some of the package binaries I had linked and just stop working with no way to reason or figure out how to fix it. At this point I decided to try some other tools.
+
+\subsubsection{PyBullet}
+\todo{Left it here last time continue}
+
+\subsection{Toolset Dilemma}\todo{needs a total rewrite this is more of a plan/rough draft}
+Faced a lot of issues with rlbench, however, the time I spent on it was too long and learnt how to fix any issues when they came up. It also provided niceties like requesting demos and wiring environment and tasks fairly seamlessly
+
+On the other hand, pybullet was customisable and I think overall ran better, coppeliasim (and especially my installation had a few issues which i couldnt seem to fix) but a lot of the ground work done by rlbench I would need to redo. 
+
+So the main dilemma was, should I be wasting time making a comprehensive suite to fit my needs early on in the project and then cancontinue with the premise of the task, or stick with rlbench and solve issues as they arose. Once I fixed a lot of the OS dependent errors, newer versions of coppelia was for some reason not very happy with newer Ubuntu versions, I decided to stick with rlbench, and hoping any issue arising from this point on shouldn't be a system breaking one, and I was familiar enough with the rlbench codebase to at least attempt to fix anything at this point. So I went back to square one and got the work on rlbench.
+
+
+
+\todo{following to be deleted}
 I didn't do any meaningful work in terms of experimenting with learning or robots, but spent majority of my time setting up RLBench (quite tricky OS requirements and problems) and playing around to get myself familiar with the software.
