@@ -1,0 +1,55 @@
+\section{Transitioning to 3D}
+The move to 3D was slow, the jump from \emph{pygame} to a full blown physics simulation was a big leap and it came with its problems.
+
+\subsection{CoppeliaSim and RLBench}
+
+CoppeliaSim is a mostly open source simulation program that provides full access to its features through an educational license and RLBench is an in-house (Imperial) tool adapted to plug into CoppeliaSim through its python API interface (PyRep \cite{}) \todo{cite pyrep}. 
+
+There are many tutorials online to help learn how CoppeliaSim operates and designing some scenes \todo[color=green]{maybe cite some stuff here, not necessary}. However, RLBench is a harder beast to tame. Although the system is very smart and eliminates a lot of the manual work needed to be done before starting experimentation, it was now slightly out of date and I had many issues setting it up on my system.
+
+\subsection{Environment Issues}\todo{entire section needs a reread and structuring}
+One of the first large-scale issues I'd face in this project came here, quite early in its lifespan. I would soon learn robotics development is mostly done on Linux based machines and the journey to getting everything working would be quite long.
+
+\subsubsection{Windows Setup}
+I do most development work on Windows and WSL (Windows Subsystem for Linux) \cite{} and expecting this project to be fairly memory and graphic power hungry I though I'd setup everything on the Windows side. This caused a few issues with PyRep, this was becuase PyRep firstly expected to be running on Linux, and RLBench was having issues working.
+
+\subsubsection{WSL Setup}
+I thought this wouldn't be a problem, as WSL version 2 has been pretty good with GUI applications running on Linux and thought I could run Coppelia on there and still access any displays I might need. The translation layer between the operating systems might cause some slowing but there shouldn't be any major issues issue. Upon configuring everything as the installation guide suggested in RLBench and PyRep repositories. I had few issues linking object files downloaded with CoppeliaSim into the PyRep layer had some issues. After spending a lot of time researching issues, and coming across some online threads with similar issues (in different applications, so nothing was immediately applicable) I decided WSL must have been the problem and decided to move onto the next logical step.
+ 
+\subsubsection{Linux Virtual Machine}
+I had previously used Ubuntu a lot and even my WSL instance was running Ubuntu. As RLBench suggested Debian based systems, assuming they also developed it in Ubuntu, I created a Virtual Machine running it. After the entire setup process, I was finally able to get the instance running and finally managed to run one of the examples that gets downloaded when installing RLBench.
+
+However, I got hit by another issues fairly quickly, the rendering of Virtual Box was definitely going through some sort of translation through Windows and then the GPU (not even sure, maybe it was all CPU rendered) however, everything was extremely sluggish, and running the non-primitive examples even crashed my virtual machine instances a few times. At this point I realised I had to settle for the real deal and got to partitioning by storage drive.
+
+\subsubsection{Dual Booting}
+I had some issues partitioning the drive Windows was already installed, as it had making that its home and spread all around the disk. I currently had no ways of backing up my data and erasing my disk to completely wipe then partitioning before installing windows again. So, I ripped a spare drive I had in my old laptop and booted Linux form there. After running through the same setup steps, I was finally properly running RLBench. With one caveat, CoppeliaSim constantly complained that I was missing some video encoding binaries, though seemed to work perfectly fine; even when I fixed the binaries it would work but every once in a while pop up saying I was missing them. There were other small annoyances like this throughout the entirety of the experimentation but at least now it was working.
+
+\subsubsection{Campus Machines}
+I knew that a solution to all of my problems might have been using a machine at the labs. I thought an issue with that may have been that RLBench requests a lot of binary linking and editing which might have required and the troubleshooting wouldn't be as easy as doing it on my machine. Which could be resolved if I requested a machine to use, but I though my personal machine had the appropriate powerful hardware for a machine learning project and wanted to use that. So jumping through all these steps tool about an entire week, but was well worth it at the end.
+
+
+\subsection{Usability Issues}
+One of the major instability issues I had was because RLBench is about 5 years old now and CoppeliaSim has moved on in some parts, and I was not able to get exactly the same version of the simulator they had as well as exactly the same version of the libraries used when developing RLBench.
+
+\subsubsection{RLBench Codebase}
+As I started using RLBench other issues started popping up, PyRep was randomly failing calls to CoppeliaSim due to errors raised in RLBench due to unexpected types and hitting exceptions such as \emph{``Should not be here''} which was especially frustrating. However, the solution was simple. Entirety of the RLBench source code is accessible, so instead of downloading it as a package I forked the repo and started fixing any issues as they started arising. Once trivial issues were getting fixed I also started using CoppeliaSim to make mockup tasks (to be outlined in the future \todo{linking!}) and create networks that would use the simulation to train.
+
+Around the time I started training some primitive models and learning more about these tools, I started hitting weirder errors, like the simulator constantly crashing, getting unexpected observation results (cameras such as overhead cameras  missing their input) and other weird issues. Spending even more time combing though some of the \emph{enourmous} codebase I would sometimes find issues to fix them, but it would routinely break some of the package binaries I had linked and just stop working with no way to reason or figure out how to fix it. At this point I decided to try some other tools.
+
+\subsubsection{PyBullet}
+The first option was PyBullet, an open-source Python module for simulation, it wraps the C API of Bullet and provides a completely customisable simulation experience. Though, the GUI experience is lacking and almost everything is controller through this C API. 
+Following some rough tutorials and combing through the manual for the module, I was able to put together fairly simple graphics, and shapes to start creating some tasks. Although, I came to a halting realisation soon after. Which was that without a complete robot learning suite at my disposal I would need to figure out a lot of the systems from scratch. Such as camera placements and movement systems, seamless task creation and linking, environment management and so on.
+
+
+\subsection{Toolset Dilemma}\todo{needs a total rewrite this is more of a plan/rough draft}
+
+Faced a lot of issues with RlBench, however, the time I spent on it was too long and learnt how to fix any issues when they came up. It also provided niceties like requesting demos and wiring environment and tasks fairly seamlessly.
+
+On the other hand, PyBullet was customisable and I think overall ran better, coppeliasim (and especially my installation had a few issues which i couldnt seem to fix) but a lot of the ground work done by rlbench I would need to redo. 
+
+So the main dilemma was, should I be wasting time making a comprehensive suite to fit my needs early on in the project and then cancontinue with the premise of the task, or stick with rlbench and solve issues as they arose. Once I fixed a lot of the OS dependent errors, newer versions of coppelia was for some reason not very happy with newer Ubuntu versions, I decided to stick with rlbench, and hoping any issue arising from this point on shouldn't be a system breaking one, and I was familiar enough with the rlbench codebase to at least attempt to fix anything at this point. So I went back to square one and got the work on rlbench.
+
+
+
+\todo{following to be deleted}
+I didn't do any meaningful work in terms of experimenting with learning or robots, but spent majority of my time setting up RLBench (quite tricky OS requirements and problems) and playing around to get myself familiar with the software.
