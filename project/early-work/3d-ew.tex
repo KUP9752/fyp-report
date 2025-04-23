@@ -36,7 +36,9 @@ As I started using RLBench other issues started popping up, PyRep was randomly f
 
 Around the time I started training some primitive models and learning more about these tools, I started hitting weirder errors, like the simulator constantly crashing, getting unexpected observation results (cameras such as overhead cameras  missing their input) and other weird issues. Spending even more time combing though some of the \emph{enourmous} codebase I would sometimes find issues to fix them, but it would routinely break some of the package binaries I had linked and just stop working with no way to reason or figure out how to fix it. At this point I decided to try some other tools.
 
-\subsubsection{PyBullet}
+\todo{add picture of the missing libraries thingy}
+
+\subsubsection{PyBullet}\todo{add pybullet reference}
 The first option was PyBullet, an open-source Python module for simulation, it wraps the C API of Bullet and provides a completely customisable simulation experience. Though, the GUI experience is lacking and almost everything is controller through this C API. 
 Following some rough tutorials and combing through the manual for the module, I was able to put together fairly simple graphics, and shapes to start creating some tasks. Although, I came to a halting realisation soon after. Which was that without a complete robot learning suite at my disposal I would need to figure out a lot of the systems from scratch. Such as camera placements and movement systems, seamless task creation and linking, environment management and so on.
 
@@ -51,5 +53,56 @@ So the main dilemma was, should I be wasting time making a comprehensive suite t
 
 
 
-\todo{following to be deleted}
-I didn't do any meaningful work in terms of experimenting with learning or robots, but spent majority of my time setting up RLBench (quite tricky OS requirements and problems) and playing around to get myself familiar with the software.
+I didn't do any meaningful work in terms of experimenting with learning or robots, but spent majority of my time setting up RLBench (quite tricky OS requirements and problems) and playing around to get myself familiar with the software. \todo{following to be deleted}
+
+
+
+\section{First Steps in 3D}
+Landing back on RLBench and solving most of the issues, first steps were to create some 3d environments and tasks to test capabilities of simple policies on tasks that progressively get more difficult. 
+
+\subsection{Reaching Task}
+The very first step was to directly translate the 2D task I played with earlier in \ref{subsec:ew-2d-problem}. This mean that I could create a simple reaching task, which not will happen in a 3D environment, with realistic physics simulation
+
+\subsubsection{Creating the Task}
+As discussed before, RLBench provides an intuitive method for quickly creating and validating tasks. \todo{link the tutoirals and the videeos maybe?}. Following the tutorials provided by the creator of RLBench and other resources online on CoppeeliaSim \todo{link some copsim manuals or information here.} The task is wired
+
+\missingfigure{Pictures of the task, front side right 1x3 }
+\begin{figure}
+\end{figure}
+
+\subsubsection{Creating a Policy}
+
+The next immediate step was to create a policy network. As I am mainly working on imitation learning from demonstrations provided by the system, my network needs to be able to ingest these demonstrations and generate actions in the action space of the robot.\\
+
+\fbox{
+  \parbox{\linewidth}{
+    \textbf{Aside on RLBench Demonstrations} \\
+    Demonstrations are provided enbcapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. This way the demonstration itself along with the movement trajectory a control variable, while I test the performance of a policy or the feasability of a task.
+  }
+}
+
+% //NOTE: same as above, see whats better when pages start moving around?
+% \fbox{
+%   \begin{minipage}{\linewidth}
+%     \textbf{Aside on RlBench Demonstrations} \\
+%     Demonstrations are provided enbcapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. This way the demonstration itself along with the movement trajectory a control variable, while I test the performance of a policy or the feasability of a task.
+% \end{minipage}
+% }
+
+By default the demonstrations -which I will now refer to as ``demos'' from now on- and specifically the images from the cameras produce images of resolution $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. Therefore, I created a simple network following this architecture outline in \ref{fig:policy-arch}.
+
+\missingfigure{architecture diagram of the policy}
+\label{fig:policy-arch}
+
+\subsubsection{Tuning the Policy}
+\todo{here last}
+\subsubsection{Policy Improvements}
+
+\section{Shortcomings of a Wrist Mounted Camera}
+\todo{[sub]section names can be changed and made better}
+\subsection{Is the Wrist Camera Enough?}
+
+\subsection{Introducing an Obstacle}
+
+\subsection{Grasping Task}
+
