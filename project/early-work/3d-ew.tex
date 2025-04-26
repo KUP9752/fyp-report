@@ -34,6 +34,8 @@ One of the major instability issues I had was because RLBench is about 5 years o
 \subsubsection{RLBench Codebase}
 As I started using RLBench other issues started popping up, PyRep was randomly failing calls to CoppeliaSim due to errors raised in RLBench due to unexpected types and hitting exceptions such as \emph{``Should not be here''} which was especially frustrating. However, the solution was simple. Entirety of the RLBench source code is accessible, so instead of downloading it as a package I forked the repo and started fixing any issues as they started arising. Once trivial issues were getting fixed I also started using CoppeliaSim to make mockup tasks (to be outlined in the future \todo{linking!}) and create networks that would use the simulation to train.
 
+\todo{mention RLBench and accompanying API PyRep are written for Coppelia v4.1.0, which is now almost 5 years old (https://manual.coppeliarobotics.com/en/versionInfo.htm), updating coppelia had issues with PyRep not working}
+
 Around the time I started training some primitive models and learning more about these tools, I started hitting weirder errors, like the simulator constantly crashing, getting unexpected observation results (cameras such as overhead cameras  missing their input) and other weird issues. Spending even more time combing though some of the \emph{enourmous} codebase I would sometimes find issues to fix them, but it would routinely break some of the package binaries I had linked and just stop working with no way to reason or figure out how to fix it. At this point I decided to try some other tools.
 
 \todo{add picture of the missing libraries thingy}
@@ -74,7 +76,7 @@ The next immediate step was to create a policy network. As I am mainly working o
 \fbox{
   \parbox{\linewidth}{
     \textbf{Aside on RLBench Demonstrations} \\
-    Demonstrations are provided enbcapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. This way the demonstration itself along with the movement trajectory a control variable, while I test the performance of a policy or the feasability of a task.
+    Demonstrations are provided encapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. This way the demonstration itself along with the movement trajectory a control variable, while I test the performance of a policy or the feasibility of a task.
   }
 }\vspace{0.3cm}
 
@@ -82,33 +84,51 @@ The next immediate step was to create a policy network. As I am mainly working o
 % \fbox{
 %   \begin{minipage}{\linewidth}
 %     \textbf{Aside on RlBench Demonstrations} \\
-%     Demonstrations are provided enbcapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. This way the demonstration itself along with the movement trajectory a control variable, while I test the performance of a policy or the feasability of a task.
+%     Demonstrations are provided encapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. This way the demonstration itself along with the movement trajectory a control variable, while I test the performance of a policy or the feasibility of a task.
 % \end{minipage}
 % }
 
 
-\noindent By default the demonstrations -which I will now refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $64 \times 64$ pixels. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. Therefore, I created a simple network following this architecture outline in \ref{fig:policy-arch}. The full code can be found in \todo{add the code of the network to appendix}.
+\noindent By default the demonstrations -which I will refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $128 \times 128$ pixels. I binned this down to $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. Therefore, I created a simple network following this architecture outline in \ref{fig:policy-arch}. The full code can be found in \todo{add the code of the network to appendix}.
 
 \missingfigure{architecture diagram of the policy}
 \label{fig:policy-arch}
 
-\subsubsection{Tuning the Policy}
+\subsubsection{Tuning the Policy}\todo{}
 
 \subsubsection{Policy Improvements}
 \todo{maybe do some lr scheduling and data processing for the images for generalisation  and mention the shuffling etc of the data and that it doesn't change much}
 
-The
+\subsubsection{Testing Visual Limits}\todo{not sure about these to be honest, should I jump straight to obstacles}
+I was currently limiting the learning to the wrist mounted camera, which worked well for the unobscured task, however, conditions are not always ideal, so wanted to do some quick checks to get concrete results on how the agent behaves when the target is placed on the fringes of its field of vision. 
 
-\subsubsection{Tetsing Visual limits}
+\subsubsection{Generalisability}
+Training and rolling out a policy trained on randomly moving the target in front of the camera (while making it possible to be slightly out of view, but never fully out of view) we can see that a wrist camera and some behavioural cloning is all that is required for such a simple task as this one. \todo{insert some graphs on reaching and distance etc}
 
-\subsubsection{Reaching with an Obstacle}
-Due to the simplicity of the previous task, the policy is able to easily generalise to multiple different spawning locations. So the next step is to introduce a obstacle placing mechanism 
-\section{Shortcomings of a Wrist Mounted Camera}
 
-\todo[color=green]{[sub]section names can be changed and made better}
-\subsection{Is the Wrist Camera Enough?}
+\subsection{Reaching with an Obstacle}
+So, to carry this investigation to the next level I introduced an obstacle placing mechanism as well as randomly placing the target behind the obstacle, so that the agent doesn't learn where the target can be behind a wall from where the obstacle is.
 
-\subsection{Introducing an Obstacle}
+\subsubsection{Wrist Camera Alone isn't Enough}
+This is where the single wrist camera started showing its shortcomings. The demonstrations are not necessarily pointing the wrist of the robot and hence the camera mounted there to look towards the target. This means that the wrist camera alone does not necessarily move towards the target.
 
-\subsection{Grasping Task}
+From experiments I have realised that it learns to move around the obstacle easily, using simple behavioural cloning. However, getting the last nudge to actually reach the target is where it falls apart, especially in more realistic scenarios where the target is randomised behind the obstacle.
+
+\subsubsection{Other Cameras}
+Introducing the other cameras placed around in the environment, such as the \verb|left shoulder| or the \verb|right shoulder| cameras we can confirm that the wrist camera alone is not sufficient \todo{insert figure here with wrist vs others }, and the combination of wrist and other cameras are almost always the best as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target.
+
+\subsubsection{Implementing `Looking' into the Demonstrations}\todo{haven't done this yet}\label{ew-looking-at-target}
+Added to Linear might work on this tomorrow ideally by monday ill be doing more attention stuff
+
+Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \ref{}\todo{find some prior info tracking works} or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}
+
+\subsecton{Grasping Task}
+Another task I experimented with was a grasping task. Here are the two tasks I designed to experiment with how different cameras are suitable for this typpe of task.\todo{inser the simple_grasp and the grasp_then_move tasks}. First one, \emph{Simple Grasp},  \ref{} is simple, almost a reaching task with a different ending. While the second, \emph{Grasp Then Move} is more complicated as the final target location needs to be found before the agent can know where to place this target cube.
+
+
+Although, initially the wrist camera shouldn't pose any problems, as we advance through the task, especially after we have grasped something the wrist camera becomes heavily obstructed and becomes unreliable so basing our decisions on this medium alone is not ideal.
+
+\subsubsection{Observations}
+What I got from these experiments was that the agent can benefit from understanding its surroundings at a higher level and more importantly remembering them. This is because once the camera becomes obstructed, as with \emph{Grasp Then Move}, even if the agent could do some exploration to find the target, it wouldn't be ideal due to the restricted view it has access to. So, observing the environment before, and remembering important parts will be vital for the later stages of tasks. I aim to explore some pre-policy visual exploration of the environment to be albe to address issues such as this one.
+
 
