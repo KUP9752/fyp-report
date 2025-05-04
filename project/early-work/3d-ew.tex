@@ -201,7 +201,8 @@ Or more interestingly other sensors, such as depth or force sensors on robot han
 So, to carry this investigation to the next level I introduced an obstacle placing mechanism as well as randomly placing the target behind the obstacle. This is to ensure that the agent doesn't learn where the target can be behind a wall from where the obstacle is.
 
 
-\missingfigure{add the task images from `ReachObs_Random/IndRandom'}
+\missingfigure{add the task images from ReachObs\_Random IndRandom}
+
 \subsubsection{Wrist Camera Alone isn't Enough}
 
 As expected, this is where the single wrist camera started showing its shortcomings. 
@@ -219,12 +220,10 @@ Introducing the other cameras placed around in the environment, such as the \ver
 \subsubsection{Implementing `Looking' into the Demonstrations}\todo{haven't done this yet}\label{ew-looking-at-target}
 issues this is not easy might be working on this as a part of approach 2 later
 
-Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \ref{}\todo{find some prior info tracking works} or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}
+Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \todo{find some prior info tracking works add ref} or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}
 
 \section{Expanding the Task Space: Grasping Tasks}
-% Another task I experimented with was a grasping task. Here are the two tasks I designed to experiment with how different cameras are suitable for this typpe of task.\todo{inser the simple_grasp and the grasp_then_move tasks}. First one, \emph{Simple Grasp},  \ref{} is simple, almost a reaching task with a different ending. While the second, \emph{Grasp Then Move} is more complicated as the final target location needs to be found before the agent can know where to place this target cube.
-
-Another task which is likely to suffer from lack of viewpoints is a grasping task. Although, in a more nuanced way compared to the reaching with obstacles. \todo{Grasp_Simple and OTher}
+Another task which is likely to suffer from lack of viewpoints is a grasping task. Although, in a more nuanced way compared to the reaching with obstacles. \todo{Grasp style Simple and OTher}
 
 
 Although, initially the wrist camera shouldn't pose any problems, as we advance through the task, especially after we have grasped something the wrist mounted camera becomes heavily obstructed and becomes unreliable so basing our decisions on this medium alone is not ideal.
