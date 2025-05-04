@@ -1,4 +1,4 @@
-\section{Transitioning to 3D}
+\section{Transitioning to Three Dimensions}
 The move to 3D was slow, the jump from \emph{pygame} to a full blown physics simulation was a big leap and it came with its problems.
 
 \subsection{CoppeliaSim and RLBench}
@@ -63,53 +63,139 @@ I didn't do any meaningful work in terms of experimenting with learning or robot
 Landing back on RLBench and solving most of the issues, first steps were to create some 3d environments and tasks to test capabilities of simple policies on tasks that progressively get more difficult. So, the very first step was to directly translate the 2D task I played with earlier in \ref{subsec:ew-2d-problem}. This mean that I could create a simple reaching task, which not will happen in a 3D environment, with realistic physics simulation
 
 \subsection{Creating the Task}
-As discussed before, RLBench provides an intuitive method for quickly creating and validating tasks. \todo{link the tutoirals and the videeos maybe?}. Following the tutorials provided by the creator of RLBench and other resources online on CoppeeliaSim \todo{link some copsim manuals or information here.} The task is wired
+As discussed before, RLBench provides an intuitive method for quickly creating and validating tasks. \todo{link the tutoirals and the videeos maybe?}. Following the tutorials provided by the creator of RLBench and other resources online on CoppeliaSim \todo{link some copsim manuals or information here.} I could now create tasks for my use case.
 
-\missingfigure{Pictures of the task, front side right 1x3 }
-\begin{figure}
+Tasks are created using the \emph{`task builder'} CLI, which is a user facing interface that talks to the PyRep API which in turn controls CoppeliaSim. This allows the user to use GUI elements within the simulator to create objects, boundaries as well as edit their properties while observing what they look like in different camera view layers. Then to create scene wirings; the automatically created \verb|Task| class is used, where \emph{initialisation}, \emph{episode step} and other task related systems can be created for the scene object to then use to create demonstrations and train robot policies. See Figure \ref{fig:task-builder}.
+
+\begin{figure}[htbp]
+  \begin{subfigure}{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/early-work/task-builder-cli-1.png}      \caption{Task builder CLI: creating a new task}
+  \end{subfigure}%
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/early-work/task-builder-scene.png}
+    \caption{Simulator: Graphical view of the new task}
+  \end{subfigure}%
+  
+  \vspace{0.5cm}
+  
+  \begin{subfigure}{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/early-work/task-builder-cli-2.png}
+    \caption{Task builder CLI: running the simulator on new task}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/early-work/task-builder-scene-hierarchy.png}
+    \caption{Simulator: Scene Hierarchy of the objects in the new task}
+  \end{subfigure}
+  \caption{Creating a new task with `task builder'}\label{fig:task-builder}
+\end{figure}\
+
+
+The task I created is simple, see Figure \ref{fig:reach-no-obs}. I decided to use the \emph{Panda arm}, as that seemed to be standard and more importantly immediately supported by RLBench. It has 7 Degrees of Freedom (DoF) and a gripper -so the action space is a 8 dimensional vector. Then a red spherical target, which is not tangible, in the simulation it will be visually rendered but the arm will not collide or interact physically with it. Finally, added a proximity sensor to the target (which is not visually rendered) so the task can be immediately classified as completed by the system.
+
+
+
+% //NOTE: relative paths for images, maybe add submodule once project is finished
+\begin{figure}[htbp]
+  \begin{subfigure}{0.48\linewidth}
+    \centering
+    \includegraphics[scale=0.4]{../fyp/assets/task-pics/reach-no-obs/random-front.png}      
+    \caption{Front View}
+  \end{subfigure}%
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[scale=0.4]{../fyp/assets/task-pics/reach-no-obs/random-top.png}
+    \caption{Top View}
+  \end{subfigure}
+  \vspace{0.5em}
+  \begin{subfigure}{1\linewidth}
+    \centering
+    \includegraphics[scale=0.5]{../fyp/assets/task-pics/reach-no-obs/random-scene-hierarchy.png}
+    \caption{Scene Hierarchy}\label{fig:reach-no-obs-hierarchy}
+  \end{subfigure}%
+  \caption{Reaching Task with no obstacles}\label{fig:reach-no-obs}
 \end{figure}
 
 \subsection{Creating a Policy}
 
-The next immediate step was to create a policy network. As I am mainly working on imitation learning from demonstrations provided by the system, my network needs to be able to ingest these demonstrations and generate actions in the action space of the robot.\\
+The next step was to create a policy network. As I am mainly working on imitation learning from demonstrations provided by the system, my network needs to be able to ingest these demonstrations and generate actions in the action space of the robot. \par
 
-\fbox{
-  \parbox{\linewidth}{
-    \textbf{Aside on RLBench Demonstrations} \\
-    Demonstrations are provided encapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. This way the demonstration itself along with the movement trajectory a control variable, while I test the performance of a policy or the feasibility of a task.
-  }
-}\vspace{0.3cm}
+\fbox{  
+  \begin{minipage}{\linewidth}
+    \textbf{Aside on RlBench Demonstrations} \par
+    Demonstrations are provided encapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. \par 
+    Demonstrations are created following waypoints. PyRep expects  \emph{Dummy} objects within the scene called ``waypointX'' where sequence number of the waypoint starting from $0$. Then he demonstration engine calculates trajectories to these waypoints in sequence. For example, in Figure \ref{fig:reach-no-obs-hierarchy}, we have `waypoint0' within the target, for which a trajectory will be calculated from the tip of the robot gripper.
+  \end{minipage}
+}
 
-% //NOTE: same as above, see whats better when pages start moving around?
-% \fbox{
-%   \begin{minipage}{\linewidth}
-%     \textbf{Aside on RlBench Demonstrations} \\
-%     Demonstrations are provided encapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. This way the demonstration itself along with the movement trajectory a control variable, while I test the performance of a policy or the feasibility of a task.
-% \end{minipage}
-% }
+\noindent By default the demonstrations -which I will refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $128 \times 128$ pixels. I binned this down to $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. Therefore, I created a simple network following this architecture outlined in Figure \ref{fig:policy-arch}. The full code can be found in \todo{add the code of the network to appendix}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{assets/early-work/cnn-encoder-policy-head.png}
+  \caption{Simple Policy Network Architecture}\label{fig:policy-arch}
+\end{figure}\todo{ius the quality bad? reuload or reexport the xmml is in assets}
 
 
-\noindent By default the demonstrations -which I will refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $128 \times 128$ pixels. I binned this down to $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. Therefore, I created a simple network following this architecture outline in \ref{fig:policy-arch}. The full code can be found in \todo{add the code of the network to appendix}.
-
-\missingfigure{architecture diagram of the policy}
-\label{fig:policy-arch}
-
-\subsubsection{Tuning the Policy}\todo{}
+\subsubsection{Tuning the Policy}\todo{can remove not sure??s}
 
 \subsubsection{Policy Improvements}
 \todo{maybe do some lr scheduling and data processing for the images for generalisation  and mention the shuffling etc of the data and that it doesn't change much}
 
-\subsubsection{Testing Visual Limits}\todo{not sure about these to be honest, should I jump straight to obstacles}
-I was currently limiting the learning to the wrist mounted camera, which worked well for the unobscured task, however, conditions are not always ideal, so wanted to do some quick checks to get concrete results on how the agent behaves when the target is placed on the fringes of its field of vision. 
-
-\subsubsection{Generalisability}
-Training and rolling out a policy trained on randomly moving the target in front of the camera (while making it possible to be slightly out of view, but never fully out of view) we can see that a wrist camera and some behavioural cloning is all that is required for such a simple task as this one. \todo{insert some graphs on reaching and distance etc}
 
 
-\subsection{Reaching with an Obstacle}
+\subsubsection{Testing Visual Limits}\todo[color=red]{not sure about these to be honest, maybe remove these??}
+
+
+conditions are not always ideal, so wanted to do some quick checks to get concrete results on how the agent behaves when the target is placed on the fringes of its field of vision. So created the thee tasks shown in Figure \ref{fig:no-obs-3-views}.
+
+\begin{figure}[htbp]
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[scale=0.4]{../fyp/assets/demo-trials-no_obs/tasks/static-tasks-camera/initial-obs-side_l.png}      
+    \caption{Left Side}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \includegraphics[scale=0.4]{../fyp/assets/demo-trials-no_obs/tasks/static-tasks-camera/initial-obs-central.png}
+    \caption{Central}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[scale=0.4]{../fyp/assets/demo-trials-no_obs/tasks/static-tasks-camera/initial-obs-side_r.png}
+    \caption{Right Side}
+  \end{subfigure}%
+  \caption{Three variations of the reach task with the obstacles sometimes out of view}\label{fig:no-obs-3-views}
+\end{figure}
+
+
+\subsection{Generalisability}
+I had some static versions of this task where the target sphere was always in the same position, for which a single demonstration with long enough training is enough to learn the task. This is because without variation, Behavioural Cloning can be easily achieved by overfitting to the data. 
+
+Therefore I created a dynamic version of the task, where the target is not randomly placed within view (not necessarily always fully within view but the centre will be, making sure the wrist camera can see it). This is achieved by using a \verb|SpawnBoundary| and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white bow being the boundary, which is not rendered in the simulation. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
+
+Running some tests with a tuned policy, it was enough to see that with any camera combination
+\todo{talk more in this section not sure}
+
+
+\section{Reaching with an Obstacle}
 So, to carry this investigation to the next level I introduced an obstacle placing mechanism as well as randomly placing the target behind the obstacle, so that the agent doesn't learn where the target can be behind a wall from where the obstacle is.
 
 \subsubsection{Wrist Camera Alone isn't Enough}
+\subsection{Camera Limitations}\todo{reread and make sure it is a good starter segue to obs}
+
+
+I was started experimenting limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task, however, another interesting area of investigation is finding what kind of tasks benefit from different viewpoints, for example shoulder mounted or other static scene-observing cameras. 
+Or more interestingly other sensors, such as depth or force sensors on robot hand. This relates back to the idea of human perception. To learn new tasks, we use all kinds of feedback from the environment that is reactive on our actions.
+
 This is where the single wrist camera started showing its shortcomings. The demonstrations are not necessarily pointing the wrist of the robot and hence the camera mounted there to look towards the target. This means that the wrist camera alone does not necessarily move towards the target.
 
 From experiments I have realised that it learns to move around the obstacle easily, using simple behavioural cloning. However, getting the last nudge to actually reach the target is where it falls apart, especially in more realistic scenarios where the target is randomised behind the obstacle.
@@ -122,13 +208,11 @@ Added to Linear might work on this tomorrow ideally by monday ill be doing more 
 
 Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \ref{}\todo{find some prior info tracking works} or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}
 
-\subsecton{Grasping Task}
-Another task I experimented with was a grasping task. Here are the two tasks I designed to experiment with how different cameras are suitable for this typpe of task.\todo{inser the simple_grasp and the grasp_then_move tasks}. First one, \emph{Simple Grasp},  \ref{} is simple, almost a reaching task with a different ending. While the second, \emph{Grasp Then Move} is more complicated as the final target location needs to be found before the agent can know where to place this target cube.
+\section{Expanding the Task Space: Grasping Tasks}
+% Another task I experimented with was a grasping task. Here are the two tasks I designed to experiment with how different cameras are suitable for this typpe of task.\todo{inser the simple_grasp and the grasp_then_move tasks}. First one, \emph{Simple Grasp},  \ref{} is simple, almost a reaching task with a different ending. While the second, \emph{Grasp Then Move} is more complicated as the final target location needs to be found before the agent can know where to place this target cube.
 
 
 Although, initially the wrist camera shouldn't pose any problems, as we advance through the task, especially after we have grasped something the wrist camera becomes heavily obstructed and becomes unreliable so basing our decisions on this medium alone is not ideal.
 
 \subsubsection{Observations}
 What I got from these experiments was that the agent can benefit from understanding its surroundings at a higher level and more importantly remembering them. This is because once the camera becomes obstructed, as with \emph{Grasp Then Move}, even if the agent could do some exploration to find the target, it wouldn't be ideal due to the restricted view it has access to. So, observing the environment before, and remembering important parts will be vital for the later stages of tasks. I aim to explore some pre-policy visual exploration of the environment to be albe to address issues such as this one.
-
-
