@@ -182,21 +182,34 @@ I had some static versions of this task where the target sphere was always in th
 
 Therefore I created a dynamic version of the task, where the target is not randomly placed within view (not necessarily always fully within view but the centre will be, making sure the wrist camera can see it). This is achieved by using a \verb|SpawnBoundary| and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white bow being the boundary, which is not rendered in the simulation. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
 
-Running some tests with a tuned policy, it was enough to see that with any camera combination
-\todo{talk more in this section not sure}
+Running some tests with a tuned \todo{talk about tuning maybe?} policy, it was enough to see that, with the wrist camera having unobscured access to the target, it would easily learn to reach for it.
+
+
+\subsection{Camera Limitations}\todo{reread and make sure it is a good starter segue to obs}
+
+I was started experimenting limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task, however, another interesting area of investigation is finding what kind of tasks benefit from different viewpoints, for example shoulder mounted or other static scene-observing cameras. 
+
+Or more interestingly other sensors, such as depth or force sensors on robot hands or grippers. This relates back to the idea of human perception. To learn new tasks, we use all kinds of feedback from the environment that is reactive on our actions. Therefore, it is important to study shortcomings of individual sensors with respect to others to understand how policies with limited access to sensors can be made to overcome such challenges without necessarily adding more `observability' to a workspace.
+
+\subsubsection{Multi Camera Mechanisms}
+\todo{talk about `CamType' briefly}
+\subsubsection{Policy Changes}
+\todo{talk about the policy using differnt camera inputs to blend and make informed choices? maybe some plots here showing if it is better or not?}
 
 
 \section{Reaching with an Obstacle}
-So, to carry this investigation to the next level I introduced an obstacle placing mechanism as well as randomly placing the target behind the obstacle, so that the agent doesn't learn where the target can be behind a wall from where the obstacle is.
+So, to carry this investigation to the next level I introduced an obstacle placing mechanism as well as randomly placing the target behind the obstacle. This is to ensure that the agent doesn't learn where the target can be behind a wall from where the obstacle is.
 
+
+\missingfigure{add the task images from `ReachObs_Random/IndRandom'}
 \subsubsection{Wrist Camera Alone isn't Enough}
-\subsection{Camera Limitations}\todo{reread and make sure it is a good starter segue to obs}
 
+As expected, this is where the single wrist camera started showing its shortcomings. 
 
-I was started experimenting limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task, however, another interesting area of investigation is finding what kind of tasks benefit from different viewpoints, for example shoulder mounted or other static scene-observing cameras. 
-Or more interestingly other sensors, such as depth or force sensors on robot hand. This relates back to the idea of human perception. To learn new tasks, we use all kinds of feedback from the environment that is reactive on our actions.
+\todo{add graph of going around the obstacle but not quite reaching the target (wrist)}
+\todo{show this with other combinations of cameras, comment on if the l/r without wrist can learn to go around the obstacle easily? maybe not, generalisation might be hard with no wrist}
 
-This is where the single wrist camera started showing its shortcomings. The demonstrations are not necessarily pointing the wrist of the robot and hence the camera mounted there to look towards the target. This means that the wrist camera alone does not necessarily move towards the target.
+The agent would easily move around the obstacle, however, would struggle to make the last steps in touching the target. This is mostly due to the fact that the demonstrations (which are provided by RlBench) are not necessarily pointing the wrist of the robot and hence the camera mounted there to look towards the target. This means that the wrist camera alone does not necessarily move towards the target, rather the robot learns to move behind the obstacle and nothing else.
 
 From experiments I have realised that it learns to move around the obstacle easily, using simple behavioural cloning. However, getting the last nudge to actually reach the target is where it falls apart, especially in more realistic scenarios where the target is randomised behind the obstacle.
 
@@ -204,15 +217,17 @@ From experiments I have realised that it learns to move around the obstacle easi
 Introducing the other cameras placed around in the environment, such as the \verb|left shoulder| or the \verb|right shoulder| cameras we can confirm that the wrist camera alone is not sufficient \todo{insert figure here with wrist vs others }, and the combination of wrist and other cameras are almost always the best as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target.
 
 \subsubsection{Implementing `Looking' into the Demonstrations}\todo{haven't done this yet}\label{ew-looking-at-target}
-Added to Linear might work on this tomorrow ideally by monday ill be doing more attention stuff
+issues this is not easy might be working on this as a part of approach 2 later
 
 Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \ref{}\todo{find some prior info tracking works} or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}
 
 \section{Expanding the Task Space: Grasping Tasks}
 % Another task I experimented with was a grasping task. Here are the two tasks I designed to experiment with how different cameras are suitable for this typpe of task.\todo{inser the simple_grasp and the grasp_then_move tasks}. First one, \emph{Simple Grasp},  \ref{} is simple, almost a reaching task with a different ending. While the second, \emph{Grasp Then Move} is more complicated as the final target location needs to be found before the agent can know where to place this target cube.
 
+Another task which is likely to suffer from lack of viewpoints is a grasping task. Although, in a more nuanced way compared to the reaching with obstacles. \todo{Grasp_Simple and OTher}
 
-Although, initially the wrist camera shouldn't pose any problems, as we advance through the task, especially after we have grasped something the wrist camera becomes heavily obstructed and becomes unreliable so basing our decisions on this medium alone is not ideal.
+
+Although, initially the wrist camera shouldn't pose any problems, as we advance through the task, especially after we have grasped something the wrist mounted camera becomes heavily obstructed and becomes unreliable so basing our decisions on this medium alone is not ideal.
 
 \subsubsection{Observations}
 What I got from these experiments was that the agent can benefit from understanding its surroundings at a higher level and more importantly remembering them. This is because once the camera becomes obstructed, as with \emph{Grasp Then Move}, even if the agent could do some exploration to find the target, it wouldn't be ideal due to the restricted view it has access to. So, observing the environment before, and remembering important parts will be vital for the later stages of tasks. I aim to explore some pre-policy visual exploration of the environment to be albe to address issues such as this one.
