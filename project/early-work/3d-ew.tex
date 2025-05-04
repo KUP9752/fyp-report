@@ -108,7 +108,7 @@ The task I created is simple, see Figure \ref{fig:reach-no-obs}. I decided to us
     \caption{Front View}
   \end{subfigure}%
   \hfill
-  \begin{subfigure}{0.48\textwidth}
+  \begin{subfigure}{0.48\linewidth}
     \centering
     \includegraphics[scale=0.4]{../fyp/assets/task-pics/reach-no-obs/random-top.png}
     \caption{Top View}
@@ -153,7 +153,7 @@ The next step was to create a policy network. As I am mainly working on imitatio
 \subsubsection{Testing Visual Limits}\todo[color=red]{not sure about these to be honest, maybe remove these??}
 
 
-conditions are not always ideal, so wanted to do some quick checks to get concrete results on how the agent behaves when the target is placed on the fringes of its field of vision. So created the thee tasks shown in Figure \ref{fig:no-obs-3-views}.
+conditions are not always ideal, so wanted to do some quick checks to get concrete results on how the agent behaves when the target is placed on the fringes of its field of vision. So created the three tasks shown in Figure \ref{fig:no-obs-3-views}.
 
 \begin{figure}[htbp]
   \begin{subfigure}{0.3\linewidth}
@@ -176,7 +176,6 @@ conditions are not always ideal, so wanted to do some quick checks to get concre
   \caption{Three variations of the reach task with the obstacles sometimes out of view}\label{fig:no-obs-3-views}
 \end{figure}
 
-
 \subsection{Generalisability}
 I had some static versions of this task where the target sphere was always in the same position, for which a single demonstration with long enough training is enough to learn the task. This is because without variation, Behavioural Cloning can be easily achieved by overfitting to the data. 
 
@@ -198,10 +197,44 @@ Or more interestingly other sensors, such as depth or force sensors on robot han
 
 
 \section{Reaching with an Obstacle}
-So, to carry this investigation to the next level I introduced an obstacle placing mechanism as well as randomly placing the target behind the obstacle. This is to ensure that the agent doesn't learn where the target can be behind a wall from where the obstacle is.
+So, to carry this investigation to the next level I introduced an obstacle placing mechanism as well as randomly placing the target behind the obstacle. This is to ensure that the agent doesn't learn where the target can be behind a wall from where the obstacle is. See Figure \ref{fig:reach-obs-random} for how this task looks and the check \todo{add appendix link} for the backend wiring of these tasks.
 
+There are two versions of this task, I thought it might be interesting to randomise the object firstly dependently then independently on the obstacle. The `dependent' randomisation called \verb|ReachObs_Random| samples the obstacle, which in turn controls the spawn boundary of where the target can spawn in, meaning the target will always appear behind the obstacle albeit, edges of it can sometimes stick out. Conversely, the `independently' random version, called \verb|ReachObs_IndRandom|, this keeps the target spawn boundary fixed, meaning the target can be anywhere in the visible workspace, but it is not necessarily always covered by the obstacle. I can see that this potentially can be useful to keep the dataset a bit more diverse, and allow the wrist camera initially observe the target sometimes.
 
-\missingfigure{add the task images from ReachObs\_Random IndRandom}
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[scale=0.3]{../fyp/assets/task-pics/reach-obs/random-front.png}
+    \caption{Front}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[scale=0.3]{../fyp/assets/task-pics/reach-obs/random-side.png}
+    \caption{Side (Left)}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[scale=0.3]{../fyp/assets/task-pics/reach-obs/random-top.png}
+    \caption{Top}
+  \end{subfigure}
+  \vfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[scale=0.5]{assets/early-work/obs-random-scene-hierarchy.png}
+    \caption{`ReachObs\_Random' Scene Hierarchy}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[scale=0.5]{assets/early-work/obs-ind-random-scene-hierarchy.png}
+    \caption{`ReachObs\_IndRandom' Scene Hierarchy}
+  \end{subfigure}
+  \caption{Reaching Task with an Obstacle}\label{fig:reach-obs-random}
+\end{figure}
+
 
 \subsubsection{Wrist Camera Alone isn't Enough}
 
@@ -223,9 +256,50 @@ issues this is not easy might be working on this as a part of approach 2 later
 Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \todo{find some prior info tracking works add ref} or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}
 
 \section{Expanding the Task Space: Grasping Tasks}
-Another task which is likely to suffer from lack of viewpoints is a grasping task. Although, in a more nuanced way compared to the reaching with obstacles. \todo{Grasp style Simple and OTher}
+Another task which is likely to suffer from lack of viewpoints is a grasping task. So I designed these tasks around the idea of grasping. Firstly, a simple version (Figure \ref{fig:grasp-simple}) which the agent learns to reach then grasp the cubic target. 
+
+Main differences between this and the reaching task is that the target here is tangible, so on top of being rendered it is also set to be \emph{collidable}. Another major addition is the usage of the \emph{extension string} as seen in \ref{subfig:simple-zoom-actions}, this instructs the demonstration engine to insert certain moves within the movement of the simple trajectory. In this case \verb|open_gipper()| ensures the gripper is open, then a later waypoint will instruct it to close.
+
+\todo{maybe some experiment resutls here?}
+
+The more complicated counterpart, shown in Figure \ref{fig:grasp-move}, is a scenario where the cube needs to be picked up then moved to the target location (designated in green)
+
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/simple-front.png}
+    \caption{Front}\label{subfig:simple-front}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.5\linewidth}
+    \centering
+    \includegraphics[scale=0.3]{../fyp/assets/task-pics/grasp/simple-front-zoom-gripper_actions.png}
+    \caption{Zoomed, with gripper action}\label{subfig:simple-zoom-actions}
+  \end{subfigure}
+  \caption{Simple Grasping Task}\label{fig:grasp-simple}
+\end{figure}
+
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/move-front.png} 
+    \caption{Front}\label{subfig:grasp-move-front}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/move-top.png}
+    \caption{Top}\label{subfig:grasp-move-top}
+  \end{subfigure}
+  \caption{Grasping then moving}\label{fig:grasp-move}
+\end{figure}
 
 
+
+\missingfigure{grasp pic and possibly the demo gifs}
+\todo{add a picture with the cube grasped and the wrist camera view seen at that point}
 Although, initially the wrist camera shouldn't pose any problems, as we advance through the task, especially after we have grasped something the wrist mounted camera becomes heavily obstructed and becomes unreliable so basing our decisions on this medium alone is not ideal.
 
 \subsubsection{Observations}
