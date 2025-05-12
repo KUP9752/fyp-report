@@ -130,13 +130,16 @@ The task I created is simple, see Figure \ref{fig:reach-no-obs}. I decided to us
 
 The next step was to create a policy network. As I am mainly working on imitation learning from demonstrations provided by the system, my network needs to be able to ingest these demonstrations and generate actions in the action space of the robot. \par
 
-\fbox{  
-  \begin{minipage}{\linewidth}
-    \textbf{Aside on RLBench Demonstrations} \par
-    Demonstrations are provided encapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. \par 
-    Demonstrations are created following waypoints. PyRep expects  \emph{Dummy} objects within the scene called ``waypointX'' where sequence number of the waypoint starting from $0$. Then he demonstration engine calculates trajectories to these waypoints in sequence. For example, in Figure \ref{fig:reach-no-obs-hierarchy}, we have `waypoint0' within the target, for which a trajectory will be calculated from the tip of the robot gripper.
-  \end{minipage}
-}
+\begin{center}
+  \fbox{  
+    \begin{minipage}{\linewidth}
+      \textbf{Aside on RLBench Demonstrations} \par
+      Demonstrations are provided encapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. \par 
+      Demonstrations are created following waypoints. PyRep expects  \emph{Dummy} objects within the scene called ``waypointX'' where sequence number of the waypoint starting from $0$. Then he demonstration engine calculates trajectories to these waypoints in sequence. For example, in Figure \ref{fig:reach-no-obs-hierarchy}, we have `waypoint0' within the target, for which a trajectory will be calculated from the tip of the robot gripper.
+    \end{minipage}
+  }
+\end{center}\todo[color=green]{check centering acts weird sometimes}
+
 
 \noindent By default the demonstrations -which I will refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $128 \times 128$ pixels. I binned this down to $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. Therefore, I created a simple network following this architecture outlined in Figure \ref{fig:policy-arch}. The full code can be found in \todo{add the code of the network to appendix}.
 
@@ -148,6 +151,7 @@ The next step was to create a policy network. As I am mainly working on imitatio
 
 
 \subsubsection{Tuning the Policy}\todo{can remove not sure??s}
+\todo{talk about the different types of ingesting state informariton per observation/per demo, run some tests , I think the per obs works better but find some reason as to why}
 
 \subsubsection{Policy Improvements}
 \todo{maybe do some lr scheduling and data processing for the images for generalisation  and mention the shuffling etc of the data and that it doesn't change much}
@@ -183,12 +187,12 @@ conditions are not always ideal, so wanted to do some quick checks to get concre
 \subsection{Generalisability}
 I had some static versions of this task where the target sphere was always in the same position, for which a single demonstration with long enough training is enough to learn the task. This is because without variation, Behavioural Cloning can be easily achieved by overfitting to the data. 
 
-Therefore I created a dynamic version of the task, where the target is not randomly placed within view (not necessarily always fully within view but the centre will be, making sure the wrist camera can see it). This is achieved by using a \verb|SpawnBoundary| and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white bow being the boundary, which is not rendered in the simulation. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
+Therefore I created a dynamic version of the task, where the target is now randomly placed within view (not necessarily always fully within view but the centre will be, making sure the wrist camera can see it). This is achieved by using a \verb|SpawnBoundary| and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white bow being the boundary, which is not rendered in the simulation visually. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
 
 Running some tests with a tuned \todo{talk about tuning maybe?} policy, it was enough to see that, with the wrist camera having unobscured access to the target, it would easily learn to reach for it.
 
 
-\subsection{Camera Limitations}\todo{reread and make sure it is a good starter segue to obs}
+\subsection{Camera Limitations}\todo{reread and make sure it is a good starter segue to obs (maybe move these to after obs?)}
 
 I was started experimenting limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task, however, another interesting area of investigation is finding what kind of tasks benefit from different viewpoints, for example shoulder mounted or other static scene-observing cameras. 
 
@@ -256,8 +260,9 @@ Introducing the other cameras placed around in the environment, such as the \ver
 
 \subsubsection{Implementing `Looking' into the Demonstrations}\todo{haven't done this yet}\label{ew-looking-at-target}
 issues this is not easy might be working on this as a part of approach 2 later
+Another solution might be to experiment with the demonstration system to make sure we are pointing the wrist camera (so, the hand of our robot) towards its target as a demonstration trajectory is calculated \todo{explain that this proved tricky and might not even be worth it}
 
-Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \todo{find some prior info tracking works add ref} or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}
+If we can't implicitly encode the `looking' information through the demonstration that means we will have to inject this information into our agent some other way. Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \todo{find some prior info tracking works add ref} where object priors are incorporated into the learning or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}.  
 
 \section{Expanding the Task Space: Grasping Tasks}
 Another task which is likely to suffer from lack of viewpoints is a grasping task. So I designed these tasks around the idea of grasping. Firstly, a simple version (Figure \ref{fig:grasp-simple}) which the agent learns to reach then grasp the cubic target. 
