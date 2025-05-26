@@ -1,10 +1,22 @@
 \chapter{Active Perception Policy Learning}
-In this section we will cover:
+In this section, by using what I have learnt so far, I will:
   \begin{itemize}
-    \item Proposing some approaches to learn active perception policies
-    \item Comparing these approaches to each other and some baselines \todo{not sure about baselines, what are my baselines?}
-    \item Early experimentation on limitations of vision\todo{\emph{vision}, does it read well?}
-    \item 
-    \item \ldots
+    \item Proposing some approaches to implementing active perception policies, mainly:
+      \begin{enumerate}
+        \item Environmental reasoning policy
+        \item Uncertainty score based planning policy
+        \item Human-like separte camera and gripper model for learning
+      \end{enumerate}
+    \item Implement these suggestions
+    \item Compare the proposed systems against each other and non-active baselines
+    \item \ldots \todo{}
   \end{itemize}
+
+Contrary to the previous section, active vision entails moving the primary information source, as the robot control involves moving our robot (and by proxy its gripper) the cameras I will be mostly working with here will include some combination of the wrist mounted sensors, such as the RGB, the depth, and possibly other sensors \todo{are there others?? point clouds are just depth and some fancy math}
+
+% 1-
+\input{project/appl/first-approach.tex}
+% 2-
+\input{project/appl/second-approach.tex}
+\input{project/appl/third-approach.tex}
   

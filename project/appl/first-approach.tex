@@ -1,0 +1,29 @@
+\section{First Approach: 3D Reasoning}
+Main idea here is to not touch the training for the policy. Which is to say, a policy will be learnt as normal from demonstrations using imitation learning. Then during its execution, the robot can use 3D reasoning and possibly planning to move to its optimal state before applying what its learnt from the demonstration (which are specifically relating to the task)
+
+\subsection{Proposed Approach}
+What makes this system is the \emph{optimal pose predictor}, as we want the robot to place itself in a situation where the:
+\begin{itemize}
+  \item Object visibility is maximised
+  \item Occlusions are minimised
+\end{itemize}
+all the while keeping the robot in a valid kinematic state as dictated by the physics in the simulator.
+
+
+A simple system would follow the following decision process:
+\missingfigure{Train -> evaluate visibility -> if POOR: runu viewpoint optimisation, move gripper there -> execute trained IL policy}
+
+Therefore, we can formalise this system as follows:
+\[
+p^* = {argmax}_{p \in \mathcal{P}}
+  \left[
+    \mathcal{V}(p; \mathcal{O}, \mathcal{S} 
+    - 
+    \lambda\mathcal{C}(p))
+  \right]
+\]
+
+Therefore the most important consideration is defining these scoring utility functions that 
+
+\subsection{Implementation}
+\todo{add details on how its implemented and maybe code snippets and graphs?}
