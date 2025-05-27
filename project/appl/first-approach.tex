@@ -13,17 +13,32 @@ all the while keeping the robot in a valid kinematic state as dictated by the ph
 A simple system would follow the following decision process:
 \missingfigure{Train -> evaluate visibility -> if POOR: runu viewpoint optimisation, move gripper there -> execute trained IL policy}
 
-Therefore, we can formalise this system as follows:
+We can formalise this optimal pose system as follows:
 \[
 p^* = {argmax}_{p \in \mathcal{P}}
   \left[
-    \mathcal{V}(p; \mathcal{O}, \mathcal{S} 
+    \mathcal{V}\left(p; \mathcal{T}, \mathcal{S}\right)
     - 
-    \lambda\mathcal{C}(p))
+    \lambda\mathcal{C}\left(p\right)
   \right]
 \]
 
-Therefore the most important consideration is defining these scoring utility functions that 
+Where \(p^* \in \mathcal{P}\), is a (reachable) candidate gripper pose, represented in in \(\mathbb{R}^7\): \( \left[ x, ~y, ~z, ~qx, ~qy, ~qz, ~qw\right]\), as RLBench stores pose information as a list of 3D coordinates (\(x, ~y, ~z\)) and a quaternion (\(q = \langle x, ~y, ~z, ~w \rangle \)) to represent rotation. Which is a more compact way of representing rotations compared to $3\times3$ matrices.
+
+$\mathcal{T}$ and $\mathcal{S}$ are the 3D information about the target object and the scene respectively. They can be mesh data about the objects, or possibly point clouds. This approach will initially have to depend on prior knowledge about the target, then later I might be able to encode the target information to be learnt during training so that we can remove the dependence on providing priors.
+
+$\mathcal{V}$ is the visibility score for our target object. We need to define some scoring functions to asses the utility of our current pose within the scene.
+
+And finally, $\mathcal{C}$, is some sort of constraint or cost function to help shape the choices correctly, it might be a constraint to make sure candidate poses are reachable, or maybe a cost function determining whether a candidate pose is too far from the current configuration. $\lambda$ is just a tunable weight to adjust how much these limitations contribute to out optimal pose finding. To add, there maybe multiple cost functions so we can expand them as: \(\lambda_1\mathcal{C}_1 + \cdots +\lambda_n\mathcal{C}_n \).
+
 
 \subsection{Implementation}
+Following the plan, the most important part to start with is our utility function, and a way of sampling poses. Then I can start devising constraints to help shape the policy.
+
+\subsubsection{Scoring a Candidate Pose}
+The first, and simplest, idea to start implementing a utility function is to extract the target colour and mask the RGB camera to score visibility on \todo{continue}
+
+\subsubsection{Choosing a Candidate Pose}
+
+
 \todo{add details on how its implemented and maybe code snippets and graphs?}
