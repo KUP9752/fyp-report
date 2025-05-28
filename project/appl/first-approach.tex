@@ -17,7 +17,7 @@ We can formalise this optimal pose system as follows:
 \[
 p^* = {argmax}_{p \in \mathcal{P}}
   \left[
-    \mathcal{V}\left(p; \mathcal{T}, \mathcal{S}\right)
+    \mathcal{V}\left(p; \mathcal{O}\right)
     - 
     \lambda\mathcal{C}\left(p\right)
   \right]
@@ -25,7 +25,7 @@ p^* = {argmax}_{p \in \mathcal{P}}
 
 Where \(p^* \in \mathcal{P}\), is a (reachable) candidate gripper pose, represented in in \(\mathbb{R}^7\): \( \left[ x, ~y, ~z, ~qx, ~qy, ~qz, ~qw\right]\), as RLBench stores pose information as a list of 3D coordinates (\(x, ~y, ~z\)) and a quaternion (\(q = \langle x, ~y, ~z, ~w \rangle \)) to represent rotation. Which is a more compact way of representing rotations compared to $3\times3$ matrices.
 
-$\mathcal{T}$ and $\mathcal{S}$ are the 3D information about the target object and the scene respectively. They can be mesh data about the objects, or possibly point clouds. This approach will initially have to depend on prior knowledge about the target, then later I might be able to encode the target information to be learnt during training so that we can remove the dependence on providing priors.
+$\mathcal{O}$ is the given observation. So, any  3D information about the target object and the scene respectively. They can be mesh data about the objects, or possibly point clouds. This approach will initially have to depend on prior knowledge about the target, then later I might be able to encode the target information to be learnt during training so that we can remove the dependence on providing priors.
 
 $\mathcal{V}$ is the visibility score for our target object. We need to define some scoring functions to asses the utility of our current pose within the scene.
 
@@ -36,9 +36,19 @@ And finally, $\mathcal{C}$, is some sort of constraint or cost function to help 
 Following the plan, the most important part to start with is our utility function, and a way of sampling poses. Then I can start devising constraints to help shape the policy.
 
 \subsubsection{Scoring a Candidate Pose}
-The first, and simplest, idea to start implementing a utility function is to extract the target colour and mask the RGB camera to score its visibility (similar to how it was done in `attn' before \todo{link})
+The very first step is to implement an utility function. The initial plan was to use a pretrained segmentation network. Such as MaskRCNN \todo{ref?}. The idea was to segment objects present in the scene and ideally get some bounding boxes of where the system thought the objects were. However, this had some application issues, because these networks were mainly trained with real-life data and pictures the toy tasks that I created without proper graphics overlaying them, would commonly be misclassified or not be classified at all. 
+
+Along with bounding boxes MaskRCNN also gives uncertainties as well as the label of what it thinks this item is. Which I initially thought I could use as a score for `seeing' the target.From the wrist camera it would almost always find the grippers (which are visible) but it was quite uncertain at marking my main target object, and the very rare times it did mark it it would not be certain what it was. From the many pretrained labels it would guess between: `apple', `fire hydrant', and `traffic light'. This is unideal because in the fully autonomous training stage, the network does not necessarily understand about what its looking for, and it doesn't care what its looking for. This however made it hard to quantify the \emph{vision score} with the uncertainty because firstly it couldn't decide on what it was that it was seeing, meaning I couldn't extract just a label from the MaskRCNN return dictionary and check its uncertainty. On top of this it would sometimes latch onto other things in t he scene, such as the grippers I mentioned (mostly identified them as \todo{i cant remember check again?}). So I either had to label these by hand, which is inefficient, or find a way to have the network learn what its target is through an unsupervised (or at least semi-supervised manner).
+\todo{add figures of bounding box redo in rwd copy if needed}
+
+This therefore lead me to pursue a simpler idea implementing a utility function is to extract the target colour and mask the RGB camera to score its visibility (similar to how it was done in `attn' before \todo{link})
+
+
+
+
 
 \subsubsection{Choosing a Candidate Pose}
-
+Sampling around a sphere from the gripper's pose
 
 \todo{add details on how its implemented and maybe code snippets and graphs?}
+  
