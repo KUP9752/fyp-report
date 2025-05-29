@@ -1,13 +1,20 @@
 \chapter{Camera Combination Investigations}
-This chapter I will experiment with:
+This chapter I will be:
 \begin{itemize}
-  \item a good vision score policy without intrinsic information about the simulator.
-    \item simple colour checking with a threshold?? -> shit but all that I could get working 
-    \item  reay projectrion and checking if it lands on target
-      \item  prior info about target?? -> using CAD models I can do RBG(-D) pose estimation
-      \item extract prior information form demonstration?
-  \item segmentation masks to pull bits out
-    \item  How do we know which segmentation mask is my target?
+  \item Creating some toy tasks in RLBench
+  \item Propse methods of imitiation learning to solve these tasks
+  \item Experiment with the strengths and weaknesses of said methods
+  \item Augment my proposals with findings
+  \item Use learnings to guide proposed active policies in the next chapter \todo{maybe remove this}
+  
+  \todo{there are commented notes from earlier here, might help the next section}
+  % \item a good vision score policy without intrinsic information about the simulator.
+  %   \item simple colour checking with a threshold?? -> shit but all that I could get working 
+  %   \item  reay projectrion and checking if it lands on target
+  %     \item  prior info about target?? -> using CAD models I can do RBG(-D) pose estimation
+  %     \item extract prior information form demonstration?
+  % \item segmentation masks to pull bits out
+  %   \item  How do we know which segmentation mask is my target?
   \item 
 \end{itemize}
 
@@ -16,3 +23,7 @@ This chapter I will experiment with:
 
 
 \todo{move the depth interfacing here}
+% Start
+
+% Depth Interfacing
+\input{project/cam-comb/depth.tex}
