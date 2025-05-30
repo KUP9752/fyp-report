@@ -1,0 +1,48 @@
+\section{Expanding the Task Space: Grasping Tasks}
+Another task which is likely to suffer from lack of viewpoints is a grasping task. So I designed these tasks around the idea of grasping. Firstly, a simple version (Figure \ref{fig:grasp-simple}) which the agent learns to reach then grasp the cubic target. 
+
+Main differences between this and the reaching task is that the target here is tangible, so on top of being rendered it is also set to be \emph{collidable}. Another major addition is the usage of the \emph{extension string} as seen in \ref{subfig:simple-zoom-actions}, this instructs the demonstration engine to insert certain moves within the movement of the simple trajectory. In this case \verb|open_gipper()| ensures the gripper is open, then a later waypoint will instruct it to close.
+
+\todo{maybe some experiment resutls here?}
+
+The more complicated counterpart, shown in Figure \ref{fig:grasp-move}, is a scenario where the cube needs to be picked up then moved to the target location (designated in green)
+
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/simple-front.png}
+    \caption{Front}\label{subfig:simple-front}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.5\linewidth}
+    \centering
+    \includegraphics[scale=0.3]{../fyp/assets/task-pics/grasp/simple-front-zoom-gripper_actions.png}
+    \caption{Zoomed, with gripper action}\label{subfig:simple-zoom-actions}
+  \end{subfigure}
+  \caption{Simple Grasping Task}\label{fig:grasp-simple}
+\end{figure}
+
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/move-front.png} 
+    \caption{Front}\label{subfig:grasp-move-front}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/move-top.png}
+    \caption{Top}\label{subfig:grasp-move-top}
+  \end{subfigure}
+  \caption{Grasping then moving}\label{fig:grasp-move}
+\end{figure}\todo[color=blue]{reshape}
+
+
+\missingfigure{grasp pic and possibly the demo gifs, }
+\todo{add a picture with the cube grasped and the wrist camera view seen at that point}
+Although, initially the wrist camera shouldn't pose any problems, as we advance through the task, especially after we have grasped something the wrist mounted camera becomes heavily obstructed and becomes unreliable so basing our decisions on this medium alone is not ideal.
+
+\subsubsection{Observations}
+What I got from these experiments was that the agent can benefit from understanding its surroundings at a higher level and more importantly remembering them. This is because once the camera becomes obstructed, as with \emph{Grasp Then Move}, even if the agent could do some exploration to find the target, it wouldn't be ideal due to the restricted view it has access to. So, observing the environment before, and remembering important parts will be vital for the later stages of tasks. I aim to explore some pre-policy visual exploration of the environment to be albeit to address issues such as this one.
