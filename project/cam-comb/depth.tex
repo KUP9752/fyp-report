@@ -1,11 +1,18 @@
 \section{Depth Interfacing}
-The RGB cameras are not the only things we have access to in this system. On top of them we have access to the depth sensor (and the point cloud information which is derived using the depth sensor)
-This means that there are extra bits of information the policy can use to reason about its surroundings in the workspace. This section comprise the main bulk of my work where I wanted to be able answer the question of: ``Do we need stereo-vision or a depth camera with a single vision source suffice?''
+Another area of important research, before relating all this back to active vision, is figuring out distance. Depth interfacing is an important part of perception, and continuing from the drawn parallels to humans, we place object in our fields of vision by our two eyes. Stereo-vision, allows us to process two slightly different poses of a target object to reinforce our understanding of where that object is in the environment around us. Other information such as lighting (shadows) may unconsciously help us as well. However, the main takeaway is that understanding distance to an object goes a long way in firstly understanding how to approch an object.
 
-This is because, as I hinted earlier in the background section, the main idea of active vision is to be able to use minimal amounts of viewpoints and make the most out of these. In this scenario, I want to see if it can be justified to use the wrist camera accompanied by the wrist depth sensor to replace any other cameras we might have around the workspace.
+The few ways to achieve this in robotics and RLBench specifically is either to use two cameras (with a known distance between the two cameras to adjust poses with known intrinsics). However, RGB cameras are not the only things we have access to in this system. We also we have access to the depth sensor -and the point cloud information which is derived using this information.
 
-\subsection{Grasping with Varying Depths}
+This is because, as I hinted earlier in the background section, the main idea of active vision is to be able to use minimal amounts of viewpoints and make the most out of these. In this scenario, I want to see if it can be justified to use the wrist camera accompanied by the wrist depth sensor to replace any other cameras we might have around the workspace. Paving the way to the next section in proposing active vision policies that act solely on information from a repositionable sensor (be that rgb, depth or any other).
+
+So,  we want to see whether depth information adds meaningful information that we can justify not using external scene cameras in favour of a wrist camera and a wrist depth sensor.
+
+\section{Grasping with Varying Depths}
 I wanted to investigate how the agent reacts to possible targets changing shapes and distances interacts with the input mediums we have.
+
+\subsection{Task Design}
+The experiment that makes sense in this case is a grasping task. As the task performer needs to figure out where an object is before attempting to grab it. So, I created a modified version of the simple grasping task where the target object's distance and scale can be externally varied to observe the behaviours of agents in a controlled manner.\todo{talk about delegating the task creating and param passing as wellas the tasks in appendix and link here}
+
 \missingfigure{two tasks box far, box close with wrist rgb  outputs 2 by 2 grid}
 
 This is the general setup I am planning on using to evaluate the depth sensor versus a stereo or any multi-view setup.
@@ -14,41 +21,14 @@ As we can see here, in these very different reaching scenarios \todo{ref the fig
 \missingfigure{add the left and right shoulder cams here 2 by 1 figure, of the above task}
 \missingfigure{add differnt depth outputs from the above task, 2 by 1 figure}
 
-\subsection{Feature Extraction and Fusion}
-Following the experimental setup I also wanted to see what is the most viable way to fuse information about the depth cameras and the RGB cameras to enable the best way of learning for my policies. This is inherently a difficult problem as there is no one way to do this, and multiple ways may interact differently with different setups
+\section{Creating an Appropriate Policy}
+The policy for grasping needed slight modifications compared to the simpler reaching task. Along with understanding what is being seen for movement of the joints, we also needed a mechanism for sending a grasping signal for the robot. The previous policy would regress the entire 6DoF along with the final \emph{float} that controls the gripper. This was not sufficient for this task. Firstly, there weren't many frames the gripper is signaled to be closed, as the gripping happens at the end of the task, comparatively less observations where the gripper is closed; means that there is an inherent imbalance in our dataset. If we were to treat \textbf{CLOSED} and \textbf{OPEN} as binary labels; which they are as RLBench takes a \emph{float} $\in \left[0, 1\right]$ and thresholds at $ > 0.9$ to check if it should be open. Therefore, regressing the entire action with the gripper bit makes it extremely uncertain and mostly skew towards staying open. 
 
-\subsection{Simple Fusion Methods}
-This adds onto before, gated attention and rgb attending to depth etc, explain some approaches
-
-\subsection{Deeper/Better Understanding - RCN}
-This was not useful, mainly because what I have constrained myself into with the smaller image sizes, and these larger image segmenting networks are better with more information as they aggressively pool especially -the larger models. \todo{not sure say some other bs here}
-
-\subsection{Temporal Understanding of Demonstration}
-Even though the agent is not half bad at trying to reach the target in the above configurations, it is not necessarily better at succeeding at grasping, and the movements seem janky compared to precise demonstrations, and the robot doesn't necessarily understand where in the movement it is, because the first half of the episode is very repetitive and the inputs are eerily similar. This meant that an important part of the system was for my agent to understand where it was as well as when it was.
-
-\subsubsection{Latent RNN Encodings of Movement Steps}
-I wanted to encode the timestep information into some sort of feature representation which would use the previous states to encode the data. This simple idea was to introduce temporal noise into the decision process. Then act on the final encoding
+To adjust for this I first tried to do binary classification with weighting the samples to counteract this, which was not fruitful just due to the overall dataset size being small as well. So, going back to regression, I decided to add Cross Entropy Loss and with a gripper prediction head just predict the gripper action from the extracted camera features, then add this as a part of the overall loss with a weighting \todo{add loss in math notation with lambda gripper}. This meant that the gripper action is separately tunable to the movement action. This makes inherent sense as the movement decisions should never affect the gripper. The information flow is camera to movement and gripper action separately \todo{small flowchart to show cam  move, cam gripper action} 
 
 
-\missingfigure{diagram about feeding the entire demo and training per step}
+\subsubsection{Incorporating the Depth Camera}
+probably cant just fuse with the rgb, might need a new conv for this then merger header
 
-\todo{problems here were that the entire demo was being used, but the optimisation was getting made at the final state}
+\todo{conclude depth here and move onto combination experiments}
 
-\subsubsection{Fine-Grained per Time Step Training}
-Once I realised my mistake, which was about discarding half my encoded steps and were not using my RNN to its full potential \todo{rewrite} As I have access to ground truth information at every observation step, it would be smart to optimise the loss in a fine-grained manner at every frame.
-\missingfigure{updated diagram to convey the padding and unpacking and training the loss on every frame step}
-This lead to a more robust and confident architecture. The movements of my policy felt less spiky, no more sudden jerks and more calculated reaching. It did still absolutely overfit to the average position, and was not much better at grasping, but the episodic movements were cleaner and I believe enhancing the grasping branch of the network would allow it to be more successful \todo{what the fuck am i talking about, summarise and clean up}
-
-
-\subsection{ViT Encodings}
-\todo[color=red]{not done much on this, but may be able to talk about how I would go about it or just remove}
-
-\subsection{Proprioception}
-Up until this point, I left proprioceptive data out of the training, mainly because I wanted to train on purely visual feedback to see what it could achieve without any other state information. Secondly, including state information about the robot, would not necessarily immediately help with the 
-
-\subsection{Segue into Active Vision}
-
-
-\todo{improve the grasping}
-
-\todo{It might be worth scaling everthing to 128 by 128 next week and do a repeat run so that I can at least say that I have done it}
