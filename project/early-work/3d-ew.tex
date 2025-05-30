@@ -3,12 +3,12 @@ The move to 3D was slow, the jump from \emph{pygame} to a full blown physics sim
 
 \subsection{CoppeliaSim and RLBench}
 
-CoppeliaSim is a mostly open source simulation program that provides full access to its features through an educational license and RLBench \cite{james2019rlbenchrobotlearningbenchmark}is an in-house (Imperial) tool adapted to plug into CoppeliaSim through its python API interface, PyRep \cite{pyrep2020}. 
+CoppeliaSim is a mostly open source simulation program that provides full access to its features through an educational license and RLBench \cite{james2019rlbenchrobotlearningbenchmark} is an in-house (Imperial) tool adapted to plug into CoppeliaSim through its python API interface, PyRep \cite{pyrep2020}. 
 
-There are many tutorials online to help learn how CoppeliaSim operates and designing some scenes \todo[color=green]{maybe cite some stuff here, not necessary}. However, RLBench is a harder beast to tame. Although the system is very smart and it eliminates a lot of the required manual work before I can get started with running experiments; it is quite old, plugs into version $4.1$ of CoppeliaSim from 2020. As well as its age, I had had some issues setting it up on my system. 
+There are many tutorials online to help learn how CoppeliaSim operates and designing some scenes \todo[color=green]{maybe cite some stuff here, not necessary}. However, RLBench is a harder beast to tame. Although the system is very smart and it eliminates a lot of the required manual work before starting experimenting; it is quite old, plugs into version $4.1$ of CoppeliaSim from 2020. As well as its age, I had had some issues setting it up on my system. 
 
 \subsection{Environment Issues}\todo[color=red]{this section might need shortening, 2 pages is a lot for this}
-One of the first large-scale issues I'd face in this project came here, quite early in its lifespan. I would soon learn robotics development is mostly done on Linux based machines and the journey to getting everything working would be quite long.
+One of the first large-scale issues I'd face in this project came quite early in its lifespan. I would soon learn robotics development is mostly done on Linux based machines and the journey to getting everything working would be quite long.
 
 \subsubsection{Windows Setup}
 I do most development work on Windows and WSL (Windows Subsystem for Linux) \cite{microsoftWSL} and expecting this project to be memory and graphic power hungry, it made sense to set everything up on the Windows side. This caused a few issues with PyRep, mainly because PyRep expected to be running on Linux, and RLBench was having issues launching.
@@ -19,9 +19,9 @@ I thought this wouldn't be a problem, as WSL version 2 has been pretty good with
 The translation layer between the operating systems might cause some slowing but there shouldn't be any major issues. Upon configuring everything as the installation guide suggested in RLBench and PyRep repositories. I had few issues linking object files downloaded with CoppeliaSim into the PyRep layer. After spending a lot of time researching issues, and coming across some online threads with similar issues (in different applications, so nothing was immediately applicable) I decided WSL must have been the problem and decided to move onto the next logical step.
  
 \subsubsection{Linux Virtual Machine}
-I had previously used Ubuntu a lot and even my WSL instance was running Ubuntu. As RLBench suggested Debian based systems, assuming they also developed it in Ubuntu, I created a Virtual Machine running it. After the entire setup process, I was finally able to get the instance running and finally managed to run one of the examples that gets downloaded when installing RLBench.
+I had previously used Ubuntu a lot and even my WSL instance was running Ubuntu. As RLBench suggested Debian based systems, and seeing the tutorials were done on Ubuntu, I created a Virtual Machine running it. After the entire setup process, I was finally able to get the instance running and finally managed to run one of the examples that gets downloaded when installing RLBench.
 
-However, I got hit by another issues fairly quickly, the rendering of Virtual Box was definitely going through some sort of translation through Windows and the GPU adapted was not linking properly. So, everything was extremely sluggish, and running the non-primitive examples even crashed my virtual machine instances a few times. At this point I realised I had to settle for the real deal and got to partitioning by storage drive.
+However, I got hit by another issues fairly quickly, the rendering of Virtual Box was definitely going through some sort of translation through Windows and the GPU adapter was not linking properly. So, everything was extremely sluggish, and running the non-primitive examples even crashed my virtual machine instances a few times. At this point I realised I had to settle for the real deal and got to partitioning by storage drive.
 
 \subsubsection{Dual Booting}
 I had some issues partitioning the drive Windows was already installed, so decided to get myself another drive I could boot Ubuntu from.
@@ -35,23 +35,24 @@ After running through the same setup steps and linking binaries, I was finally p
 \end{figure}
 
 
-\subsubsection{Campus Machines}
+\subsubsection{Side Note on Campus Machines}
 I knew that a solution to all of my problems might have been using a machine at the labs. I thought an issue with that may have been that RLBench needs some binary linking and setting of system variables, which might have required more access rights and the troubleshooting wouldn't be as easy as doing it on my machine. 
 
-However, the main reason I didn't try this is because my personal machine has appropriately powerful hardware for a machine learning project and wanted to take advantage of this. So jumping through all these steps took about an entire week, but was well worth it, as now I have a system that can run all these systems in a headed manner, meaning I can watch and observe the behaviours of my robot as it learns and explores its workspace.
+However, the main reason I didn't try this is because my personal machine has appropriately powerful hardware for a machine learning project and wanted to take advantage of this. So jumping through all these steps took about an entire week, but was well worth it, as now I have a system that can run all these systems in a headed manner, meaning I can watch and observe the behaviours of my robot as it learns and explores its workspace, to possibly see its shortcomings and propose methods in eliminating them.
 
 \subsection{Usability Issues}
-One of the major instability issues I had was because RLBench is about 5 years old now and CoppeliaSim has moved on in some parts. However, PyRep didn not work with any other version other than version $4.1$ (2020), CoppeliaSim is now at $4.9$ (2025) \cite{coppeliaSimManual}.
+I had some instability issues mainly due to RLBench's age which is about 5 years old now. CoppeliaSim has moved on in some parts. However, PyRep didn't not work with any other version other than version $4.1$ (2020), CoppeliaSim is now at $4.9$ (2025) \cite{coppeliaSimManual}.
+There was work being done on updating PyRep to version 4.6 \ref{pyrep460beta} last year, but I did not feel confident in using a beta build after all the issues I was already having.
 
 \subsubsection{RLBench Codebase}
-As I started using RLBench other issues started popping up, PyRep was randomly failing calls to CoppeliaSim due to errors raised in RLBench due to unexpected types and hitting exceptions such as \emph{``Should not be here''} which was especially frustrating. However, the solution was simple. Entirety of the RLBench source code is accessible, so instead of downloading it as a package I forked the repo and started fixing any issues as they started arising. Once trivial issues were getting fixed I also started using CoppeliaSim to make mockup tasks (see the next section, \ref{sec:3d-reaching-tasks}) and create networks that would use the simulation to train.
+As I started using RLBench other issues started popping up, PyRep was randomly failing calls to CoppeliaSim due to errors raised in RLBench due to unexpected types and hitting exceptions such as \emph{``Should not be here''} which was especially frustrating. However, the solution was simple. Entirety of the RLBench source code is accessible, so I forked the repo and started fixing any issues as they started arising. Once trivial issues were getting fixed I also started using CoppeliaSim to make mockup tasks (see the next section, \ref{sec:3d-reaching-tasks}\todo{link this correctly}) and create networks that would use the simulation to train.
 
-Around the time I started training some primitive models and learning more about these tools, I started hitting weirder errors, like the simulator constantly crashing, getting unexpected observation results, such as cameras such as overhead cameras  missing their input. Spending even more time combing though some of this \textbf{large} codebase I would sometimes find issues to fix them, but it would routinely break some of the package binaries I had linked and just stop working with no way to reason or figure out how to fix it. At this point I decided to check out some other tools.
+Although there were more errors and weird behaviours to come. The simulator would constantly and seemingly randomly crash, data from observations and other live elements within the simulator would give bogus data, like it being randomly \verb|None| or empty arrays. However, the codebase is \textbf{large} and types not being enforced made this journey quite hard. At this point I wanted to explore other tools I could use.
 
 \subsubsection{PyBullet}
-The first option was PyBullet \cite{pybullet}, an open-source Python module for simulation, it wraps the Bullet SDK \cite{bullet3} and provides a completely customisable simulation experience. Though, the GUI experience is lacking and almost everything is controller through this SDK through a C-API
-. 
-Following some rough tutorials and combing through the manual for the module, I was able to put together fairly simple graphics, and shapes to start creating some tasks. Although, I came to a halting realisation soon after. Which was that without a complete robot learning suite at my disposal I would need to figure out a lot of the systems from scratch. Such as camera placements and movement systems, seamless task creation and linking, environment management, demonstrations and so on.
+The first option was PyBullet \cite{pybullet}, an open-source Python module for simulation, it wraps the Bullet SDK \cite{bullet3} and provides a completely customisable simulation experience. Though, the GUI experience is lacking and almost everything is controlled through the SDK's C-API.
+
+Following some rough tutorials and combing through the manual for the module, I was able to put together fairly simple graphics and shapes to start creating some tasks. Although, I came to a halting realisation soon after. Which was that without a complete robot learning suite at my disposal I would need to figure out a lot of the systems from scratch. Such as camera placements and movement systems, seamless task creation and linking, environment management, demonstrations and so on.
 
 
 \subsection{Toolset Dilemma}
@@ -64,22 +65,22 @@ So the main dilemma was, should I be wasting time making a comprehensive suite t
 Fixing all the OS dependent issues and getting it running, I decided to stick with RLBench, hoping that the initial setup and early work issues would be the bulk of them. I also got familiar with the codebase during this time and was more confident in fixing any issues.
 
 \section{First Steps in 3D: Reaching Task}\label{sec:3d-reaching-tasks}
-Landing back on RLBench and solving most of the issues, first steps were to create some 3d environments and tasks to test capabilities of simple policies on tasks that progressively get more difficult. So, the very first step was to directly translate the 2D task I played with earlier in \ref{subsec:ew-2d-problem}. So, I created a simple reaching task. 
+Now deciding to stick with RLBench, first steps were to create some 3d environments and tasks to test capabilities of simple policies on tasks that progressively get more difficult. So, the very first step was to translate translate the 2D task I played with earlier, \ref{subsec:ew-2d-problem}, into a 3D setting. So, I created a simple reaching task. 
 
 \subsection{Creating the Task}
-As discussed before\todo[color=green]{where is this? link}, RLBench provides an intuitive method for quickly creating and validating tasks. Following the tutorials provided by the creator of RLBench and other resources online on CoppeliaSim \todo{link some copsim manuals or information here.} I could now create tasks for my use case.
+RLBench provides an intuitive method for quickly creating and validating tasks. Following the tutorials provided by the creator of RLBench and other resources online on CoppeliaSim \todo{link some copsim manuals or information here.} I could now create tasks for my use case.
 
 Tasks are created using the \emph{`task builder'} CLI, which is a user facing interface that talks to the PyRep API which in turn controls CoppeliaSim. This allows the user to use GUI elements within the simulator to create objects, boundaries as well as edit their properties while observing what they look like in different camera view layers. Then to create scene wirings; the automatically created \verb|Task| class is used, where \emph{initialisation}, \emph{episode step} and other task related systems can be created for the scene object to then use to create demonstrations and train robot policies. See Figure \ref{fig:task-builder}.
 
 \begin{figure}[htbp]
   \begin{subfigure}{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/early-work/task-builder-cli-1.png}      \caption{Task builder CLI: creating a new task}
+    \includegraphics[width=0.8\linewidth]{assets/early-work/task-builder-cli-1.png}      \caption{Task builder CLI: creating a new task}
   \end{subfigure}%
   \hfill
   \begin{subfigure}{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/early-work/task-builder-scene.png}
+    \includegraphics[width=0.8\linewidth]{assets/early-work/task-builder-scene.png}
     \caption{Simulator: Graphical view of the new task}
   \end{subfigure}%
   
@@ -87,17 +88,17 @@ Tasks are created using the \emph{`task builder'} CLI, which is a user facing in
   
   \begin{subfigure}{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/early-work/task-builder-cli-2.png}
+    \includegraphics[width=0.8\linewidth]{assets/early-work/task-builder-cli-2.png}
     \caption{Task builder CLI: running the simulator on new task}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/early-work/task-builder-scene-hierarchy.png}
+    \includegraphics[width=0.8\linewidth]{assets/early-work/task-builder-scene-hierarchy.png}
     \caption{Simulator: Scene Hierarchy of the objects in the new task}
   \end{subfigure}
   \caption{Creating a new task with `task builder'}\label{fig:task-builder}
-\end{figure}\
+\end{figure}\todo[color=blue]{reshape, smaller? maybe even move to appendix}
 
 
 The task I created is simple, see Figure \ref{fig:reach-no-obs}. I decided to use the \emph{Panda arm}, as that seemed to be standard and more importantly immediately supported by RLBench. It has 7 Degrees of Freedom (DoF) and a gripper -so the action space is a 8 dimensional vector. Then a red spherical target, which is not tangible, in the simulation it will be visually rendered but the arm will not collide or interact physically with it. Finally, added a proximity sensor to the target (which is not visually rendered) so the task can be immediately classified as completed by the system.
@@ -126,9 +127,8 @@ The task I created is simple, see Figure \ref{fig:reach-no-obs}. I decided to us
   \caption{Reaching Task with no obstacles}\label{fig:reach-no-obs}
 \end{figure}
 
-\subsection{Creating a Policy}
-
-The next step was to create a policy network. As I am mainly working on imitation learning from demonstrations provided by the system, my network needs to be able to ingest these demonstrations and generate actions in the action space of the robot. \par
+\subsection{Setting up the Environment}
+\todo{do this change the aside box maybe?}
 
 \begin{center}
   \fbox{  
@@ -140,8 +140,11 @@ The next step was to create a policy network. As I am mainly working on imitatio
   }
 \end{center}\todo[color=green]{check centering acts weird sometimes}
 
+\noindent By default the demonstrations -which I will refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $128 \times 128$ pixels. I binned this down to $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. Therefore, I created a simple network following this architecture outlined in Figure \ref{fig:policy-arch}. This resolution is an arbitrary choice and might need to increase the scale depending on feature extraction proficiency and whether I can identify this to be a limiting factor to learning a task. The full code can be found in \todo{maybe add the code of the environment configuration}.
 
-\noindent By default the demonstrations -which I will refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $128 \times 128$ pixels. I binned this down to $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. Therefore, I created a simple network following this architecture outlined in Figure \ref{fig:policy-arch}. The full code can be found in \todo{add the code of the network to appendix}.
+\subsection{Creating a Policy}
+
+The next step was to create a policy network. As I am mainly working on imitation learning from demonstrations provided by the system, my network needs to be able to ingest these demonstrations and generate actions in the action space of the robot. \par
 
 \begin{figure}[h]
   \centering
@@ -187,18 +190,12 @@ conditions are not always ideal, so wanted to do some quick checks to get concre
 \subsection{Generalisability}
 I had some static versions of this task where the target sphere was always in the same position, for which a single demonstration with long enough training is enough to learn the task. This is because without variation, Behavioural Cloning can be easily achieved by overfitting to the data. 
 
-Therefore I created a dynamic version of the task, where the target is now randomly placed within view (not necessarily always fully within view but the centre will be, making sure the wrist camera can see it). This is achieved by using a \verb|SpawnBoundary| and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white bow being the boundary, which is not rendered in the simulation visually. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
+Therefore I created a dynamic version of the task, where the target is now randomly placed within view (not necessarily always fully within view but the centre will be, making sure the wrist camera can see it). This is achieved by using a \verb|SpawnBoundary| and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white dotted box being the boundary, which is not rendered in the simulation visually. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
 
 Running some tests with a tuned \todo{talk about tuning maybe?} policy, it was enough to see that, with the wrist camera having unobscured access to the target, it would easily learn to reach for it.
-
 
 \subsection{Camera Limitations}\todo{reread and make sure it is a good starter segue to obs (maybe move these to after obs?)}
 
 I was started experimenting limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task, however, another interesting area of investigation is finding what kind of tasks benefit from different viewpoints, for example shoulder mounted or other static scene-observing cameras. 
 
-Or more interestingly other sensors, such as depth or force sensors on robot hands or grippers. This relates back to the idea of human perception. To learn new tasks, we use all kinds of feedback from the environment that is reactive on our actions. Therefore, it is important to study shortcomings of individual sensors with respect to others to understand how policies with limited access to sensors can be made to overcome such challenges without necessarily adding more `observability' to a workspace.
-
-\subsubsection{Multi Camera Mechanisms}
-\todo{talk about `CamType' briefly}
-\subsubsection{Policy Changes}
-\todo{talk about the policy using differnt camera inputs to blend and make informed choices? maybe some plots here showing if it is better or not?}
+Or more interestingly other sensors, such as depth or force sensors on robot hands or grippers (\todo{inspired by the MILES paper, talk about this}). This relates back to the idea of human perception. To learn new tasks, we use all kinds of feedback from the environment that is reactive on our actions. Therefore, it is important to study shortcomings of individual sensors with respect to others to understand how policies with limited access to sensors can be made to overcome such challenges without necessarily adding more `observability' to a workspace, which is the main problem we are trying to address with later active systems.\todo[color=blue]{reread and shorten if needed}

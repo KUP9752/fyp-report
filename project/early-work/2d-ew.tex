@@ -1,15 +1,15 @@
 \section{Starting off with Two Dimensions}\todo[color=red]{shorten section, make pictuers smaler, this is too long I think}
-Early steps I was advised to work on was, getting an idea of \emph{learning} in two dimensions (2D) to get an intuition and follow it on with expanding it to three dimensions (3D) from there.
+Early steps I was advised to work on was, getting an idea of \emph{policy learning} in two dimensions (2D) to get an intuition and follow it on with expanding it to three dimensions (3D) from there.
 
 \subsection{Structuring the Problem}\label{subsec:ew-2d-problem}
-Following those ideas I wanted to create a simple task to train a policy to teach a block to move towards the other block, on simple 2D rendered canvas. Essentially creating a two dimensional reaching task.
+Following those ideas I wanted to create a simple task to train a policy to teach a block to move towards the other block, on simple 2D rendered canvas. Creating a path finding task, which essentially is a two dimensional reaching task.
 
 \subsubsection{Problem Design} 
-I started with pygame \cite{pygame}, a python library that can be used to create 2D canvas with artifacts in it. But before rendering there are some things we have to define. I wanted to create a small\emph{ish} canvas to simulate the game in, with my player and target. I chose to make a $800 \times 600$ canvas and defined my blocks to be $20 \times 20$. Skipping the details the simple game was rendered as Figure \ref{fig:initial-canvas}, where the agent (blue) attempts to get to the target (red).
+I started with pygame \cite{pygame}, a python library that can be used to create 2D canvas with artifacts in it. But before rendering there are some things we have to define. I wanted to create a small\emph{ish} canvas to simulate the game in, with my player and target. I chose to make a $800 \times 600$ canvas and defined my blocks to be $20 \times 20$. Skipping the small details, the simple game was rendered as Figure \ref{fig:initial-canvas}, where the agent (blue) attempts to get to the target (red).
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.6\textwidth]{assets/early-work/initial-canvas.png}
+  \includegraphics[width=0.4\textwidth]{assets/early-work/initial-canvas.png}
   \caption{Initial canvas $800 \times 600$ and $20 \times 20$ blocks}\label{fig:initial-canvas}
 \end{figure}
 
@@ -29,9 +29,9 @@ So, knowing the space, I created an expert policy, \(\pi_{demo}\), which gives t
 \]
 as before. (Data loading was managed with dataframes and pickles for optimal GPU loading and speed)
 
-Therefore, combining the two, I trained a linear neural network with 3 layers in PyTorch \cite{pytorch} predict the key presses (the action) given the coordinates of the blocks (state).
+Therefore, combining the two, I trained a linear neural network with 3 layers in PyTorch \cite{pytorch} predict the key presses (the action) given the coordinates of the blocks (state), which included the target's coordinates as well.
 
-Without getting into implementation details, as this is early work, this worked pretty well. Every frame the state would be fed into the model and the model gives out the movement for that frame. Although, the movement was quite jagged because the classification was predicting key presses and the discrete actions were inherently not smooth; because a small change in a direction could prompt the model to change the  direction suddenly. A solution to this would be to get the direction change instead of a discrete movement direction. So, I pivoted to a regression model.
+Without getting into implementation details, this worked pretty well. Every frame the state would be fed into the model and the model gives out the movement for that frame. Although, the movement was quite jagged because the classification was predicting key presses and the discrete actions were inherently not smooth; because a small change in a direction could prompt the model to change the  direction suddenly. A solution to this would be to get the direction change instead of a discrete movement direction. So, I pivoted to a regression model.
 
 \subsubsection{Regression}
 Similarly, as the scope changing I had to change my model slightly. State remained the same, but the action is now defined to have the type: \(Action: tuple[float, float]\), reflecting the change in $x$ and the change in $y$ (\(\delta x , \delta y\)).
@@ -39,43 +39,43 @@ Following a similar approach I now had a regression model, trained on the same d
 
 
 \subsection{Extending the Problem: Vision}
-To step the investigation in the direction of vision, now I wanted to do the same learning, however, without access to the coordinates of the blocks. I wanted to keep the regression interface, as the smooth movement was working a lot better and, in an ideal robot scenario in the real-world regression based actions are more common due to to continuous values in ranges of motion.
+To step the investigation in the direction of vision, now I wanted to do the same learning, however, without access to the coordinates of the blocks. Adding onto the regression interface, both because smooth movement is preferred and this reflects real life robot control in the form of continuous values to adjust motor velocities.
 
-I started by creating my training data, this time as I was making the expert policy play the game, instead of saving the state as a \emph{4-tuple} of coordinates it was taking a screenshot of the canvas. As the canvas is an RGB image, the type of state now became: $State: list[Image, Action]$ where the image is a vector of size $3 \times 800 \times 600$, for the 3 RGB channels and the size of the canvas.
+I started by simulating the training data, making the expert play the game and instead of saving the state as a \emph{4-tuple} of coordinates it was taking a screenshot of the canvas. As the canvas is an RGB image, the type of state now became: $State: list[Image, Action]$ where the image is a vector of size $3 \times 800 \times 600$, for the 3 RGB channels and the size of the canvas.
 
 \subsubsection{Receptive Area}
-Then I experimented with CNNs to be able to extract information from the scene and infer some sort of relationship. The first issue I faced was with receptive field size, I was mainly using a kernel size of 5 and stride of 2, so that by image was efficiently getting downscaled down the pipeline to learn information at smaller scales. 
+Next step was feature extraction, my model had to \emph{understand} what it was seeing. I experimented with CNNs to be able to extract information from the scene and infer a relationship between state and action. The first issue I faced was with receptive field size. Mainly using a kernel size of $5$ and stride of $s$, so that by image was efficiently getting downscaled down the pipeline to learn information at smaller scales. 
 
-However, due to the block size being too small compared to the total size of the canvas, CNNs that weren't deep enough were not performing well, due to not extracting features well. So I decided to increase the size of the blocks to $50 \times 50$ and after some experimentation and tuning parameters I landed on this model (Figure \ref{fig:cnn-5050}) that performed as well as, if not better, than the coordinate based regression model.
+However, due to the block size being too small compared to the total size of the canvas, CNNs that weren't deep enough were not extracting useful features from my scene. To hone the issue, I decided to increase the size of the blocks to $50 \times 50$ and after some experimentation and tuning parameters I landed on this model (Figure \ref{fig:cnn-5050}) that performed as well as, if not better\todo{any evidence about it performing better?}, than the coordinate based regression model.
 
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.8\textwidth]{assets/early-work/cnn-diagram.png}
+  \includegraphics[width=0.5\textwidth]{assets/early-work/cnn-diagram.png}
   \caption{One of the best models for the agent reaching task}\label{fig:cnn-5050}
 \end{figure}
 
 \subsubsection{Sampling in Phases}
-Another issue I ran into was the this model was performing generally well in getting very close to the target but refusing to take a very small step to collide and successfully complete the task. I realised this was because of the random sample collection being generally far away from the target, by the nature of uniform random sampling and there being vastly more space away from the target. So, to fix this, rather than changing the model architecture I changed the way expert data was sampled.
+Another issue I ran into was the this model was performing generally well in getting very close to the target but refusing to take the final small step to collide and successfully complete the task. I realised this was because of the random sample collection being generally far away from the target, by the nature of uniform random sampling and there being vastly more space away from the target. So, to fix this, rather than changing the model architecture I changed the way expert data was sampled.
 
-In training, I added a parameter to the training dataset, and to the creation of the training data. I made sure I could control the places data was being generated and labelling them where they were getting generated with respect to the the target. Called these phases of generation and made sure i could control the ratio of training samples and which phase they were coming from during the training. 
+In training, I added a parameter to the training dataset, and to the creation of the training data. I made sure I could control the places data was being generated and labelling them where they were getting generated with respect to the the target. Called these phases of generation and made sure i could control the ratio of training samples and which phase they were coming from during the training. \todo[color=blue]{can be shortened/removed}
 
-See Figure \ref{fig:phase-regions}, for an explanation of this idea. Giving more weighting to a closer region to the target, allowed my model to not suffer from the distribution shifts in my data, and allowed for the final push in the right direction for the agnet to complete the task successfully.
+See Figure \ref{fig:phase-regions}, for an explanation of this idea. Giving more weighting to a closer region to the target, allowed my model to not suffer from the distribution shifts in my data, allowed for the final push in the right direction for the agent to complete the task successfully.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.8\textwidth]{assets/early-work/regions.png}
+  \includegraphics[width=0.5\textwidth]{assets/early-work/regions.png}
   \caption{Illustration of phases around the target, 0 would be green, 1 would be blue and 2 would be the rest of the canvas in this example. }\label{fig:phase-regions}
-\end{figure}
+\end{figure}\todo{possibly redraw this}
 
 
 \subsubsection{Returning to Small Blocks}
-I also then got a model that was only one more convolutional layer deeper to work on the earlier smaller block size, however, the training time increase between the two were quite large for the same data sizes. Around one hour versus, four hours and change, for about 1000 episodes. Therefore, I continued this experimentation with the larger block size.
+I also then got a model that was only one more convolutional layer deeper to work on the earlier smaller block size, however, the training time increase between the two were quite large for the same data sizes. Around one hour versus, four hours and change, for about 1000 episodes. Therefore, I continued this experimentation with the larger block size.\todo{data? or not importtant enough?}
 
 
 \subsection{Next Hurdle: Obstacles}
-Then the next rational step was to add obstacles to simulate some ablations, which would mimic occlusions in 3D. Although, not visual barriers this was another hurdle the agent had to overcome.
-Then the agent uses a path-finding algorithm, inspired by the $A^*$ algorithm \cite{cui2011based}, explores the cells around it with the heuristic of keeping the Euclidian distance of it and the target low.
+The rational next step was to add obstacles to simulate some ablations, which would mimic occlusions in 3D. Although, not visual barriers this was another hurdle the agent had to overcome.
+The expert data moved the agent using a path-finding algorithm, inspired by the $A^*$ algorithm \cite{cui2011based}, explores the cells around it with the heuristic of keeping the Euclidian distance of it and the target low. \todo{pseudocode of this?}
 
 \subsubsection{Obstacle Generation}
 I took a simple procedural checkered approach where the canvas was divided into a grid which has cells the size of the agent. Then a cell will either be an obstacle or not with some clever mechanics around ensuring at least a single path from the agent to the target and some uncertainty. Check Figure \ref{fig:obs-gen} for some examples.
@@ -84,13 +84,13 @@ I took a simple procedural checkered approach where the canvas was divided into 
   \centering
   \begin{subfigure}{0.45\textwidth}
       \centering
-      \includegraphics[width=0.8\linewidth]{assets/early-work/obs-gen1.png}
+      \includegraphics[width=0.6\linewidth]{assets/early-work/obs-gen1.png}
       \caption{Example 1}
   \end{subfigure}%
   \hfill
   \begin{subfigure}{0.45\textwidth}
       \centering
-      \includegraphics[width=0.8\linewidth]{assets/early-work/obs-gen2.png}
+      \includegraphics[width=0.6\linewidth]{assets/early-work/obs-gen2.png}
       \caption{Example 2}
   \end{subfigure}
 
@@ -98,13 +98,13 @@ I took a simple procedural checkered approach where the canvas was divided into 
 
   \begin{subfigure}{0.45\textwidth}
       \centering
-      \includegraphics[width=0.8\linewidth]{assets/early-work/obs-gen3.png}
+      \includegraphics[width=0.6\linewidth]{assets/early-work/obs-gen3.png}
       \caption{Example 3}
   \end{subfigure}%
   \hfill
   \begin{subfigure}{0.45\textwidth}
       \centering
-      \includegraphics[width=0.8\linewidth]{assets/early-work/obs-gen4.png}
+      \includegraphics[width=0.6\linewidth]{assets/early-work/obs-gen4.png}
       \caption{Example 4}
   \end{subfigure}
   \caption{The 2 by 2 grid of some example obstacle generations}\label{fig:obs-gen}
@@ -112,14 +112,15 @@ I took a simple procedural checkered approach where the canvas was divided into 
 
 \subsubsection{Getting Stuck}
 I faced some issues with the model learning to avoid obstacles, the above policy for the no-obstacle case worked pretty well most of the time, however some select cases, such as there being an obstacle right between the agent and the target. 
-\todo{figure for this, maybe for final report.} 
+\todo{figure for this, and then talk about sampling and gradient optimisations for real learning about the robots} 
 
-After some experimentation, I thought this might be because of the way I modelled the prediction system. Every frame expects a new movement to be generated, per the state given. This inherently has no history about where the agent was moving from. Similarly, the training data is also not ordered in any way, and it is frame corresponds to movement. Therefore, my model was essentially learning the underlying policy of the Euclidean distance heuristic used in the path finding and not extracting useful information about trajectories. This could have been solved with a reinforcement learning approach, or a demonstration requesting apoproach. Where the agent can ask for a new demonstration once it gets stuck or certain amount of time passes \todo{not sure here, talk about new demonstration and why I didn't do this?}
+After some experimentation, I thought this might be because of the way I modelled the prediction system. Every frame expects a new movement to be generated, per the state given. This inherently has no history about where the agent was moving from. Similarly, the training data is also not ordered in any way, and it is frame corresponds to movement. Therefore, my model was essentially learning the underlying policy of the Euclidean distance heuristic used in the path finding and not extracting useful information about trajectories. This could have been solved with a reinforcement learning approach, or a demonstration requesting apoproach. Where the agent can ask for a new demonstration once it gets stuck or certain amount of time passes \todo{not sure here, talk about new demonstration and why I didn't do this?}.
+A simple solution to this would to introduce planning, as the agent has access to a high level of the scene, it should be able to include this in its movement calculations. However, due to this being preliminary work about vision, and end-to-end learning, I stayed away from classical planning and exploration based approaches in favour or learning the scene through understanding the expert demonstration the agent is given
 
 \subsubsection{Future of 2D: Sequence Models}
 My next approach was to play around with a model that would take in multiple frames and output either one or multiple moves in order to have this idea of a history.
 
-I experimented briefly with a \emph{sequence-to-movement} model primitively replicating a RNN, where it kept a 10 frame buffer along with the movement to predict the next movement. This idea seemed promising, however, my initial approaches were not fruitful, the models were suffering from a lot of empty episodes or repeated frames were causing erroneous learning. Therefore, I realised I had to pivot to non-concrete length sequences, such as transformer models accepting $n$ number of history frames with a max cap, rather than always needing the $x$ my makeshift-RNN was using (10 in my case). 
+I experimented briefly with a \emph{sequence-to-movement} model primitively replicating a RNN, where it kept a 10 frame buffer along with the movement to predict the next movement. This idea seemed promising, however, my initial approaches were not fruitful, the models were suffering from a lot of empty episodes or repeated frames were causing erroneous learning. Therefore, I realised I had to pivot to non-concrete length sequences. This can be explicitly padding and careful calculations of RNN outputs, or transformer models accepting $n$ number of history frames with a max cap, rather than always needing the $x$ my makeshift-RNN was using (10 in my case). 
 
 This is where I have currently left the 2D experimentation and moved onto starting some 3D approaches.
 
