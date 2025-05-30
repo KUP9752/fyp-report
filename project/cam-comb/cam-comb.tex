@@ -1,13 +1,18 @@
 \chapter{Feature Combination and Dependence Investigations}
 This chapter I will be:
 \begin{itemize}
-  \item Creating some toy tasks in RLBench
-  \item Propse methods of imitiation learning to solve these tasks
-  \item Experiment with the strengths and weaknesses of said methods
-  \item Augment my proposals with findings
+  \item Creating more complicated toy tasks in RLBench
+  \item Propose various imitation learning agents to solve these tasks
+  \item Evaluate said methods by:
+  \begin{enumerate}
+    \item Providing different views and features
+    \item Augmenting the fusion of these features
+    \item Understand how the agent `views' a scene and what information it benefits from for which tasks
+    \item Compare the strengths and weaknesses of these methods
+  \end{enumerate}
   \item Use learnings to guide proposed active policies in the next chapter \todo{maybe remove this}
   
-  \todo{there are commented notes from earlier here, might help the next section}
+  \todo{there are commented notes from earlier here, check the cam-combs tex file}
   % \item a good vision score policy without intrinsic information about the simulator.
   %   \item simple colour checking with a threshold?? -> shit but all that I could get working 
   %   \item  reay projectrion and checking if it lands on target
@@ -15,17 +20,20 @@ This chapter I will be:
   %     \item extract prior information form demonstration?
   % \item segmentation masks to pull bits out
   %   \item  How do we know which segmentation mask is my target?
-  \item 
 \end{itemize}
-
 
 \todo{in the vision experiments section add the condlusion from `plots.ipynb'  talk about why wrist is not generalising and the possible fixes by adding depth, }
 
 
 \todo{move the depth interfacing here}
-% Start
-\input{project/cam-comb/start.tex}
-% Depth Interfacing
-\input{project/early-work/cam-dep.tex}
+% Reaching tasks
+\input{project/cam-comb/reach.tex}
+% Grasping tasks
+\input{project/cam-comb/grasp.tex}
+
+% Depth Interfacing - under grasping
 \input{project/cam-comb/depth.tex}
+% proposed policies and learnings
+\input{project/cam-comb/policies.tex}
+
 
