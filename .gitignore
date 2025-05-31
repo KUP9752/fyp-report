@@ -4,6 +4,4 @@ main*
 !main.tex
 
 *.log
-_minted/_FAD58DE7366495DB4650CFEFAC2FCD61.index.minted
-_minted/default.style.minted
-_minted/E7F8139BCD87D64EC3AD3C775315811E.highlight.minted
+_minted/
