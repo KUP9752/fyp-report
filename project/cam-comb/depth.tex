@@ -3,23 +3,50 @@ Or more interestingly other sensors, such as depth or force sensors on robot han
 
 
 \section{Depth Interfacing}
-Another area of important research, before relating all this back to active vision, is figuring out distance. Depth interfacing is an important part of perception, and continuing from the drawn parallels to humans, we place object in our fields of vision by our two eyes. Stereo-vision, allows us to process two slightly different poses of a target object to reinforce our understanding of where that object is in the environment around us. Other information such as lighting (shadows) may unconsciously help us as well. However, the main takeaway is that understanding distance to an object goes a long way in firstly understanding how to approch an object.
+Another area of important research, before relating all this back to active vision, is figuring out distance. Depth interfacing is an important part of perception. Continuing from the drawn parallels to humans, we place object in our fields of vision by our two eyes. Stereo-vision, allows us to process two slightly different poses of a target object to reinforce our understanding of where that object is in the environment around us. Other information such as lighting (shadows) may unconsciously help us as well. However, the main takeaway is that understanding distance to an object goes a long way in firstly understanding how to approach an object.
 
-The few ways to achieve this in robotics and RLBench specifically is either to use two cameras (with a known distance between the two cameras to adjust poses with known intrinsics). However, RGB cameras are not the only things we have access to in this system. We also we have access to the depth sensor -and the point cloud information which is derived using this information.
+The few ways to achieve this in robotics and RLBench specifically is either to use two cameras (with a known distance between the two cameras to adjust poses with known intrinsics). However, RGB cameras are not the only things we have access to in this system. We also we have access to a depth sensor -and the point cloud information which is derived using this information.
 
 This is because, as I hinted earlier in the background section, the main idea of active vision is to be able to use minimal amounts of viewpoints and make the most out of these. In this scenario, I want to see if it can be justified to use the wrist camera accompanied by the wrist depth sensor to replace any other cameras we might have around the workspace. Paving the way to the next section in proposing active vision policies that act solely on information from a repositionable sensor (be that rgb, depth or any other).
 
-So,  we want to see whether depth information adds meaningful information that we can justify not using external scene cameras in favour of a wrist camera and a wrist depth sensor.
+So, I want to see whether depth data adds meaningful information that we can justify not using external scene cameras in favour of a wrist camera and a wrist depth sensor.
 
 \section{Grasping with Varying Depths}
-I wanted to investigate how the agent reacts to possible targets changing shapes and distances interacts with the input mediums we have.
+I want to investigate how the an agent might react to different sized targets that might be placed at different distances from the gripper.
 
 \subsection{Task Design}
-The experiment that makes sense in this case is a grasping task. As the task performer needs to figure out where an object is before attempting to grab it. So, I created a modified version of the simple grasping task where the target object's distance and scale can be externally varied to observe the behaviours of agents in a controlled manner.\todo{talk about delegating the task creating and param passing as wellas the tasks in appendix and link here}
+The experiment that makes sense in this case is a grasping task. Because unlike the reaching tasks from earlier, the robot will need slightly more precision in executing its grasp and actually grabbing the target.
 
-\missingfigure{two tasks box far, box close with wrist rgb  outputs 2 by 2 grid}
+As the task performer needs to figure out where an object is before attempting to grab it. So, I created a modified version of the simple grasping task where the target object's distance and scale can be externally varied to observe the behaviours of agents in a controlled manner.\todo[color=green]{talk about delegating the task creating and param passing as wellas the tasks in appendix and link here}
 
-This is the general setup I am planning on using to evaluate the depth sensor versus a stereo or any multi-view setup.
+\begin{figure}[htpb] % htpb allows all placement
+  \begin{subfigure}{0.4\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/normal-size-grasp.png}
+    \caption{Normal Sized Cube}\label{subfig:normal-grasp}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.4\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/smaller-grasp.png}
+    \caption{Small Sized Cube}\label{subfig:small-grasp}
+  \end{subfigure}
+  \begin{subfigure}{0.4\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/normal-size-wrist.png}
+    \caption{Wrist RGB from Normal Sized Task}\label{subfig:normal-rgb}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.4\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/smaller-wrist.png}
+    \caption{Wrist RGB from Smaller Sized Task}\label{subfig:small-rgb}
+  \end{subfigure}
+  \caption{Visualisation of the Depth Interfacing experiment task}\label{fig:di-task}
+\end{figure}
+
+This is the general setup I am planning on using to evaluate the depth sensor versus a stereo or any multi-view setup. 
+\todo{put the other graphics already in the thing}
 
 As we can see here, in these very different reaching scenarios \todo{ref the figure} the wrist inputs are the same, or very similar, due to the different placements of the targets. However, if we look at the stereo setup, for example \todo{ref the l and r cams}, the objects can be distinguished. Or if we were to have a stereo wrist RGB setup \todo[color=red]{not sure if this is possible I hate changing anything in RLBench, maybe mention trying if i have the time to} or \todo{link other figure} the depth features might be able to help distinguish these 2 views.
 \missingfigure{add the left and right shoulder cams here 2 by 1 figure, of the above task}
