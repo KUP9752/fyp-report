@@ -6,10 +6,10 @@ Following the experimental setup I also wanted to see what is the most viable wa
 \subsection{Simple Fusion Methods}
 This adds onto before, gated attention and rgb attending to depth etc, explain some approaches
 
-\subsection{Deeper/Better Understanding - RCN}
+\subsection{Deeper/Better Features Understanding - RCN}
 This was not useful, mainly because what I have constrained myself into with the smaller image sizes, and these larger image segmenting networks are better with more information as they aggressively pool especially -the larger models. \todo{not sure say some other bs here}
 
-\subsection{Temporal Understanding of Demonstration}
+\subsection{Temporal Understanding of Demonstrations}
 Even though the agent is not half bad at trying to reach the target in the above configurations, it is not necessarily better at succeeding at grasping, and the movements seem janky compared to precise demonstrations, and the robot doesn't necessarily understand where in the movement it is, because the first half of the episode is very repetitive and the inputs are eerily similar. This meant that an important part of the system was for my agent to understand where it was as well as when it was.
 
 \subsubsection{Latent RNN Encodings of Movement Steps}
@@ -20,7 +20,7 @@ I wanted to encode the timestep information into some sort of feature representa
 
 \todo{problems here were that the entire demo was being used, but the optimisation was getting made at the final state}
 
-\subsubsection{Fine-Grained per Time Step Training}
+\subsubsection{Fine-Grained per Time-Step Training}
 Once I realised my mistake, which was about discarding half my encoded steps and were not using my RNN to its full potential \todo{rewrite} As I have access to ground truth information at every observation step, it would be smart to optimise the loss in a fine-grained manner at every frame.
 \missingfigure{updated diagram to convey the padding and unpacking and training the loss on every frame step}
 This lead to a more robust and confident architecture. The movements of my policy felt less spiky, no more sudden jerks and more calculated reaching. It did still absolutely overfit to the average position, and was not much better at grasping, but the episodic movements were cleaner and I believe enhancing the grasping branch of the network would allow it to be more successful \todo{what the fuck am i talking about, summarise and clean up}
@@ -29,10 +29,10 @@ This lead to a more robust and confident architecture. The movements of my polic
 \subsection{ViT Encodings}
 \todo[color=red]{not done much on this, but may be able to talk about how I would go about it or just remove}
 
-\subsection{Proprioception}
+\section{Proprioception}\todo{maybe talk about why I left it out earlier in the chapter}
 Up until this point, I left proprioceptive data out of the training, mainly because I wanted to train on purely visual feedback to see what it could achieve without any other state information. Secondly, including state information about the robot, would not necessarily immediately help with the 
 
-\subsection{Segue into Active Vision}
+\section{Moving to \emph{Active Vision}}
 
 
 \todo{improve the grasping}
