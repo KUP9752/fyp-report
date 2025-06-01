@@ -16,8 +16,7 @@ Along with the policy the second most important of any ML workload is the way th
 \subsubsection{Data Loading}
 I followed a simple flattening approach for loading the data into the system. Using PyTorch's \textbf{Dataset} and \textbf{DataLoader} classes I created a dataset that can take in a raw list of demonstration, then flattens its observations into a tensor of shape \(\langle 3,~64,~64 \rangle \) (permuted from the usual \(\langle 64,~64,~3 \rangle \) for images due to Torch conventions of convolutional networks and where they expect the channel  dimension). Then the dataset makes individual observation indexable along with their corresponding action labels. Types given as:\mintinline{python}|DemoObsDataset: tensor[tensor[3,  64, 64], tensor[8]]|. Then the loader can manage the shuffling and batching as usual. Initially I kept the data unshuffled, to keep the data in its sequential form. While keeping the batch size as the demo length. This is because currently I am trying to overfit the network to the single demonstration given to it to gauge how long to train my networks for
 
-
-\subsubsection{Static Starts}
+\subsection{Initial Observations}
 Starting with the 3 static versions of the task, where the target is placed as shown in \ref{fig:no-obs-3-views} seen from the wrist cameras. I wanted to get an idea of how to tune the policy parameters. While understanding the relationship between training length and varying observability of the target.
 
 \begin{figure}[htbp]
@@ -41,15 +40,9 @@ Starting with the 3 static versions of the task, where the target is placed as s
   \caption{Three variations of the reach task with the obstacles sometimes out of view}\label{fig:no-obs-3-views}
 \end{figure}
 
-
-
-\todo[color=pink]{also run random experiments and place them here}
-
-
-\subsection{Initial Observations}
 I tested multiple epochs of training with the simple policy and recorded the final distance to the target at the end of their episode. The episode length is determined by the demo lengths, which I defaulted to the maximum, will also try mean, as keeping a static episode length doesn't make sense (especially on later tasks where the demonstration episodes can drastically vary in length)
 
-The success of the tasks are wired to reaching the target in the simulator and will send a \emph{DONE} signal if it is reached. This happens around $0.12$ metres to the target. I have also observed the target will reach a very close distance but it won't trigger the detection in Coppelia, I think this must be a bounding box issue, wither the dummy objects that are doing the collision detection are missing each other, or the polling rate in the simulator is not frequent enough to detect this change. Either way, I added a way to count closeness into success if it were close enough. The following tests are run with \(within\_err = 0.8\).
+The success of the tasks are wired to reaching the target in the simulator and will send a \emph{DONE} signal if it is reached. This happens around $0.12$ metres to the target. I have also observed the target will reach a very close distance but it won't trigger the detection in Coppelia, I think this must be a bounding box issue, wither the dummy objects that are doing the collision detection are missing each other, or the polling rate in the simulator is not frequent enough to detect this change. Either way, I added a way to count closeness into success if it were close enough.
 
 \subsubsection{Static Tasks}
 Testing on the static versions of the task, a simple policy with training around $20$ to $100$ epochs seems to do the job well, see Figure \ref{fig:rno-static}. And this is mostly because without variation in position simple Behavioural Cloning can be employed by overfitting to the data given. 
@@ -66,31 +59,45 @@ As I trained for longer it seemed to overfit early move really slowly at the sta
 To test generalisability, I created a dynamic version of the task, where the target is now randomly placed within view (not necessarily always fully within view, but at least some parts are visible). This is achieved by using a \verb|SpawnBoundary| and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white dotted box being the boundary. This boundary is not rendered in the simulation visually. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
 
 \begin{figure}[htpb] % htpb allows all placement
-  \begin{subfigure}{0.45\linewidth}
+  \begin{subfigure}{0.50\linewidth}
     \centering
-    \includegraphics[scale=0.5]{assets/cam-comb/reach-no-obs/rno_random-dist.png}
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-no-obs/rno_random-dist.png}
     \caption{Average Final Distance to Target}\label{subfig:rno-random-dist}
   \end{subfigure}
   \hfill
-  \begin{subfigure}{0.45\linewidth}
+  \begin{subfigure}{0.50\linewidth}
     \centering
-    \includegraphics[scale=0.5]{assets/cam-comb/reach-no-obs/rno_random-success.png}
-    \caption{Success Rate (\%) for the 10 Test Demos}\label{subfig:rno-random-success}
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-no-obs/rno_random-success.png}
+    \caption{Success Rate (\%) for the $10$ Test Demos}\label{subfig:rno-random-success}
   \end{subfigure}
   \caption{Experiments with randomly placed target}\label{fig:rno-random}
 \end{figure}
 
-To run the random tests, Figure \ref{fig:rno-random}, above in comparable manner I reused my set of demos that were created and saved 
+To run the random tests, shown in Figure \ref{fig:rno-random}, in a comparable manner I reused my set of demos that were created and saved earlier for this task for training. Then a set of 10 demos were randomly generated at the start and after the agent with the specific parameters were trained, I evaluated these policies against the test counterparts.
 
-Looking at \ref{sub@subfig:rno-random-dist}, we can see that providing more demonstrations helps the policy generalise better
+Looking at graph \ref{subfig:rno-random-dist}, we can see that providing more demonstrations helps the policy generalise better to random locations, where the sweet spots seems to be around 10 demos and around $500$ where the success rate (\ref{subfig:rno-random-success}) is quite high
 
 \subsection{Camera Limitations}\todo[color=red]{reread and make sure it is a good starter segue to obs (maybe move these to after obs?), mention this under reachObs! MOVE}
+I started this section by limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task. Introducing some of the other RGB cameras, specifically the \verb|left shoulder| or the \verb|right shoulder| views, does not necessarily benefit the performance, see \ref{fig:rno-random-cams}. Conversely, we are increasing the training time by adding more channels to the convolutional layers, which can be considered a drawback.
 
-I was started experimenting limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task, however, another interesting area of investigation is finding what kind of tasks benefit from different viewpoints, for example shoulder mounted or other static scene-observing cameras. \todo[color=pink]{static scee cameras oh shit need more data here}
+\begin{figure}[htpb] % htpb allows all placement
+  \begin{subfigure}{0.50\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-no-obs/rno_random-cams.png}
+    \caption{Average Final Distance to Target}\label{subfig:rno-random-cams-dist}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.50\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-no-obs/rno_random-cam_success.png}
+    \caption{Success Rate (\%) of the $10$ Demos}\label{subfig:rno-random-cams-success}
+  \end{subfigure}
+  \caption{Experimenting with multiple RGB cameras}\label{fig:rno-random-cams}
+\end{figure}
 
-\todo[color=red]{move this to later}
-Or more interestingly other sensors, such as depth or force sensors on robot hands or grippers (\todo{inspired by the MILES paper, talk about this}). This relates back to the idea of human perception. To learn new tasks, we use all kinds of feedback from the environment that is reactive on our actions. Therefore, it is important to study shortcomings of individual sensors with respect to others to understand how policies with limited access to sensors can be made to overcome such challenges without necessarily adding more `observability' to a workspace, which is the main problem we are trying to address with later active systems.\todo[color=blue]{reread and shorten if needed}
+Although the performance does not outright increase, we can clearly see that having a different point of view can sometimes drastically affect the quality of the learnt network and hence the action produced. \todo[color=purple]{}  \todo{need to actually talk about the numbers here refer to graph}
 
+However, this is not to say all tasks will be immune to benefits from extra views. An important part of this project is to understand what is most important for a robot to observe in its given environment and task and how can it optimally leverage this data to solve a task better. And increasingly more complex tasks should benefit from abundance of information.
 
 \subsection{Increasing the Toy Task Complexity}\todo{subsection to above?}
 Complexity of tasks can be increased in two main ways:
@@ -101,11 +108,10 @@ Complexity of tasks can be increased in two main ways:
 I plan to do these mainly by introducing obstacles; which will guide me to understand what an agent needs to understand navigation. Secondly, I want to branch out to a grasping task, to increase the number of items of execution, to evaluate the capability of an agent to use its understanding to complete increasingly more complicated tasks.
 
 \section{Reaching with an Obstacle}
-To add onto the reaching task, I introduced an obstacle placing mechanism as well as randomly placing the target behind this obstacle, ensuring the agent doesn't learn where the target is by looking at just the obstacle. See Figure \ref{fig:reach-obs-random} for how this task looks and the check \todo[color=green]{add appendix link, and code} for the backend wiring of these tasks.
+To add onto the reaching task, I introduced an obstacle placing mechanism as well as randomly placing the target behind this obstacle, ensuring the agent doesn't learn where exactly target is by looking at just the obstacle\todo[color=purple]. See Figure \ref{fig:reach-obs-random} for how this task looks and the check \todo[color=green]{add appendix link, and code} for the backend wiring of the task.
 
 \subsection{Creating the Task}
-
-There are two versions of this task, I thought it might be interesting to randomise the object firstly dependently then independently on the obstacle. The `dependent' randomisation called \verb|ReachObs_Random| samples the obstacle, which in turn controls the spawn boundary of where the target can spawn in, meaning the target will always appear behind the obstacle albeit, edges of it can sometimes stick out. Conversely, the `independently' random version, called \verb|ReachObs_IndRandom|\todo{also add to appendix and link here}, this keeps the target spawn boundary fixed, meaning the target can be anywhere in the visible workspace, but it is not necessarily always covered by the obstacle. I can see that this potentially can be useful to keep the dataset a bit more diverse, and allow the wrist camera initially observe the target sometimes.\todo[color=red]{use this somewhere, or hint back to it, maybe even to say there was no difference}
+There are two versions of this task, I thought it might be interesting to randomise the object firstly dependently then independently on the obstacle. The `dependent' randomisation called \verb|ReachObs_Random| samples the obstacle, which in turn controls the spawn boundary of where the target can spawn in, meaning the target will always appear behind the obstacle albeit, edges of it can sometimes stick out. Conversely, the `independently' random version, called \verb|ReachObs_IndRandom|\todo{also add to appendix and link here}, keeps the target spawn boundary fixed, meaning the target can be anywhere in the visible workspace, but it is not necessarily always covered by the obstacle. I can see that this potentially can be useful to keep the dataset a bit more diverse, and allow the wrist camera initially observe the target sometimes.\todo[color=red]{use this somewhere, or hint back to it, maybe even to say there was no difference}
 
 \begin{figure}[htpb] % htpb allows all placement
   \centering
@@ -144,9 +150,11 @@ There are two versions of this task, I thought it might be interesting to random
 \subsection{Experimenting with Views}\todo[color=red]{}
 
 \subsubsection{Using same unchanged policy form ReachNoObs}
-This is bad, the same will not work the demonstrations are not transferrable!!
+\todo{run the best params we have for the first one here with nothing changed}
 
-\subsubsection{Understanding the Dataset}
+\subsubsection{Understanding the Data Management}
+\todo{mention switching to demo dataset}
+\missingfigure{shuffling plots}
 Talk about how the data is loaded and created and managed for the network, talk about shuffling mechanisms and what I've found etc. talk about \verb|shuffle_obs_in_demo| and the other one.
 
 \subsection{Improvements}
@@ -154,22 +162,19 @@ Talk about how the data is loaded and created and managed for the network, talk 
 
 
 \subsubsection{Wrist Camera Alone isn't Enough}
-As expected, this is where the single wrist camera started showing its shortcomings. 
+As expected this is where the single wrist camera started showing its shortcomings. The agent would easily move around the obstacle, however, would struggle to make the last steps in touching the target. This is mostly due to the fact that the demonstrations (which are provided by RLBench) are not necessarily pointing the wrist of the robot and hence the camera mounted there to look towards the target. This means that the behavioural cloning agent learns to to the swaying motion around a large grey body, however, is not aware of the obstacle, or even understand the task is related to reaching for the obstacle and depends on its visual cues. 
 
 \todo{add graph of going around the obstacle but not quite reaching the target (wrist)}
 \todo{show this with other combinations of cameras, comment on if the l/r without wrist can learn to go around the obstacle easily? maybe not, generalisation might be hard with no wrist}
 
-The agent would easily move around the obstacle, however, would struggle to make the last steps in touching the target. This is mostly due to the fact that the demonstrations (which are provided by RLBench) are not necessarily pointing the wrist of the robot and hence the camera mounted there to look towards the target. This means that the behavioural cloning agent learns to to the swaying motion around a large grey body, however, is not aware of the obstacle, or even understand the task is related to reaching for the obstacle and depends on its visual cues. 
-
-From experiments I have realised that it learns to move around the obstacle easily, using simple behavioural cloning. However, getting the last nudge to actually reach the target is where it falls apart, especially in more realistic scenarios where the target is randomised behind the obstacle. For static placement behind the wall, the agent, expectedly is quite good. \todo{maybe explain or evidence this}
+From experiments I have realised that it learns to move around the obstacle easily, using simple behavioural cloning. However, getting the last nudge to actually reach the target is where it falls apart, especially in more realistic scenarios where the target is randomised behind the obstacle. For static placement behind the wall, the agent, expectedly is quite good. \todo{maybe explain or evidence this, plateaus aroudn the same distance value and watchig t heroot act comfirms this}
 
 \subsubsection{Other Cameras}
-Introducing the other cameras placed around in the environment, such as the \verb|left shoulder| or the \verb|right shoulder| cameras we can confirm that the wrist camera alone is not sufficient \todo{insert figure here with wrist vs others }, and the combination of wrist and other cameras are almost always the best as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target.
+So, we can confirm that the wrist camera alone is not sufficient \todo{ref}, and the combination of wrist and other cameras are almost always better as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target.\todo[color=red]{looking at he target??}
 
-\subsubsection{Multi Camera Mechanisms}
-\todo{talk about `CamType' briefly}
-\subsubsection{Policy Changes}
+
 \todo{talk about the policy using differnt camera inputs to blend and make informed choices? maybe some plots here showing if it is better or not?}
+\todo{this is important for plan2 later, as that would depend on such a mechanism, hint and even link that from here}
 
 \subsubsection{Implementing `Looking' into the Demonstrations}\todo{haven't done this yet}\label{ew-looking-at-target}
 issues this is not easy might be working on this as a part of approach 2 later
@@ -177,8 +182,9 @@ Another solution might be to experiment with the demonstration system to make su
 
 If we can't implicitly encode the `looking' information through the demonstration that means we will have to inject this information into our agent some other way. Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \todo{find some prior info tracking works add ref} where object priors are incorporated into the learning or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}.  
 
-\todo{this is important for plan2 later, as that would depend on such a mechanism, hint and even link that from here}
-
-\subsection{Attending on a Camera in Given Combination}s
+\subsection{Attending on a Camera in Given Combination}
+\todo{talk about the implementation of the }
 \subsubsection{MultiCNN}
+\todo{explaint the implementations, maybe connect to }
 \subsubsection{SingleCNN}
+I initially though to disconnect the convolutional network, thinking the information can be encoded per view and then fused together to assign better meaning to the given pose. However, with the same logic the scene is still the same scene and encoding features together means that the network will learn to \todo{find a nice way to say the network will learn its fusing in the conv layers. maybe make sure it can}
