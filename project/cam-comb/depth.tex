@@ -9,53 +9,111 @@ The few ways to achieve this in robotics and RLBench specifically is either to u
 
 This is because, as I hinted earlier in the background section, the main idea of active vision is to be able to use minimal amounts of viewpoints and make the most out of these. In this scenario, I want to see if it can be justified to use the wrist camera accompanied by the wrist depth sensor to replace any other cameras we might have around the workspace. Paving the way to the next section in proposing active vision policies that act solely on information from a repositionable sensor (be that rgb, depth or any other).
 
-So, I want to see whether depth data adds meaningful information that we can justify not using external scene cameras in favour of a wrist camera and a wrist depth sensor.
+Therefore, I want to investigate whether depth data immediately adds meaningful information and if not; what is the best way to extract information from it so that it -combined with the normal rgb view- can be utilised to pave the way for active policies.
 
 \section{Grasping with Varying Depths}
-I want to investigate how the an agent might react to different sized targets that might be placed at different distances from the gripper.
+To start investigating, I devised the following test task to see how the agent reacts to differently sized targets that might be placed at varying distances from the gripper within the scene
 
 \subsection{Task Design}
-The experiment that makes sense in this case is a grasping task. Because unlike the reaching tasks from earlier, the robot will need slightly more precision in executing its grasp and actually grabbing the target.
-
-As the task performer needs to figure out where an object is before attempting to grab it. So, I created a modified version of the simple grasping task where the target object's distance and scale can be externally varied to observe the behaviours of agents in a controlled manner.\todo[color=green]{talk about delegating the task creating and param passing as wellas the tasks in appendix and link here}
+The experiment that makes sense in this case is a grasping task. Because unlike the reaching tasks from earlier, the robot will need slightly more precision in executing its grasp and actually grabbing the target. The task performer needs to figure out where an object is before attempting to grab it. So, I created a modified version of the simple grasping task where the target object's distance and scale can be externally varied to observe the behaviours of agents in a controlled manner.\todo[color=green]{talk about delegating the task creating and param passing as well as the tasks in appendix and link here}
 
 \begin{figure}[htpb] % htpb allows all placement
+  \centering
   \begin{subfigure}{0.4\linewidth}
     \centering
     \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/normal-size-grasp.png}
-    \caption{Normal Sized Cube}\label{subfig:normal-grasp}
+    \caption{Normal Target Size}\label{subfig:normal-grasp}
   \end{subfigure}
-  \hfill
   \begin{subfigure}{0.4\linewidth}
     \centering
     \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/smaller-grasp.png}
-    \caption{Small Sized Cube}\label{subfig:small-grasp}
-  \end{subfigure}
-  \begin{subfigure}{0.4\linewidth}
-    \centering
-    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/normal-size-wrist.png}
-    \caption{Wrist RGB from Normal Sized Task}\label{subfig:normal-rgb}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}{0.4\linewidth}
-    \centering
-    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/smaller-wrist.png}
-    \caption{Wrist RGB from Smaller Sized Task}\label{subfig:small-rgb}
+    \caption{Smaller Target Size}\label{subfig:small-grasp}
   \end{subfigure}
   \caption{Visualisation of the Depth Interfacing experiment task}\label{fig:di-task}
 \end{figure}
 
-This is the general setup I am planning on using to evaluate the depth sensor versus a stereo or any multi-view setup. 
-\todo{put the other graphics already in the thing}
+These, Figure \ref{fig:di-task}, is the general setup I am planning on using to evaluate the depth sensor versus a multi-view setup. 
 
-As we can see here, in these very different reaching scenarios \todo{ref the figure} the wrist inputs are the same, or very similar, due to the different placements of the targets. However, if we look at the stereo setup, for example \todo{ref the l and r cams}, the objects can be distinguished. Or if we were to have a stereo wrist RGB setup \todo[color=red]{not sure if this is possible I hate changing anything in RLBench, maybe mention trying if i have the time to} or \todo{link other figure} the depth features might be able to help distinguish these 2 views.
-\missingfigure{add the left and right shoulder cams here 2 by 1 figure, of the above task}
-\missingfigure{add differnt depth outputs from the above task, 2 by 1 figure}
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.4\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/normal-size-wrist.png}
+    \caption{Smaller - Wrist RGB}\label{subfig:normal-rgb}
+  \end{subfigure}
+  \begin{subfigure}{0.4\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/smaller-wrist.png}
+    \caption{Smaller - Wrist RGB}\label{subfig:small-rgb}
+  \end{subfigure}
+  \begin{subfigure}{0.40\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/normal-depth.png}
+    \caption{Wrist Depth Mask - Normal}\label{subfig:normal-depth}
+  \end{subfigure}
+  \begin{subfigure}{0.40\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/smaller-depth.png}
+    \caption{Wrist Depth Mask - Smaller}\label{subfig:small-depth}
+  \end{subfigure}
+  \caption{Wrist RGB and Depth Masks for the tasks}\label{fig:di-rgb-vs-depth}
+\end{figure}
+
+Initial observations from the side clearly indicate that these are two different targets and will require different reach lengths before the agent can attempt to grab them. However, as seen in the comparison in \ref{subfig:normal-rgb} and \ref{subfig:small-rgb}, the RGB outputs look practically the same, and will very likely produce extremely similar features after extraction. A way to differentiate them would be to utilise the wrist depth mask in this encoding. As shown in \ref{subfig:normal-depth} and \ref{subfig:small-depth}, they now carry different features in those areas. In the depth mask the darker colours indicate closer objects, and the information is encoded as floats. 
+
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.40\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/normal-l_rgb.png}
+    \caption{Normal - Left Shoulder RGB}\label{subfig:normal-l-shoulder}
+  \end{subfigure}
+  \begin{subfigure}{0.40\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/normal-r_rgb.png}
+    \caption{Normal - Right Shoulder RGB}\label{subfig:normal-r-shoulder}
+  \end{subfigure}
+  \begin{subfigure}{0.40\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/smaller-l_rgb.png}
+    \caption{Smaller - Left Shoulder RGB}\label{subfig:smaller-l-shoulder}
+  \end{subfigure}
+  \begin{subfigure}{0.40\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/depth-interfacing/smaller-r_rgb.png}
+    \caption{Smaller - Right Shoulder RGB}\label{subfig:smaller-r-shoulder}
+  \end{subfigure}
+  \caption{Left and Right Shoulder RGB Cameras}\label{fig:di-lr-shoulder}
+\end{figure}
+
+
+Another possible differentiating factor, and likely earlier tasks were performing well, is due to the shoulder cameras. These also provide extra information about the scene the agent can use to understand its 3D geometry, even if it isn't explicitly taught it. Although these are also not perfect, as seen in \ref{subfig:smaller-l-shoulder}, this camera is completely obstructed by the robot and is not seeing the target. This is not immediately problematic, because a smart enough system might be able to reason that the target is visible on the right and not on the left, leading to devising the correct depth for it. However, I have not intentionally encoded that information and doubt my network will be able to produce correct results with these observations.
+
+\subsubsection{Adding Stereo Wrist Vision}\todo[color=red]{add wrist L and wrist R cameras, remove otherwise after a short mention}
+A possibility to overcome this self-occlusion is to introduce stereo vision at the wrist level. Adding 2 off-centre cameras to the gripper, likely to the left and right of the existing wrist camera, will fix the self-occlusion, and possibly create a better comparison to the \emph{Wrist RGB} and \emph{Wrist Depth} combination. However, this comes with a lot of rewiring of RLBench and with its likely hidden issues that will pop up later. Will consider this further down the line, if there is evidence policies that will be proposed later can benefit form such a camera setup.
+
+
+
 
 \section{Creating an Appropriate Policy}
-The policy for grasping needed slight modifications compared to the simpler reaching task. Along with understanding what is being seen for movement of the joints, we also needed a mechanism for sending a grasping signal for the robot. The previous policy would regress the entire 6DoF along with the final \emph{float} that controls the gripper. This was not sufficient for this task. Firstly, there weren't many frames the gripper is signaled to be closed, as the gripping happens at the end of the task, comparatively less observations where the gripper is closed; means that there is an inherent imbalance in our dataset. If we were to treat \textbf{CLOSED} and \textbf{OPEN} as binary labels; which they are as RLBench takes a \emph{float} $\in \left[0, 1\right]$ and thresholds at $ > 0.9$ to check if it should be open. Therefore, regressing the entire action with the gripper bit makes it extremely uncertain and mostly skew towards staying open. 
+The policy for grasping needed slight modifications compared to the simpler reaching task. Along with understanding what is being seen for movement of the joints, we also needed a mechanism for sending a grasping signal for the robot. The previous policy would regress the entire 6DoF along with the final \emph{float} that controls the gripper. This was evident earlier when observing the reaching task I realised the gripper would sometimes `clap', meaning it would open and close quickly for every other action, which is odd, but was not a deal breaker before.
 
-To adjust for this I first tried to do binary classification with weighting the samples to counteract this, which was not fruitful just due to the overall dataset size being small as well. So, going back to regression, I decided to add Cross Entropy Loss and with a gripper prediction head just predict the gripper action from the extracted camera features, then add this as a part of the overall loss with a weighting \todo{add loss in math notation with lambda gripper}. This meant that the gripper action is separately tunable to the movement action. This makes inherent sense as the movement decisions should never affect the gripper. The information flow is camera to movement and gripper action separately \todo{small flowchart to show cam  move, cam gripper action} 
+However, now this would not be sufficient. Firstly, there weren't many frames the gripper is signaled to be closed, as the gripping happens at the end of the task, comparatively less observations where the gripper is closed; means that there is an inherent imbalance in our dataset. If we were to treat \textbf{CLOSED} and \textbf{OPEN} as binary labels; which they are as RLBench takes a \emph{float} $\in \left[0, 1\right]$ and thresholds at $ > 0.9$ to check if it should be open. Therefore, regressing the entire action with the gripper bit makes it extremely uncertain and mostly skew towards staying open. With quick fluctuations, due to uncertainty.
+
+To adjust for this I first tried to do binary classification with weighting the samples to counteract this, which was not fruitful just due to the overall dataset size being small as well. There are as much data as there is episodes in a demo, which is usually not much more than $50$. So, going back to regression, I decided to add Binary Cross Entropy (BCE) Loss; using \verb|BCEWithLogitsLoss| from Pytorch \todo[color=green]{ref this?}. Along with a gripper prediction head just to predict the gripper action from the extracted camera features, then add this as a part of the overall loss with a weighting, giving us:
+
+\[
+  loss = mse\_loss \left(action_{v}, ~\hat{action_v}\right) 
+  + 
+  \lambda_{gripper} bce\_loss\left( action_{g}, ~\hat{action_g}\right)
+\]
+
+where $v$ and $g$ means respectively the $7$-dim joint velocity vector and the $1$-dim float vector which is \( \in \{ 0.0, 1.0 \}\)
+
+This meant that the gripper action is separately tunable to the movement action. This makes inherent sense as the movement decisions should never affect the gripper. The information flow is camera to movement and gripper action separately \todo{small flowchart to show cam  move, cam gripper action} 
+
+
+\todo[color=pink]{run some, simple grasp policy static tests here with l and r vs wrist and depth}
 
 
 \subsubsection{Incorporating the Depth Camera}

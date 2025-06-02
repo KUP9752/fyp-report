@@ -1,16 +1,27 @@
 \section{Proposing Policies}
 
 \subsection{Feature Extraction and Fusion}
-Following the experimental setup I also wanted to see what is the most viable way to fuse information about the depth cameras and the RGB cameras to enable the best way of learning for my policies. This is inherently a difficult problem as there is no one way to do this, and multiple ways may interact differently with different setups
+Following the experimental setup I also wanted to see what is the most viable way to fuse information about the depth cameras and the RGB cameras to enable the best way of learning for my policies. This is inherently a difficult problem as there is no one way to do this, and multiple ways may interact differently with varying task setups.
 
 \subsection{Simple Fusion Methods}
+This is what I used for the initial tests I concluded above in depth interfacing\todo{link or ref figures}
 This adds onto before, gated attention and rgb attending to depth etc, explain some approaches
 
-\subsection{Deeper/Better Features Understanding - RCN}
-This was not useful, mainly because what I have constrained myself into with the smaller image sizes, and these larger image segmenting networks are better with more information as they aggressively pool especially -the larger models. \todo{not sure say some other bs here}
+\subsection{Deeper/Better Feature Understanding - RCNN}
+Another thing I wanted to try was to include off-the-shelf models to help extract features and information from my views. As one of the problems I described faced earlier was from the agent not remembering the earlier information that it has seen, I believed an important part of increasing the workspace understanding would be to incorporate residual connections.
+
+I experimented with various sizes of ResNet networks \todo[color=green]{reference}. I essentially replaced my own \verb|CNNEncoder| block with modified versions of \emph{resnet18, resnet34, and resnet50} \todo[color=green]{maybe not mention all, afterall the large ones will be ass when the image is so small}. I had to modify these, because the unmodified version using a main CNN of kernel size $7$ was too large and appropriate features were not being extracted from the views I was feeding. This was evident from observing the agent act in a test scenario where the arm would do nothing remotely similar to what the demo did, or even what the task is about.\todo{maybe a picture of the arm doing some bs here}. \todo[color=pink]{run the original confirm it does not work, if not get a diagram of kernel sizes 7 and 3 and an explanation why this might be the case.}
+
+The modified versions, with a smaller kernel, feeding into the later layers and then getting the residual connection didn't seem to work any better either \todo[color=pink]{test on comparing my one with a resnet graph on a toy grasping task, maybe grasp then move?}
+
+A reason these might not have worked well is because of one of my earlier constraints. The image sizes being \(64 \times 64\) pixels, might not be enough to extract meaningful information with a ResNet. This is likely due to its aggressive pooling between the layers and especially during the residual connection and the aggressiveness only increases in larger models. \todo[color=red]{not actually sure if this is right, fact check, wrote this some time ago} 
+
+\subsubsection{increasing the camera view for experimentation}\todo[color=red]{larger image trials? expand the task to be lager 128 or even 224 seems common with resnet}
 
 \subsection{Temporal Understanding of Demonstrations}
-Even though the agent is not half bad at trying to reach the target in the above configurations, it is not necessarily better at succeeding at grasping, and the movements seem janky compared to precise demonstrations, and the robot doesn't necessarily understand where in the movement it is, because the first half of the episode is very repetitive and the inputs are eerily similar. This meant that an important part of the system was for my agent to understand where it was as well as when it was.
+Even though the agent is not half bad at trying to reach the target in the above configurations, it is not necessarily better at succeeding at grasping, and the movements seem janky compared to the  precise demonstrations given. I believe this is because the robot is only given its current view and does not understand where it might be during the epsiode \todo{this is the issue I faced}
+
+and the robot doesn't necessarily understand where in the movement it is, because the first half of the episode is very repetitive and the inputs are eerily similar. This meant that an important part of the system was for my agent to understand where it was as well as when it was.
 
 \subsubsection{Latent RNN Encodings of Movement Steps}
 I wanted to encode the timestep information into some sort of feature representation which would use the previous states to encode the data. This simple idea was to introduce temporal noise into the decision process. Then act on the final encoding
