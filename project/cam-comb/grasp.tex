@@ -15,7 +15,6 @@ The more complicated counterpart, shown in Figure \ref{fig:grasp-move}, is a sce
     \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/simple-front.png}
     \caption{Front}\label{subfig:simple-front}
   \end{subfigure}
-  \hfill
   \begin{subfigure}{0.5\linewidth}
     \centering
     \includegraphics[scale=0.3]{../fyp/assets/task-pics/grasp/simple-front-zoom-gripper_actions.png}
@@ -31,7 +30,6 @@ The more complicated counterpart, shown in Figure \ref{fig:grasp-move}, is a sce
     \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/move-front.png} 
     \caption{Front}\label{subfig:grasp-move-front}
   \end{subfigure}
-  \hfill
   \begin{subfigure}{0.45\linewidth}
     \centering
     \includegraphics[scale=0.2]{../fyp/assets/task-pics/grasp/move-top.png}
@@ -45,7 +43,25 @@ The more complicated counterpart, shown in Figure \ref{fig:grasp-move}, is a sce
 
 Initially the wrist camera shouldn't pose any problems. Although, I suspect as we advance through the task, especially after we have grasped something, wrist camera becoming heavily obstructed will render it unreliable so basing our decisions on this medium alone might not be ideal.
 
+\subsection{Creating an Appropriate Policy}
+The policy for grasping needed slight modifications compared to the simpler reaching task. Along with understanding what is being seen for movement of the joints, we also needed a mechanism for sending a grasping signal for the robot. The previous policy would regress the entire 6DoF along with the final \emph{float} that controls the gripper. This was evident earlier when observing the reaching task I realised the gripper would sometimes `clap', meaning it would open and close quickly for every other action, which is odd, but was not a deal breaker before.
 
+However, now this would not be sufficient. Firstly, there weren't many frames the gripper is signaled to be closed, as the gripping happens at the end of the task, comparatively less observations where the gripper is closed; means that there is an inherent imbalance in our dataset. If we were to treat \textbf{CLOSED} and \textbf{OPEN} as binary labels; which they are as RLBench takes a \emph{float} $\in \left[0, 1\right]$ and thresholds at $ > 0.9$ to check if it should be open. Therefore, regressing the entire action with the gripper bit makes it extremely uncertain and mostly skew towards staying open. With quick fluctuations, due to uncertainty.
+
+To adjust for this I first tried to do binary classification with weighting the samples to counteract this, which was not fruitful just due to the overall dataset size being small as well. There are as much data as there is episodes in a demo, which is usually not much more than $50$. So, going back to regression, I decided to add Binary Cross Entropy (BCE) Loss; using \verb|BCEWithLogitsLoss| from Pytorch \todo[color=green]{ref this?}. Along with a gripper prediction head just to predict the gripper action from the extracted camera features, then add this as a part of the overall loss with a weighting, giving us:
+
+\[
+  loss = mse\_loss \left(action_{v}, ~\hat{action_v}\right) 
+  + 
+  \lambda_{gripper} bce\_loss\left( action_{g}, ~\hat{action_g}\right)
+\]
+
+where $v$ and $g$ means respectively the $7$-dim joint velocity vector and the $1$-dim float vector which is \( \in \{ 0.0, 1.0 \}\)
+
+This meant that the gripper action is separately tunable to the movement action. This makes inherent sense as the movement decisions should never affect the gripper. The information flow is camera to movement and gripper action separately \todo{small flowchart to show cam  move, cam gripper action} 
+
+
+\todo[color=pink]{run some, simple grasp policy static tests here with l and r vs wrist and depth}
 \todo[color=pink]{experiments here, or move this where I can get some data on this}
 \subsubsection{Observations}
 What I got from these experiments was that the agent can benefit from understanding its surroundings at a higher level, and more importantly remembering them. This is because once thek camera becomes obstructed, as with \textbf{Grasp Then Move}, even if the agent could do some exploration to find the target, it wouldn't be ideal due to the restricted view it has access to. So, observing the environment before, and remembering important parts will be vital for the later stages of tasks. I aim to explore some pre-policy visual exploration of the environment then feed this information forward, possibly when it might be needed. For example residual forwarding of data might be used later \todo{should I keep this here?}
