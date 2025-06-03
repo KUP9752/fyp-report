@@ -2,7 +2,7 @@
 Another task which is likely to suffer from lack of viewpoints is a grasping task. I first designed
 a simple version (Figure \ref{fig:grasp-simple}) which the agent learns to reach then grasp the cubic target. 
 
-Main differences between this and the reaching task is that the target here is tangible, so on top of being rendered it is also set to be \emph{collidable}. Another major addition is the usage of the \emph{extension string} as seen in \ref{subfig:simple-zoom-actions}, this instructs the demonstration engine to insert certain moves within the calculated trajectory. In this case \verb|open_gipper()| ensures the gripper is open, then a later waypoint will instruct it to close. 
+Main differences between this and the reaching task is that the target here is tangible, so on top of being rendered it is also set to be \emph{collidable}. Another major addition is the usage of the \emph{extension string} as seen in \ref{subfig:simple-zoom-actions}, this instructs the demonstration engine to insert certain moves within the calculated trajectory. In this case \verb|open_gipper()| ensures the gripper is open; then a later waypoint will instruct it to close. 
 
 As the task complexity increases, its design complexity also increases. Also, without any prior knowledge about 3D simulators and 3D design, it took me quite a long time to hunt everything about CoppeliaSim, RLBench, and PyRep to put these together. One criticism I have on these tools is the documentation is all over the place. \todo[color=green]{too ranty? rewrite or remove}
 
@@ -41,7 +41,7 @@ The more complicated counterpart, shown in Figure \ref{fig:grasp-move}, is a sce
 
 \todo{add a picture with the cube grasped and the wrist camera view seen at that point}
 
-Initially the wrist camera shouldn't pose any problems. Although, I suspect as we advance through the task, especially after we have grasped something, wrist camera becoming heavily obstructed will render it unreliable so basing our decisions on this medium alone might not be ideal.
+Initially the wrist camera shouldn't pose any problems. Although, I suspect as we advance through the task, especially after we have grasped the target, the wrist camera becoming heavily obstructed will render it unreliable; so basing our decisions on this medium alone might not be ideal.
 
 \subsection{Creating an Appropriate Policy}
 The policy for grasping needed slight modifications compared to the simpler reaching task. Along with understanding what is being seen for movement of the joints, we also needed a mechanism for sending a grasping signal for the robot. The previous policy would regress the entire 6DoF along with the final \emph{float} that controls the gripper. This was evident earlier when observing the reaching task I realised the gripper would sometimes `clap', meaning it would open and close quickly for every other action, which is odd, but was not a deal breaker before.
@@ -58,11 +58,13 @@ To adjust for this I first tried to do binary classification with weighting the 
 
 where $v$ and $g$ means respectively the $7$-dim joint velocity vector and the $1$-dim float vector which is \( \in \{ 0.0, 1.0 \}\)
 
-This meant that the gripper action is separately tunable to the movement action. This makes inherent sense as the movement decisions should never affect the gripper. The information flow is camera to movement and gripper action separately \todo{small flowchart to show cam  move, cam gripper action} 
+This meant that the gripper action is separately tunable to the movement action. This makes inherent sense as the movement decisions should never affect the gripper. The information flow is camera to movement and gripper action separately. \todo{small flowchart to show cam  move, cam gripper action} 
 
 
-\todo[color=pink]{run some, simple grasp policy static tests here with l and r vs wrist and depth}
-\todo[color=pink]{experiments here, or move this where I can get some data on this}
-\subsubsection{Observations}
-What I got from these experiments was that the agent can benefit from understanding its surroundings at a higher level, and more importantly remembering them. This is because once thek camera becomes obstructed, as with \textbf{Grasp Then Move}, even if the agent could do some exploration to find the target, it wouldn't be ideal due to the restricted view it has access to. So, observing the environment before, and remembering important parts will be vital for the later stages of tasks. I aim to explore some pre-policy visual exploration of the environment then feed this information forward, possibly when it might be needed. For example residual forwarding of data might be used later \todo{should I keep this here?}
+\todo[color=pink]{run some, simple grasp policy static tests here with l and r vs wrist and depth about tuning (running rn)}
+
+
+\subsubsection{Observations}\todo[color=pink]{experiments here, or move this where I can get some data on this}
+Talking about the grasp then move, literally have never ran this yet.
+What I got from these experiments was that the agent can benefit from understanding its surroundings at a higher level, and more importantly remembering them. This is because once  camera becomes obstructed, as with \textbf{Grasp Then Move}, even if the agent could do some exploration to find the target, it wouldn't be ideal due to the restricted view it has access to. So, observing the environment before, and remembering important parts will be vital for the later stages of tasks. I aim to explore some pre-policy visual exploration of the environment then feed this information forward, possibly when it might be needed. For example residual forwarding of data might be used later \todo{should I keep this here?}
 

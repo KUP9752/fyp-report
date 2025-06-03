@@ -38,7 +38,7 @@ There are two versions of this task, I thought it might be interesting to random
   \caption{Reaching Task with an Obstacle}\label{fig:reach-obs-random}
 \end{figure}\todo[color=blue]{smaller?} 
 
-\subsection{Experimenting with Views}\todo[color=red]{not sure what is meant to happen here, maybe move the seq trhing to grasping above and only talk about data here}
+\subsection{Experiments}\todo[color=red]{not sure what is meant to happen here, maybe move the seq trhing to grasping above and only talk about data here}
 
 \subsubsection{Using same unchanged policy form ReachNoObs}
 Unsurprisingly this did not perform very well, 
@@ -61,7 +61,7 @@ Unsurprisingly this did not perform very well,
 I had initially designed the system to flatten the given demonstrations and then draw from them during the training. However, one drawback with this is that we cannot incorporate any shuffling in the data. \todo
 
 \todo{mention switching to demo dataset}
-\missingfigure{shuffling plots}
+\missingfigure{shuffling plots, might not add this at all to the report, to be confirmed}
 Talk about how the data is loaded and created and managed for the network, talk about shuffling mechanisms and what I've found etc. talk about \verb|shuffle_obs_in_demo| and the other one.
 
 \subsection{Improvements}
@@ -76,11 +76,12 @@ As expected this is where the single wrist camera started showing its shortcomin
 
 From experiments I have realised that it learns to move around the obstacle easily, using simple behavioural cloning. However, getting the last nudge to actually reach the target is where it falls apart, especially in more realistic scenarios where the target is randomised behind the obstacle. For static placement behind the wall, the agent, expectedly is quite good. \todo{maybe explain or evidence this, plateaus aroudn the same distance value and watchig t heroot act comfirms this}
 
-\subsubsection{Other Cameras}
-So, we can confirm that the wrist camera alone is not sufficient \todo{ref}, and the combination of wrist and other cameras are almost always better as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target.\todo[color=red]{looking at he target??}
+\subsubsection{Other Cameras}\todo{rename}
+So, we can confirm that the wrist camera alone is not sufficient \todo{ref}, and the combination of wrist and other cameras are almost always better as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target, so that inherently some target understanding can be encoded into a task.\todo[color=red]{looking at he target??}
 
 
 \todo{talk about the policy using differnt camera inputs to blend and make informed choices? maybe some plots here showing if it is better or not?}
+
 \todo{this is important for plan2 later, as that would depend on such a mechanism, hint and even link that from here}
 
 \subsubsection{Implementing `Looking' into the Demonstrations}\todo{haven't done this yet}\label{ew-looking-at-target}
@@ -90,6 +91,9 @@ Another solution might be to experiment with the demonstration system to make su
 If we can't implicitly encode the `looking' information through the demonstration that means we will have to inject this information into our agent some other way. Another way to make sure agent understands to look at the target is teaching it to actively seek out its target, either following previous works such as \todo{find some prior info tracking works add ref} where object priors are incorporated into the learning or with attention mechanisms that figure out what is important in a task without prior object information \todo{maybe reference this later}.  
 
 \subsection{Attending on a Camera in Given Combination}
+One of the first ideas, that was bordering on `active vision' was to selectively accept the encoding from a single camera depending on what it was seeing. 
+
+
 \todo{talk about the implementation of the }
 \subsubsection{MultiCNN}
 \todo{explaint the implementations, maybe connect to }
