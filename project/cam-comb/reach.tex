@@ -11,7 +11,8 @@ The next step was to create a policy network. As I am mainly working on imitatio
 
 Along with the policy the second most important of any ML workload is the way the data us regularised, processed, and loaded into the system for training or testing.
 
-\subsubsection{Data Processing}\todo{talk about rgb transforms? uniforming etc, or remove not sure}
+\subsubsection{Data Processing}\todo[color=red]{talk about rgb transforms? uniforming etc, or not not sure}
+The main processing I applied to the data was normalisation and scaling. RLBench, by default, returns image colour values in the range \(\left[0, 255\right]\) which was transformed to be in range \(\left[0.0, 1.0\right]\). Done before both inference and training. Mainly to keep weight magnitudes manageable and faster convergence, due to optimisers and activation functions working better at smaller scales. Secondly, this means that each pixel in the image will contribute to the extruded feature proportionally and not raw numbers, which will help with the numerical stability and gradient flow throughout the network.
 
 \subsubsection{Data Loading}
 I followed a simple flattening approach for loading the data into the system. Using PyTorch's \textbf{Dataset} and \textbf{DataLoader} classes I created a dataset that can take in a raw list of demonstration, then flattens its observations into a tensor of shape \(\langle 3,~64,~64 \rangle \) (permuted from the usual \(\langle 64,~64,~3 \rangle \) for images due to Torch conventions of convolutional networks and where they expect the channel  dimension). Then the dataset makes individual observation indexable along with their corresponding action labels. Types given as:\mintinline{python}|DemoObsDataset: tensor[tensor[3,  64, 64], tensor[8]]|. Then the loader can manage the shuffling and batching as usual. Initially I kept the data unshuffled, to keep the data in its sequential form. While keeping the batch size as the demo length. This is because currently I am trying to overfit the network to the single demonstration given to it to gauge how long to train my networks for
@@ -22,19 +23,19 @@ Starting with the 3 static versions of the task, where the target is placed as s
 \begin{figure}[htbp]
   \begin{subfigure}{0.3\linewidth}
     \centering
-    \includegraphics[scale=0.4]{../fyp/assets/demo-trials-no_obs/tasks/static-tasks-camera/initial-obs-side_l.png}      
+    \includegraphics[width=0.6\linewidth]{assets/cam-comb/reach-no-obs/initial-obs-side_l.png}      
     \caption{Left Side}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.3\textwidth}
     \centering
-    \includegraphics[scale=0.4]{../fyp/assets/demo-trials-no_obs/tasks/static-tasks-camera/initial-obs-central.png}
+    \includegraphics[width=0.6\linewidth]{assets/cam-comb/reach-no-obs/initial-obs-central.png}
     \caption{Central}
   \end{subfigure}
   \hfill
-  \begin{subfigure}{0.3\linewidth}
-    \centering
-    \includegraphics[scale=0.4]{../fyp/assets/demo-trials-no_obs/tasks/static-tasks-camera/initial-obs-side_r.png}
+  \begin{subfigure}{0.3\textwidth}
+    \centering 
+    \includegraphics[width=0.6\linewidth]{assets/cam-comb/reach-no-obs/initial-obs-side_r.png}
     \caption{Right Side}
   \end{subfigure}%
   \caption{Three variations of the reach task with the obstacles sometimes out of view}\label{fig:no-obs-3-views}
@@ -56,7 +57,7 @@ As I trained for longer it seemed to overfit early move really slowly at the sta
 \end{figure}
 
 \subsubsection{Placing Randomly}
-To test generalisability, I created a dynamic version of the task, where the target is now randomly placed within view (not necessarily always fully within view, but at least some parts are visible). This is achieved by using a \verb|SpawnBoundary| and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white dotted box being the boundary. This boundary is not rendered in the simulation visually. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
+To test generalisability, I created a dynamic version of the task, where the target is now randomly placed within view (not necessarily always fully within view, but at least some parts are visible). This is achieved by using a \textbf{SpawnBoundary|}and randomly sampling the location of the target withing this for every new variation of the task, or for every new episode. Which can be seen in Figure \ref{fig:reach-no-obs}, the white dotted box being the boundary. This boundary is not rendered in the simulation visually. This guarantees variety in demonstrations as well as helps us create a generalisable policy.
 
 \begin{figure}[htpb] % htpb allows all placement
   \begin{subfigure}{0.50\linewidth}
@@ -77,10 +78,41 @@ To run the random tests, shown in Figure \ref{fig:rno-random}, in a comparable m
 
 Looking at graph \ref{subfig:rno-random-dist}, we can see that providing more demonstrations helps the policy generalise better to random locations, where the sweet spots seems to be around 10 demos and around $500$ where the success rate (\ref{subfig:rno-random-success}) is quite high
 
-\subsection{Camera Limitations}\todo[color=red]{reread and make sure it is a good starter segue to obs (maybe move these to after obs?), mention this under reachObs! MOVE}
-I started this section by limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task. Introducing some of the other RGB cameras, specifically the \verb|left shoulder| or the \verb|right shoulder| views, does not necessarily benefit the performance, see \ref{fig:rno-random-cams}. Conversely, we are increasing the training time by adding more channels to the convolutional layers, which can be considered a drawback.
+\subsection{Camera Limitations}
+I started this section by limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task. Introducing some of the other RGB cameras, specifically the \textbf{left shoulder} or the \textbf{right shoulder} views, doesn't drastically benefit the performance, other than just the \textbf{right shoulder} RGB, see \ref{fig:rno-random-cams}. Conversely, combining more than one camera seems to be adding to the deficit, as the features being extracted are likely incompatible due to the various view points. 
+
+As the current fusion system does not allow for optimal multi-view feature extraction, using multiple different cameras are not necessarily benefiting the learning and might even be negating its effectiveness due to diluting the features by concatenating incompatible views. \todo{ref back to this when needed and improve the policy from now on?} 
+
+A possible explanation as to why the right shoulder camera alone might be increasing success rate is, I think, solely because of its strategic placement compared to the rest of the cameras. 
+
+It is marginally better than wrist, which is likely due to the wrist sometimes observing very similar frames if it happens to initially move away from the target, which can happen when the random target spawn location is out of distribution. Which gets the agent stuck in an unknown state in by these initial erroneous moves. Leading it to not reaching the target. This is not as big an issue with the right shoulder camera, simply due to its larger coverage, and static nature which increases the network potency in repetitive simple movements simply due to the frame of reference never changing.\todo[color=purple]{}. 
+
+To reason why the right shoulder and not the left is simply because of the geometry of the robot. The left camera is more likely to get obstructed by the robot itself due to its top joints being on its left, seen in \ref{subfig:rno-random-ls}. 
+
+So, there is improvement from multiple views, but this task does not really benefit from extra frames of vision. However, this is not to say all tasks will be immune to benefits from extra views. An important part of this project is to understand what is most important for a robot to observe in its given environment and task and how can it optimally leverage this data to solve a task better. And increasingly more complex tasks should benefit from abundance of information.
 
 \begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{assets/cam-comb/reach-no-obs/demo1-step30-left_shoulder.png}
+    \caption{Left Shoulder}\label{subfig:rno-random-ls}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{assets/cam-comb/reach-no-obs/demo1-step30-wrist.png}
+    \caption{Wrist}\label{subfig:rno-random-wrist}
+  \end{subfigure}
+  \begin{subfigure}{0.3\linewidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{assets/cam-comb/reach-no-obs/demo1-step30-right_shoulder.png}
+    \caption{Right Shoulder}\label{subfig:rno-random-rs}
+  \end{subfigure}
+  \caption{RGB Views from the first `ReachNoObs\_PlaceRandom' demo (step 30)}\label{fig:rno-random-rgb-views}
+\end{figure}
+
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
   \begin{subfigure}{0.50\linewidth}
     \centering
     \includegraphics[width=\linewidth]{assets/cam-comb/reach-no-obs/rno_random-cams.png}
@@ -90,16 +122,12 @@ I started this section by limiting the learning to only the wrist mounted camera
   \begin{subfigure}{0.50\linewidth}
     \centering
     \includegraphics[width=\linewidth]{assets/cam-comb/reach-no-obs/rno_random-cam_success.png}
-    \caption{Success Rate (\%) of the $10$ Demos}\label{subfig:rno-random-cams-success}
+    \caption{Success Rate (\%) on the $10$ tests}\label{subfig:rno-random-cams-success}
   \end{subfigure}
   \caption{Experimenting with multiple RGB cameras}\label{fig:rno-random-cams}
 \end{figure}
 
-Although the performance does not outright increase, we can clearly see that having a different point of view can sometimes drastically affect the quality of the learnt network and hence the action produced. \todo[color=purple]{}  \todo{need to actually talk about the numbers here refer to graph, talk about why the right shoulder is just better, why l and r together are lackluster}
-
-However, this is not to say all tasks will be immune to benefits from extra views. An important part of this project is to understand what is most important for a robot to observe in its given environment and task and how can it optimally leverage this data to solve a task better. And increasingly more complex tasks should benefit from abundance of information.
-
-\subsection{Increasing the Toy Task Complexity}\todo{subsection to above?}
+\subsection{Increasing the Toy Task Complexity}
 Complexity of tasks can be increased in two main ways:
 \begin{enumerate}
   \item Increase the movement or the level of interaction of the task at hand
