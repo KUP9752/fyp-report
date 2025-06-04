@@ -38,31 +38,48 @@ There are two versions of this task, I thought it might be interesting to random
   \caption{Reaching Task with an Obstacle}\label{fig:reach-obs-random}
 \end{figure}\todo[color=blue]{smaller?} 
 
-\subsection{Experiments}\todo[color=red]{not sure what is meant to happen here, maybe move the seq trhing to grasping above and only talk about data here}
+\subsection{Running the Task}
+There were a few interesting things of note happening on this task. 
 
-\subsubsection{Using same unchanged policy form ReachNoObs}
-Unsurprisingly this did not perform very well, 
+I used the unchanged reaching policy from earlier\todo{ref}. Unsurprisingly this did not perform amazingly, however, there are some important lessons to learn form what we are seeing here. Firstly, I adopted to observe the `minimum distance' to target this time \ref{fig:ro-random-cams}, however the `final distance ' graph can be found in the appendix \todo[color=green]{link appendix}. 
+
+\subsection{Why is `IndRandom' just worse?}\todo{not sure actually}
+I did not include any figures here as there were too many\todo{should i include figures here}, however some nice ones can be found in \todo{ref the appendix}. To summarise
+
 \begin{figure}[htpb] % htpb allows all placement
   \centering
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_random-dist-20demos.png}
-    \caption{}\label{subfig:ro-random-dist20}
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_random-demo-mindist-10demos.png}
+    \caption{Minimum Distance to Target}\label{subfig:ro-random-demo-dist20}
   \end{subfigure}
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_random-success-20demos.png}
-    \caption{}\label{subfig:ro-random-success-20}
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_random-demo-success-10demos.png}
+    \caption{Success Rate (\%) of Task}\label{subfig:ro-random-demo-success-20}
   \end{subfigure}
-  \caption{}\label{fig:ro-random-cams}
+  \caption{Policy trained on 10 demos, using the \emph{demo dataset} from \ref{subsec:grasp-data-loading-changes}}\label{fig:ro-random-demo-cams}
 \end{figure}
 
-\subsubsection{Understanding the Data Management}
-I had initially designed the system to flatten the given demonstrations and then draw from them during the training. However, one drawback with this is that we cannot incorporate any shuffling in the data. \todo
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_random-obs-mindist-10demos.png}
+    \caption{Minimum Distance to Target}\label{subfig:ro-random-obs-dist20}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_random-obs-success-10demos.png}
+    \caption{Success Rate (\%) of Task}\label{subfig:ro-random-obs-success-20}
+  \end{subfigure}
+  \caption{Policy trained on 10 demos, using the \emph{obs dataset} from \ref{subsec:reach-data-loading}}\label{fig:ro-random-obs-cams}
+\end{figure}
 
-\todo{mention switching to demo dataset}
-\missingfigure{shuffling plots, might not add this at all to the report, to be confirmed}
-Talk about how the data is loaded and created and managed for the network, talk about shuffling mechanisms and what I've found etc. talk about \verb|shuffle_obs_in_demo| and the other one.
+
+
+\subsubsection{Understanding the Data Management}\todo{explain the weirdness of the demo working worse}
+I had initially designed the system to flatten the given demonstrations and then draw from them during the training. However, one drawback with this is that we cannot incorporate any shuffling in the data.\todo[color=purple]{}
 
 \subsection{Improvements}
 

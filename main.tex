@@ -1,5 +1,9 @@
 \documentclass[a4paper, twoside]{report}
 
+\includeonly{
+  project/cam-comb/cam-comb,
+}
+
 %% Language and font encodings
 \usepackage[english]{babel}
 \usepackage[utf8x]{inputenc}
@@ -31,7 +35,7 @@
 
 \begin{document}
 
-\input{title/title.tex}
+\include{title/title}
 
 \begin{abstract}
 Your abstract goes here
@@ -46,22 +50,22 @@ Your abstract goes here
 \listoffigures
 \listoftables
 
-\input{introduction/introduction.tex}
-\input{background/background.tex}
-% \input{project/plan/plan.tex} % //TODO: remove plan was for interim report
+\include{introduction/introduction}
+\include{background/background}
+% \input{project/plan/plan} % //TODO: remove plan was for interim report
 
-\input{project/early-work/ew.tex}
+\include{project/early-work/ew}
 
-\input{project/cam-comb/cam-comb.tex}
-\input{project/appl/appl.tex}
+\include{project/cam-comb/cam-comb}
+\include{project/appl/appl}
 
-\input{evaluation/evaluation.tex}
-\input{conclusion/conclusion.tex}
+\include{evaluation/evaluation}
+\include{conclusion/conclusion}
 
 \bibliographystyle{unsrt}
 \bibliography{bibs/intro, bibs/background, bibs/rel-work, bibs/general}
 
-\input{appendix/appendix.tex}
+\include{appendix/appendix}
 
 
 \end{document}
