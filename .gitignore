@@ -5,3 +5,4 @@ main*
 
 *.log
 _minted/
+*.aux
