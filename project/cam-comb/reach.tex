@@ -1,4 +1,4 @@
-\section{Experimenting with Reaching}
+\section{Experimenting with Reaching}\label{sec:reach-no-obs}
 
 \subsection{Creating a Policy}
 The next step was to create a policy network. As I am mainly working on imitation learning -and specifically behavioural cloning- from demonstrations provided by the system, my network needs to be able to ingest these demonstrations and generate actions in the action space of the robot. Following the earlier parameters of a demo, I created the following network, Figure \ref{fig:policy-arch}. This takes in the given wrist rgb image and extracts features, which are then interpreted into a $8$ dim vector of \textbf{float}s as an action. First $7$ corresponding to the $7$ joints of the \emph{Panda} robot, and holding a velocity value for them, while the final value is the gripper state, $0$ meaning closed and $1$ meaning open, which is clamped by the movement system under the hood.

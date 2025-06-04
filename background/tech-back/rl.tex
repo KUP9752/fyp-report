@@ -53,9 +53,9 @@
   
 
   \subsubsection{Value-Based}
-    These techniques aim to learn the value of states (or an estimate for the value of states) and actions. So they learn the $v_\pi$ or $q_\pi$ function. which can then be used to extract the optimal policy $\pi_*$ for deciding the actions.
+  These techniques aim to learn the value of states (or an estimate for the value of states) and actions. So they learn the $v_\pi$ or $q_\pi$ function. which can then be used to extract the optimal policy $\pi_*$ for deciding the actions.
 
-    Such systems are mainly used for simple navigation tasks, basic motor control and arm reaching scenarios. Some example methods are: Q-Learning [Off-Policy], Deep Q-Networks (DQN) [Off-Policy], SARSA [On-Policy]. \todo[color=green]{citations}
+  Such systems are mainly used for simple navigation tasks, basic motor control and arm reaching scenarios. Some example methods are: Q-Learning [Off-Policy], Deep Q-Networks (DQN) [Off-Policy], SARSA [On-Policy]. \todo[color=green]{citations}
 
   \subsubsection{Policy-Based}
   This on the other hand learn a policy directly. Bypassing the need to learn the values of states or actions completely. This can be helpful if the state space and/or the action space are quite large. For example, if the action space was infinite, then value-based approaches would not be feasible as all actions must be tried to find the best, which makes directly learning the policy is the only possible approach.
@@ -66,7 +66,7 @@
   The main idea in this approach is the agent improves its policy from direct feedback from a \emph{teacher}, this teacher can be an external system that provides rewards or a complete manual system where the teacher is an ``expert human'' providing demonstrations (which goes into Imitation Learning, see \ref{sec:il}). Some common approaches are
   \begin{itemize}
     \item \textbf{Direct Action Supervision}: where the teacher suggest actions directly to the agent.
-    \item \textbf{Criticising Actions}: where the actions are suggested by the teacher.
+    \item \textbf{Criticising Actions}: where the actions are suggested by the teacher.\todo{not sure if this makes sense}
     \item \textbf{Shaped Rewards}: the teacher modifies the reward signal dynamically to encourage desirable behaviours.
     \item \textbf{Curriculum Learning}: the teacher controls the difficulty of tasks over time to ease the learning of the agent.
   \end{itemize}

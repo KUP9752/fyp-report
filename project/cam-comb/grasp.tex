@@ -4,7 +4,7 @@ a simple version (Figure \ref{fig:grasp-simple}) which the agent learns to reach
 
 Main differences between this and the reaching task is that the target here is tangible, so on top of being rendered it is also set to be \emph{collidable}. Another major addition is the usage of the \emph{extension string} as seen in \ref{subfig:simple-zoom-actions}, this instructs the demonstration engine to insert certain moves within the calculated trajectory. In this case \verb|open_gipper()| ensures the gripper is open; then a later waypoint will instruct it to close. 
 
-Final difference to mention is the cubic target. This was a quality of life choice, the spherical object was simple to attempt to grab. My initial experimentation I realised that the agent would try to grab the top bit of the sphere, get no grip but simulator would report a successful grab. Realising this was likely to due to the geometry of the target, I changed it to use a cube shape.
+Final difference to mention is the cubic target. This was a quality of life choice, the spherical object was simple to attempt to grab. During initial experimentation, I realised that the agent would try to grab the top bit of the sphere, get no grip but the simulator would report a successful grab. Realising this was likely due to the geometry of the target, I changed it to use a cube shape, which solved the issues.\todo[color=purple]{}
 
 As the task complexity increases, its design complexity also increases. Also, without any prior knowledge about 3D simulators and 3D design, it took me quite a long time to hunt everything about CoppeliaSim, RLBench, and PyRep to put these together. One criticism I have on these tools is the documentation is all over the place. \todo[color=green]{too ranty? rewrite or remove}
 
@@ -43,7 +43,7 @@ The more complicated counterpart, shown in Figure \ref{fig:grasp-move}, is a sce
 
 \todo{add a picture with the cube grasped and the wrist camera view seen at that point}
 
-Initially the wrist camera shouldn't pose any problems. Although, I suspect as we advance through the task, especially after we have grasped the target, the wrist camera becoming heavily obstructed will render it unreliable; so basing our decisions on this medium alone might not be ideal.
+Initially the wrist camera shouldn't pose any problems. Although, I suspect as we advance through the task, especially after we have grasped the target, the wrist camera becoming heavily obstructed will render it unreliable; so basing our decisions on this medium alone might not be ideal. This may warrant more viewpoints or a better understanding of the task workspace for the agent. 
 
 \subsection{Creating an Appropriate Policy}
 The policy for grasping needed slight modifications compared to the simpler reaching task. Along with understanding what is being seen for movement of the joints, we also needed a mechanism for sending a grasping signal for the robot. The previous policy would regress the entire 6DoF along with the final \emph{float} that controls the gripper. This was evident earlier when observing the reaching task I realised the gripper would sometimes `clap', meaning it would open and close quickly for every other action, which is odd, but was not a deal breaker before.\todo{figure about the two classification heads}
@@ -53,9 +53,9 @@ However, now this would not be sufficient. Firstly, there weren't many frames th
 To adjust for this I first tried to do binary classification with weighting the samples to counteract this, which was not fruitful just due to the overall dataset size being small as well. There are as much data as there is episodes in a demo, which is usually not much more than $50$. So, going back to regression, I decided to add Binary Cross Entropy (BCE) Loss; using \verb|BCEWithLogitsLoss| from Pytorch \todo[color=green]{ref this?}. Along with a gripper prediction head just to predict the gripper action from the extracted camera features, then add this as a part of the overall loss with a weighting, giving us:
 
 \[
-  loss = mse\_loss \left(action_{v}, ~\hat{action_v}\right) 
+  loss = loss_{mse} \left(action_{v}, ~\widehat{action_v}\right) 
   + 
-  \lambda_{gripper} bce\_loss\left( action_{g}, ~\hat{action_g}\right)
+  \lambda_{gripper} loss_{bce}\left( action_{g}, ~\widehat{action_g}\right)
 \]
 
 where $v$ and $g$ means respectively the $7$-dim joint velocity vector and the $1$-dim float vector which is \( \in \{ 0.0, 1.0 \}\)
@@ -68,25 +68,63 @@ This meant that the gripper action is separately tunable to the movement action.
 \subsection{Observations}\todo{maybe remove or move down}
 Ran some initial tests to understand how grasping was working and what views it was optimal with.
 
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cam-comb/grasp-simple/tuning-normal-old-policy-dist.png}
+    \caption{Average Final Distance vs Training Epochs}\label{subfig:grasp-tuning-dist}
+  \end{subfigure}
+  % \hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cam-comb/grasp-simple/tuning-normal-old-policy-success.png}
+    \caption{Successful Completions vs Training Epochs}\label{subfig:grasp-tuning-dist-success}
+  \end{subfigure}
+  \caption{Simple Grasp Tuning: Each combination of parameters are repeated 10 times over testing data and results are averaged}\label{fig:grasp-tuning-epochs}
+\end{figure}\todo[color=blue]{make bigger if can afford}
+
+
 \subsection{The Grasp}
-The biggest challenge was to tune the success rate of the tests. The agent was good at reaching towards the target, as evident from the fairly low minimum and final distances \todo{point to figure}. However, unlike the reaching task, the success of this task dependent on getting a correct grasp \todo[color=green]{ref the appendix task wiring?}. 
+The biggest challenge was to tune the success rate of the tests. The agent was good at reaching towards the target, as evident from the fairly low minimum and final distances \ref{subfig:grasp-tuning-dist}. An observation from these task is that learning the reaching movement does not take very many epochs as seen before in \ref{sec:reach-no-obs} However, unlike the reaching task, the success of this task is dependent on getting a correct grasp\todo[color=green]{ref the appendix task wiring?}, which the system is not amazing at depending on the views it is given. 
+
 
 \subsubsection{Augmenting the Loss}
-My initial response was to tweak and weight the grasping loss component, $\lambda_{gripper}$. However, increasing it too much (tried up to around $10$) meant the movement wasn't being learnt well -neither the grasping as, again, of the data is labelled as open is more abundant so it skews to keeping it open. Whisle keeping it too low, means no grasping is learnt. I figured out that \(\left[0.9, 1.2\right]\) was the optimal range, and some of the most successful models I trained were using 1.2.\todo{include figures or explain why there were no good figures to include}
+My initial response was to tweak and weight the grasping loss component, $\lambda_{gripper}$. However, increasing it too much (tried up to around $10$) meant the movement wasn't being learnt well -neither the grasping as, again, of the data is labelled as open is more abundant so it skews to keeping it open. Whisle keeping it too low, means no grasping is learnt. After experimenting, I figured out that \(\left[0.9, 1.2\right]\) was the optimal range \ref{fig:grasp-tuning-lambda-g}, and some of the most successful models I trained were using $1$ and $1.2$.\todo[color=green
+]{there are some appendix figures to include here}
 
-\subsubsection{Masking the Loss}
-The other approach I tried was to mask the grasping losses and keep them restrained to the last few frames of the action.\todo{this will definitely be better with a figure, devise a figure for this}. This meant that the $action_g$'s loss component will only be added to the main loss in the last $k$
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=0.6\linewidth]{assets/cam-comb/grasp-simple/tuning-normal-old-policy-lambda-g.png}
+    \caption{Average Final Distance vs $\lambda_{gripper}$}\label{subfig:grasp-tuning-lambda-g}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=0.6\linewidth]{assets/cam-comb/grasp-simple/tuning-normal-old-policy-success-lambda-g.png}
+    \caption{Successful Completions vs $\lambda_{gripper}$}\label{subfig:grasp-tuning-lambda-g-success}
+  \end{subfigure}
+  \caption{A test run using multiple $\lambda_{gripper}$ values}\label{fig:grasp-tuning-lambda-g}
+\end{figure}
 
-\subsubsection{Data Loading Changes}\todo[color=purple]{the sequential thing, the importnat bit may come later but leave this here for note}\todo{shorten?}
+
+\subsubsection{Data Loading Changes}\label{subsec:grasp-data-loading-changes}\todo[color=purple]{the sequential thing, the importnat bit may come later but leave this here for note}\todo{shorten?}
 Following the above approach I wanted to streamline the data loading mechanisms that were currently being used. As discussed above, in \ref{subsec:reach-data-loading}, the demonstrations are flattened before loading. So, the dataset is of type \verb|list[Observation]| where the `list' can be of any sequential or \emph{ArrayLike} type. This meant the batch size parameter within the loading directly related to how many frames were getting fed into the system at a time. So, for each epoch we see all the demos, however we only update the parameters of the network per batch and the batch size is determined by the loader.
 
 Realising not training with entirety of a demo in batch. For example if the demonstration has $50$ frames, but the `minibatch\_size' is only $32$ we would see all the demonstrations in dataset given, yet we will see them in slices of $32$. As I omitted shuffling, to preserve the sequential nature of demos\todo[color=pink]{shuffled vs not shuffeld, might be done for randomobs, maybe link that section} the model updates will be done in uncontrolled slices. This is because a demo does not have a fixed episode length and different demos for the same task, can be of different lengths.
 
 So I devised a new dataset to help process data in batches of entire demos. \verb|DemoDataset| held the data in terms of \verb|list[Demo]|. A drawback is that the demos are different lengths, so more collating and computation needs to be done before feeding this into a torch model. However, a developer experience positive, was that shuffling was painless, I could shuffle on the loader level and that would mean the frames within a demo will be the same sequential order but the demos themselves can be fed in different orders per epoch, which should help with the generalisability of the models trained on th is loader.\todo[color=green]{include demodataset in appendix}. Although I believed this new \emph{demo dataset} was mostly better, I would later learn an quirky behaviour of the \emph{obs dataset}\todo{also add to appendix, maybe even add to the earlier section in reach}.
 
+\subsection{Masking the Loss}
+The other approach I tried was to mask the grasping losses and keep them restrained to the last few frames of the action.\todo{this will definitely be better with a figure, devise a figure for this}. This meant that the $\widehat{action_g}$'s loss component will only be added to the main loss in the last $k$ frames of the movement, this is a heuristic working off the idea that the grasping only happens (and is reflected in $action_g$ labels) near the end of the episode. From looking at saved demonstrations we can confirm that the gripper will only be set to $1.0$ usually in the last $4$ to $6$ observations.
+
+So, the masking keeps $loss_{bce}$ to be non-zero only while regressing the last few items in the batch. As the batches are now defined as whole demonstrations (see \ref{subsec:data-loading-changes}), we can make a simple bit mask to match the lengths of demos in our training.batch\todo[color=green]{appendix code?}
+
+\missingfigure{put the k mask tests that are running now here}
 
 
-\subsection{Grasp Then Move Observations}\todo[color=pink]{experiments here, or move this where I can get some data on this}
+
+\subsection{Grasp Then Move Observations}\todo[color=pink]{experiments here, or move this where I can get some data on this, nothing competent but some data where I can talk about the occlusion}
 Talking about the Grasp\_ThenMove, literally have never ran this yet.
 What I got from these experiments was that the agent can benefit from understanding its surroundings at a higher level, and more importantly remembering them. This is because once  camera becomes obstructed, as with \textbf{Grasp Then Move}, even if the agent could do some exploration to find the target, it wouldn't be ideal due to the restricted view it has access to. So, observing the environment before, and remembering important parts will be vital for the later stages of tasks. I aim to explore some pre-policy visual exploration of the environment then feed this information forward, possibly when it might be needed. For example residual forwarding of data might be used later \todo{should I keep this here?}
-
