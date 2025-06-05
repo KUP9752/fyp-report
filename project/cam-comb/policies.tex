@@ -1,10 +1,23 @@
-\section{Proposing Policies}
+\section{Multi-View Understanding Policies}
+On top of just naively combining cameras and expecting the policy to understand what it means to `see' is a tall order. The next step is to understand how we can make the most of the information we are given by incorporating the various views and sensors and seeing what combination makes the most sense.
 
-\subsection{Feature Extraction and Fusion}
-Following the experimental setup I also wanted to see what is the most viable way to fuse information about the depth cameras and the RGB cameras to enable the best way of learning for my policies. This is inherently a difficult problem as there is no one way to do this, and multiple ways may interact differently with varying task setups.
+\subsection{Feature Extraction}
+So far, I have been using a simple CNN and extracting 
 
-\subsection{Simple Fusion Methods}
-This is what I used for the initial tests I concluded above in depth interfacing\todo{link or ref figures}
+\subsubsection{Better Feature Understanding}
+
+
+\subsubsection{Simple Stacking}
+This is the naive method of just stacking the view information, which is what I have been using up until this point. Simply stacking information on the channel dimension and feeding them into the network. This has clear disadvantages. Firstly, for the RGB cameras, there is definite misalignment, all these cameras have different poses and will disagree on what they see. This will lead to features not lining up leaving us with an non-optimal and more importantly a brittle policy. Meaning slight variations might confuse and move the policy out of distribution.
+
+\subsection{Fusion}
+The other level up is fusion of features. The CNNs used can be expanded 
+\subsubsection{Late Fusion}
+
+\subsubsection{Mid-Level Fusion}
+Have I ever done something on this?? not really maybe talk about how imma use the shoulder stuff with this,
+
+
 This adds onto before, gated attention and rgb attending to depth etc, explain some approaches
 
 \subsection{Deeper/Better Feature Understanding - RCNN}
