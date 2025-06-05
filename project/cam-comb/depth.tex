@@ -11,10 +11,10 @@ This is because, as I hinted earlier in the background section, the main idea of
 
 Therefore, I want to investigate whether depth data immediately adds meaningful information and if not; what is the best way to extract information from it so that it -combined with the normal rgb view- can be utilised to pave the way for active policies.
 
-\section{Grasping with Varying Depths}
+\subsection{Grasping with Varying Depths}
 To start investigating, I devised the following test task to see how the agent reacts to differently sized targets that might be placed at varying distances from the gripper within the scene
 
-\subsection{Task Design}
+\subsubsection{Task Design}
 The experiment that makes sense in this case is a grasping task. Because unlike the reaching tasks from earlier, the robot will need slightly more precision in executing its grasp and actually grabbing the target. The task performer needs to figure out where an object is before attempting to grab it. So, I created a modified version of the simple grasping task where the target object's distance and scale can be externally varied to observe the behaviours of agents in a controlled manner.\todo[color=green]{talk about delegating the task creating and param passing as well as the tasks in appendix and link here}
 
 \begin{figure}[htpb] % htpb allows all placement
