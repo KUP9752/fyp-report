@@ -105,13 +105,15 @@ If we can't implicitly encode the `looking' information through the demonstratio
 \subsubsection{Other Cameras}\todo{rename}
 So, we can confirm that the wrist camera alone is not sufficient \todo{ref}, and the combination of wrist and other cameras are almost always better as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target. Combining these ideas I moved onto the next section.
 
-\subsection{Attending on a Camera in Given Combination}
-First idea bordering on `active vision' was to selectively accept the encoding from a single camera depending on what it was seeing. So, not necessarily looking around, but accepting the inputs from one of the cameras it has access to, guided by some prior information.
+\subsection{Attending on a Camera in Given Combination}\todo{references for all the sections here?}
+First idea bordering on `active vision' was to selectively accept the encoding from a single camera depending on what it was seeing. So, not necessarily looking around, but accepting the inputs from one of the cameras it has access to, guided by some prior information. This requires at least two camera views to `blend' otherwise given only one camera, it will act like the old policy.
 
 \subsubsection{The Colour Score}
+Given a set of RGB views I want to score them and weight them according to their perceived \emph{utility}, the first metric that comes to mind is colour. 
+For every view, $\mathcal{V}$ and every pixel $\left( u, ~v\right)$ we calculate its euclidean distance to the target's colour: \( ||\mathcal{V}\left(u, ~v\right) - t_{colour}||\).
 
-\subsection{Score Weighted Features}
-Given a set of RGB views, at least two is needed for this policy to act differently than tha others, the idea was to score them and weight them according to their perceived \emph{utility}, the easiest metric was the colour. For every view, $\mathcal{V}$; in our batch, $B$, we calculate a scalar \emph{score} where \(\mathcal{V}_{i, x} \in \mathbb{R}^{B \times {v}}, ~{v} \in \{ {RGB}_{wrist}, ~{RGB}_{left\_shoulder}, ~{RGB}_{right\_shoulder} \}\) the scores are then normalised using softmax: \( \tilde{\mathcal{V}}_{i, x} = \frac{\mathcal{V}_{i, x}}{\sum_{}^{k \in v} \mathcal{V}_{i, k} + 10^{-6}} \) to be a weighing; scalar term $10^{-6}$ being a\todo{a what, what is the correct term?} , indicating which view is the most important at the moment. 
+\subsection{Scoring the  Weighted Features}\todo{rewrite fixup}
+; in our batch, $B$, we calculate a scalar \emph{score} where \(\mathcal{V}_{i, x} \in \mathbb{R}^{B \times {v}}, ~{v} \in \{ {RGB}_{wrist}, ~{RGB}_{left\_shoulder}, ~{RGB}_{right\_shoulder} \}\) the scores are then normalised using softmax: \( \tilde{\mathcal{V}}_{i, x} = \frac{\mathcal{V}_{i, x}}{\sum_{}^{k \in v} \mathcal{V}_{i, k} + 10^{-6}} \) to be a weighing; scalar term $10^{-6}$ being a\todo{a what, what is the correct term?} , indicating which view is the most important at the moment. 
 
 
 
