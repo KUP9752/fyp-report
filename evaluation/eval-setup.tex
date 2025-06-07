@@ -1,0 +1,32 @@
+\section{Evaluation Setup}
+The general setup included training a set of policies with their inherent hyperparameters, which will be discussed during their specific sections.
+
+\subsection{Collected Data}
+The data I chose to collect to reason about these policies are:
+\begin{itemize}
+  \item \textbf{Camera Type} Which cameras or combinations of cameras (and sensors) are being used in the policy to make decisions
+  \item \textbf{Final Distance} (to target) all of my tasks are target centric, hence this can be a measure of competence
+  \item \textbf{Minimum Distance} (to target) as above. The difference is reasoning where a policy might be falling apart, seeing the discrepancies between \emph{min} and \emph{final}
+  \item \textbf{Success Rate} All the tasks had slightly differing success criteria, however this is an important measure for competency again. This was mostly measured as a count out of $n$, for $n$ being the length of the test demonstrations. The term ``test demonstrations'' means that a set of demos were recorded with the target and the environment in a fixed state. Loading these back allows us to hae a comparable test between policies and their variables.
+  \item Other policy specific hyperparameters that were relevant to observe. These will be discussed then important.
+\end{itemize}
+
+\subsection{Reproducibility and Verification}
+All the random aspects that can be controlled, be it \emph{numpy} and \emph{pytorch} random choices or random `live' demos. Seeds are sets for both the libraries, as well as the \verb|DataLoader| seeds being fixed for the entirety of the policies tested here.
+The demos per task are pre-made and saved in the project repository. \todo{ref the final deliverables bit}. I repeated all the tests $5$ times with set seeds for the data shuffling, to observe if training on a different (but controlled) ordering of the demos affects a policy.
+
+\section{Test Environments}
+Two main branches of tasks I followed in this project are grasping and occluded reaching tasks.
+
+\subsection{Reaching with an Obstacle - \textbf{ReachObs\_Random}}
+
+\textbf{ReachObs\_IndRandom} is not discussed here in depth, due to the similarity of the tasks, and the independent version not being any more interesting. Some results for this test can be found here\todo{add appendix}.
+
+\subsection{Grasping}
+These two grasping tasks are to assess the contextual 3D understanding of the policy: learning depth information and adapting to differing sizes of targets; as well as learning the workspace before attempting a task \todo{grasp then move, not sure if I have time for this, but If i do defo interesting}
+
+\subsection{Grasp and Depth Understanding - \textbf{Vision\_Random}}
+
+\subsection{Carrying the Target - \textbf{Grasp\_ThenMove}}
+
+\section{Evaluated Configurations}\todo{not sure about this maybe talk about these per task down the line}
