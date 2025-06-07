@@ -105,23 +105,37 @@ If we can't implicitly encode the `looking' information through the demonstratio
 \subsubsection{Other Cameras}\todo{rename}
 So, we can confirm that the wrist camera alone is not sufficient \todo{ref}, and the combination of wrist and other cameras are almost always better as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target. Combining these ideas I moved onto the next section.
 
-\subsection{Attending on a Camera in Given Combination}\todo{references for all the sections here? and }
+\section{Attending on a Camera Depending on Colour}\label{sec:reach-obs-naive-cam-attn}\todo{references for all the sections here? and }
 First idea bordering on `active vision' was to selectively accept the encoding from a single camera depending on what it was seeing. So, not necessarily looking around, but accepting the inputs from one of the cameras it has access to, guided by some prior information. This requires at least two camera views to `blend' otherwise given only one camera, it will act like the old policy.
 
-\subsubsection{The Colour Score}
-Given a set of RGB views (normalised to be  in range \(\left[0, 1\right]\)) I want to score them and weight them according to their perceived \emph{utility}, the first metric that comes to mind is colour. For every view, $\mathcal{V}_i$, $i$ representing different cameras and every pixel $\left( u, ~v\right)$ we calculate its euclidean distance to the target's colour: \( d_i\left(u, ~v\right)||\mathcal{V}\left(u, ~v\right) - t_{colour}||\), this is to guarantee the per-pixel score is a positive real number. Then to isolate our target colour I introduced two hyperparameters: \textbf{tolerance} and \textbf{softness}. Tolerance, $\varepsilon_{tol}$, defines the acceptable range of differences of what we can classify as the \emph{target colour}; red in this case. Softness, $\varepsilon_{sof}$, \todo{explain}. So, the final classification of our score is defined as \(m_i\left(u, ~v\right) = \sigma \left(\left(\varepsilon_{tol} - d_i\left(u, ~v\right)\right)\times \varepsilon_{sof} \right)\) where \(\sigma\left(z\right) = \frac{1}{1 + e^{-z}}\): the sigmoid function. 
-Then for scoring the image I pool these tensors. Initially testing ``mean'' pooling \(\mathbf{S}_i = {\frac{1}{WH}\sum_{u = 1}^{W}\sum_{v = 1}^{H}m_i\left(u, ~v\right)} + c\) to give an overall visibility of the target in the view -adjusted by a constant. Then landed on using ``max'' pooling, \(\mathbf{S}_i = \max_{1<=u<=W, 1<=v<=H}m_i(i, ~v)\). 
+The problem this is meant to fix is the policies involving wrist cameras tend to focus too much on wrist information when it is not relevant. As we can see in \ref{fig:ro-random-demo-cams}, these policies tend to sit above the $0.4$ min distance area which means they are continually hitting against the obstacle. The obstacle is around $0.39 \approx 0.43$ metres from the obstacle depending on its generation. So, if we can attend to different cameras depending on occlusion, we might be able to fix this problem.
 
-The decision to use euclidean distance and sigmoid was to keep the score differentiable. This will help with \todo{not sure}
+\subsubsection{The Colour Score}
+Given a set of RGB views (normalised to be  in range \(\left[0, 1\right]\)) I want to score them and weight them according to their perceived \emph{utility}, the first metric that comes to mind is colour. For every view, $\mathcal{V}_i$, $i$ representing different cameras and every pixel $\left( u, ~v\right)$ we calculate its euclidean distance to the target's colour: \( d_i\left(u, ~v\right)||\mathcal{V}\left(u, ~v\right) - t_{colour}||\), this is to guarantee the per-pixel score is a positive real number. 
+
+
+Then to isolate our target colour I introduced two hyperparameters: \textbf{tolerance} and \textbf{softness}. Tolerance, $\varepsilon_{tol}$, defines the acceptable range of differences of what we can classify as the \emph{target colour}; red in this case. Softness, $\varepsilon_{sof}$, which helps adjust the harshness of sigmoid which we are feeding this for a signal. If softness is low the values within the tolerance will be a strong signal ($\approx 1$) and values without will be near $0$. 
+
+The euclidean distance paired with the sigmiod
+
+So, the final classification of our score is defined as \(m_i\left(u, ~v\right) = \sigma \left(\left(\varepsilon_{tol} - d_i\left(u, ~v\right)\right)\times \varepsilon_{sof} \right)\) where \(\sigma\left(z\right) = \frac{1}{1 + e^{-z}}\): the sigmoid function. 
+Then for scoring the image, I pool these tensors. Initially testing \emph{mean} pooling, \(\mathbf{S}_i = \max_{1<=u<=W, 1<=v<=H}m_i(i, ~v)\), which essentially acts as a signal of ``is the target colour in view or not?''. Then used \emph{mean} pooling \(\mathbf{S}_i = {\frac{1}{WH}\sum_{u = 1}^{W}\sum_{v = 1}^{H}m_i\left(u, ~v\right)} + c\) to give an overall visibility of the target within a view -adjusted by a constant. This will capture more nuanced inherent information such as distance and occlusions.
+
+The decision to use euclidean distance and sigmoid was to keep the score differentiable. This mainly helps in capturing the dynamics of the colour interaction within our neural network. A second benefit is, if later on we want to make the colour to be a learnable parameter we will be able to get the gradient of the loss with respect to ${RBG}_{target}$ to achieve this.
 
 \subsubsection{Scoring the Weighted Features}\todo{rewrite fixup}
 When we have the score per view, we can weight the scores of each view against each other
-\( \tilde{\mathbf{S}}_{i, x} = \frac{\mathbf{S}_{i, x}}{\sum_{}^{k \in v} \mathbf{S}_{i, k} + 10^{-6}} \); scalar term $10^{-6}$ being a\todo{a what, what is the correct term?} , indicating which view is the most ``useful''. 
-The features extracted from the cameras are concatenated with their respective score \( \begin{bmatrix} \mathbf{F}_i \\ \tilde{\mathbf{S}_i} \end{bmatrix} \in \mathbb{R}^{d + 1}\) where $d$ is the feature dimensions encoded after the conv layers. This, in turn, is fed into a attention network, to guess what the most important parts of the gives views are.
+\( \tilde{\mathbf{S}}_{i, x} = \frac{\mathbf{S}_{i, x}}{\sum_{}^{k \in v} \mathbf{S}_{i, k} + 10^{-6}} \); scalar term $10^{-6}$ being a numerical stabiliser and preventing vanishing gradients while not adding too much bias.
+
+The features extracted from the cameras are concatenated with their respective score \( \begin{bmatrix} \mathbf{F}_i \\ \tilde{\mathbf{S}_i} \end{bmatrix} \in \mathbb{R}^{d + 1}\) where $d$ is the feature dimensions encoded after the conv layers. This, in turn, is fed into a attention network, to guess what the most important parts of the gives views are. Outputs of the network are then fed through a \emph{softmax} before \(sm\left(s\right)_i = \frac{e^{s_i}}{\sum_{j \in v}{e^{s_j}}}\)
 
 \subsubsection{Encouraging Attention}
 Final part of the puzzle is tuning the view scoring network. I calculated the attention predictions using KL divergence, \(D_{KL}\left(P ~||~ Q\right) = \sum_{x \in \mathcal{X}} P\left(x\right) \log \frac{P\left(x\right)}{Q\left(x\right)}\). This is a measure of the probability distribution difference \todo{reference}. So, augmenting the loss of the overall network to be \(loss = loss_{action} + \lambda_{attn} D_{KL}\left( \hat{W}_{attn} ~||~ \mathbf{S}_i\right)\) where $\hat{W}_{attn}$ is the predicted weights, encouraging them to stay close to the ground truth scores.
 
+\subsection{Feature Encoder Coupling}
+Disconnecting a network  and giving each pose their own feature encoder then fusing these views might allow the agent to learn an inherent mapping of the geometry it is seeing. Although, following the same logic, as it is observing the same workspace and information
+
+Following this, the final part of this design was to separate the feature encoders for the various views and then combine fuse them later with their `utility' score
 
 
 
