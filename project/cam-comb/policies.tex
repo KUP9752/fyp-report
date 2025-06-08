@@ -8,19 +8,19 @@ So far, I have been using a simple CNN and extracting
 
 
 \subsubsection{Simple Stacking}
-This is the naive method of just stacking the view information, which is what I have been using up until this point. Simply stacking information on the channel dimension and feeding them into the network. This has clear disadvantages. Firstly, for the RGB cameras, there is definite misalignment, all these cameras have different poses and will disagree on what they see. This will lead to features not lining up leaving us with an non-optimal and more importantly a brittle policy. Meaning slight variations might confuse and move the policy out of distribution.
+This is the naive method of just stacking the views. Simply stacking information on the channel dimension and feeding them into the network. This has clear disadvantages. Firstly, for the RGB cameras, there is definite misalignment, all these cameras have different poses and will disagree on what they see. This will lead to features not lining up, leaving us with a non-optimal and more importantly a brittle policy. This could lead to unintended coupling of information which can lead to the agent making wrong choices.
 
 \subsection{Fusion}
-The other level up is fusion of features. The CNNs used can be expanded 
+The other level up is fusion of features. The CNNs used can be expanded to either work for a single view or a few of them
+
 \subsubsection{Late Fusion}
 
 \subsubsection{Mid-Level Fusion}
-Have I ever done something on this?? not really maybe talk about how imma use the shoulder stuff with this,
-
+Have I ever done something on this?? not really maybe talk about how imma use the shoulder stuff with this, i guess the film ones can kinda be classified as this?
 
 This adds onto before, gated attention and rgb attending to depth etc, explain some approaches
 
-\subsection{Deeper/Better Feature Understanding - RCNN}
+\subsection{Deeper/Better Feature Understanding - RCNN}\todo{I feel like this section is talking about the wrong thing}
 Another thing I wanted to try was to include off-the-shelf models to help extract features and information from my views. As one of the problems I described faced earlier was from the agent not remembering the earlier information that it has seen, I believed an important part of increasing the workspace understanding would be to incorporate residual connections.
 
 I experimented with various sizes of ResNet networks \todo[color=green]{reference}. I essentially replaced my own \verb|CNNEncoder| block with modified versions of \emph{resnet18, resnet34, and resnet50} \todo[color=green]{maybe not mention all, afterall the large ones will be ass when the image is so small}. I had to modify these, because the unmodified version using a main CNN of kernel size $7$ was too large and appropriate features were not being extracted from the views I was feeding. This was evident from observing the agent act in a test scenario where the arm would do nothing remotely similar to what the demo did, or even what the task is about.\todo{maybe a picture of the arm doing some bs here}. \todo[color=pink]{run the original confirm it does not work, if not get a diagram of kernel sizes 7 and 3 and an explanation why this might be the case.}
@@ -32,13 +32,10 @@ A reason these might not have worked well is because of one of my earlier constr
 \subsubsection{increasing the camera view for experimentation}\todo[color=red]{larger image trials? expand the task to be lager 128 or even 224 seems common with resnet}
 
 \subsection{Temporal Understanding of Demonstrations}
-Even though the agent is not half bad at trying to reach the target in the above configurations, it is not necessarily better at succeeding at grasping, and the movements seem janky compared to the  precise demonstrations given. I believe this is because the robot is only given its current view and does not understand where it might be during the epsiode \todo{this is the issue I faced}
-
-and the robot doesn't necessarily understand where in the movement it is, because the first half of the episode is very repetitive and the inputs are eerily similar. This meant that an important part of the system was for my agent to understand where it was as well as when it was.
+Although, I am preserving the sequential nature of the demonstrations intact in training. There is no implicit underlying mechanism for this. As the scenes and the movements are very repetitive the agent will benefit from reinforcing its understanding of where it is, by learning when it is. So, I will incorporate recurrent models. This is so that the embedding of the current states will on a history of the earlier observations or states.
 
 \subsubsection{Latent RNN Encodings of Movement Steps}
 I wanted to encode the timestep information into some sort of feature representation which would use the previous states to encode the data. This simple idea was to introduce temporal noise into the decision process. Then act on the final encoding
-
 
 \missingfigure{diagram about feeding the entire demo and training per step}
 
@@ -50,14 +47,14 @@ Once I realised my mistake, which was about discarding half my encoded steps and
 This lead to a more robust and confident architecture. The movements of my policy felt less spiky, no more sudden jerks and more calculated reaching. It did still absolutely overfit to the average position, and was not much better at grasping, but the episodic movements were cleaner and I believe enhancing the grasping branch of the network would allow it to be more successful \todo{what the fuck am i talking about, summarise and clean up}
 
 
-\subsection{ViT Encodings}
+\subsection{ViT Encodings}\todo{kind of dabled with this but will not be testing it}
 \todo[color=red]{not done much on this, but may be able to talk about how I would go about it or just remove}
 
 \section{Proprioception}\todo{maybe talk about why I left it out earlier in the chapter}
 Up until this point, I left proprioceptive data out of the training, mainly because I wanted to train on purely visual feedback to see what it could achieve without any other state information. Secondly, including state information about the robot, would not necessarily immediately help with the 
 
 \section{Moving to \emph{Active Vision}}
-
+End-to-end models with absolutely zero fine-grained interactions are quite competent. However, in the chaotic and random environments an agent may be acting in. Planning and specific nudges may prove beneficial. Similar to the 
 
 \todo{improve the grasping}
 

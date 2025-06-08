@@ -133,15 +133,5 @@ The features extracted from the cameras are concatenated with their respective s
 Final part of the puzzle is tuning the view scoring network. I calculated the attention predictions using KL divergence, \(D_{KL}\left(P ~||~ Q\right) = \sum_{x \in \mathcal{X}} P\left(x\right) \log \frac{P\left(x\right)}{Q\left(x\right)}\). This is a measure of the probability distribution difference \todo{reference}. So, augmenting the loss of the overall network to be \(loss = loss_{action} + \lambda_{attn} D_{KL}\left( \hat{W}_{attn} ~||~ \mathbf{S}_i\right)\) where $\hat{W}_{attn}$ is the predicted weights, encouraging them to stay close to the ground truth scores.
 
 \subsection{Feature Encoder Coupling}
-Disconnecting a network  and giving each pose their own feature encoder then fusing these views might allow the agent to learn an inherent mapping of the geometry it is seeing. Although, following the same logic, as it is observing the same workspace and information
-
-Following this, the final part of this design was to separate the feature encoders for the various views and then combine fuse them later with their `utility' score
-
-
-
-\todo{can I do this in evaluation maybe?}
-\todo{talk about the implementation of the }
-\subsubsection{MultiCNN}
-\todo{explaint the implementations, maybe connect to }
-\subsubsection{SingleCNN}
-I initially though to disconnect the convolutional network, thinking the information can be encoded per view and then fused together to assign better meaning to the given pose. However, with the same logic the scene is still the same scene and encoding features together means that the network will learn to \todo{find a nice way to say the network will learn its fusing in the conv layers. maybe make sure it can}
+Final proposition for this network is to check whether disconnecting the feature encoders makes a difference. In theory, every view having its own feature extractor might allow the network to learn inherent pose and view information for that specific view. Although, following the same logic, keeping a joint extractor might allow to policy to learn how different poses and information from those poses interact in tandem. As the workspace and hence the observations are quite similar.
+\todo{hint back at this in the prposed section and about how keeping some together while others are connected might make the most sense. like wd and lr combo makes the most sense}

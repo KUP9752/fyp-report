@@ -1,6 +1,6 @@
 \section{Results}\todo{remove}
 
-\subsection{Naive Colour Attention Results}
+\subsection{Naive Colour Attention - Results}
 This is the results relating to the proposed naively active approaches from \ref{sec:reach-obs-naive-cam-attn}.
 The variations of this policy I tested included: \todo{add code for aall the possibilies from test cam attn py file}
 \begin{itemize}
@@ -34,7 +34,7 @@ The very likely reason for this is that, the demonstration trajectories for this
 \subsubsection{Separate Feature Encoders}
 This parameter was more of a test to see if it interacted well in any way. Theoretically both approaches are sound. 
 
-This task is quite unforgiving and errors add up quickly, if the robot gets stuck on the obstacle, it rarely manages to save itself. Evident from the quick increases in minimum distance between epochs $100$ and $200$ for single-CNNs, which capture early fitting due to informatin abundance, but get confused trying to generalise due to the feature encodings keeping a lot of this uncertainty.
+This task is quite unforgiving and errors add up quickly, if the robot gets stuck on the obstacle, it rarely manages to save itself. Evident from the quick increases in minimum distance between epochs $100$ and $200$ for single-CNNs, which capture early fitting due to information abundance, but get confused trying to generalise due to the feature encodings keeping a lot of this uncertainty.
 
 Conversely, multi-CNNs learn late. Makes sense as more passes allow each CNN (now seeing only one frame not all) to learn slowly. Therefore, the multi-CNN policies have a more decisive dip in minimum distance reinforcing the idea that training for loner allows them to capture pose specific information that is helpful to the system in solving this task.
 
@@ -57,4 +57,5 @@ This didn't seem to make a change at all. However, looking at the loss curves \t
 I thought this policy would be able to fix the shortcomings, which was the final reach toward the obstacle not being executed well. Non-wrist cameras help with the first half of the motion while the wrist camera should be able to generalise to the final reaching motion \todo{explain: due to its self-centric nature}. However the problem is the demos don't force the gripper to `look' towards the target. So, the wrist camera cannot get the benefits from a \emph{mean} pooled configuration. This led to the attention weights being very similar above and below the obstacle. Which counteracts this policy's theoretical benefits.
 
 
-
+\section{Recurrent Models - Results}
+Not much better in terms of numbers however the model size is lower?? not sure experiment with this the big ass 4 way attention is the most expensive currently and this might be a contender,
