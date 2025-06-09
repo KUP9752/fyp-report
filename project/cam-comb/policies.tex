@@ -1,25 +1,4 @@
-\section{Multi-View Understanding Policies}
-On top of just naively combining cameras and expecting the policy to understand what it means to `see' is a tall order. The next step is to understand how we can make the most of the information we are given by incorporating the various views and sensors and seeing what combination makes the most sense.
-
-\subsection{Feature Extraction}
-So far, I have been using a simple CNN and extracting 
-
-\subsubsection{Better Feature Understanding}
-
-
-\subsubsection{Simple Stacking}
-This is the naive method of just stacking the views. Simply stacking information on the channel dimension and feeding them into the network. This has clear disadvantages. Firstly, for the RGB cameras, there is definite misalignment, all these cameras have different poses and will disagree on what they see. This will lead to features not lining up, leaving us with a non-optimal and more importantly a brittle policy. This could lead to unintended coupling of information which can lead to the agent making wrong choices.
-
-\subsection{Fusion}
-The other level up is fusion of features. The CNNs used can be expanded to either work for a single view or a few of them
-
-\subsubsection{Late Fusion}
-
-\subsubsection{Mid-Level Fusion}
-Have I ever done something on this?? not really maybe talk about how imma use the shoulder stuff with this, i guess the film ones can kinda be classified as this?
-
-This adds onto before, gated attention and rgb attending to depth etc, explain some approaches
-
+\section{Multi-Modal Policies}
 \subsection{Deeper/Better Feature Understanding - RCNN}\todo{I feel like this section is talking about the wrong thing}
 Another thing I wanted to try was to include off-the-shelf models to help extract features and information from my views. As one of the problems I described faced earlier was from the agent not remembering the earlier information that it has seen, I believed an important part of increasing the workspace understanding would be to incorporate residual connections.
 
@@ -31,27 +10,126 @@ A reason these might not have worked well is because of one of my earlier constr
 
 \subsubsection{increasing the camera view for experimentation}\todo[color=red]{larger image trials? expand the task to be lager 128 or even 224 seems common with resnet}
 
+
+
+\subsection{Feature Level Fusion}\todo{really long intro, consolidate}
+On top of just naively combining views (or modalities) and expecting the policy to understand what it means to `see' is a tall order. 
+
+I have adopted a model-free approach in making these policies, and decided to use representations of information for predicting the next motion.
+\todo{maybe more on latent representations and encoder models, here with refs}
+
+The step after extracting representation is to learn how we can make the most of the information by incorporating the various views and sensors and seeing what combination of feature extraction and their fusion allows the most information gain.
+
+So, after extracting features from available sensors. Using multiple feature extractors means that these features will need to be merged before making a final decision on movement.
+
+If these extracted features can be thought of as encoded information, as with latent models, multiple extractors will lead to to many encodings. So, the next challenge becomes merging; and not just how but when to merge features from one view to another. I will explain their potential positives and investigate the consequences of each.\todo[color=green]{this might be a good segue or part in presentation}
+
+\subsubsection{Early Fusion}
+Fuse different modalities into a single input and run through the encoding model. This usually involves combining the raw data sources. Before any information is extracted or the data is modelled in any way.
+
+Therefore, its advantages mostly lie in its simplicity. No dedicated processing has to be done per information stream. On the other hand, this can fall short of capturing complex interactions between these modalities; depending on the network and the semantic information each modality provides.
+
+\subsubsection{Late Fusion}
+This is the complete opposite of early fusion. Each modality will be run through its own model and predict a representation. The immediate advantage is that each model can learn a rich representation relating to only its given modality
+
+
+\subsubsection{Intermediate Fusion}
+This is the most common middle-ground. While separated feature learners can be used per desired modality, the representation extracted from them will be fused together. Then this aggregated latent representation can be passed through another model to get the final predictions. This is a tradeoff based system between early and late fusion. Most of the proposed systems will follow this idea.
+
+\todo{i will argue separating the grasping network will be late fusion fuse at the actionn level and not separating it will be fully intermediate}
+
+\section{Proposed Fusion Methods}
+I designed a a poly-policy which can be instantiated in any fusion configuration to handle its given modalities differently before making a final movement prediction. \todo{make a diagram - consult the sheet}
+
+\todo{add the fusingEncoder and the config to the appendix}
+\subsection{Simple Stacking}
+An example of early fusion, this is the naive method of just stacking the views on the channel dimension, and has clear disadvantages for this specific system.
+
+Firstly, for the RGB cameras, there is definite misalignment, all these cameras have different poses and will disagree on what they see. Leading to features not lining up, leaving us with a non-optimal and more importantly a brittle\todo{explain brittle? or does the next senetence take care of it} policy. This could lead to unintended coupling of information which can lead to the agent making wrong choices during inference when the same views don't necessarily align during rollout.\todo{simple diagram of overlaid squares (arrow) model (arrow) representation} This will act as a baseline to compare other fusion strategies.
+
+\subsection{Understadning Depth Separately}\label{subsec:policies-understand-depth-sep}
+RGB provides a denser representation of the system and in a configuration with multiple RGB views the depth information may be drowned out. Therefore, an important first step was to learn the depth features separately and then make them influence the action. The idea here is to have a RGB encoder and a separate Depth encoder CNNs, then learn the best way to merge this data together. I propose three different methods to do this:
+
+\begin{itemize}
+  \item Concatenation of the features from each CNN \todo{add figure, explain more if needed}
+  \item A second layer CNN, convolve the RGB outputs and the Depth outputs to learn joint features \todo{add figure, explain more if needed}
+  \item A shallower secondary CNN to learn simple \emph{gating} from already extracted RGB and Depth features. \todo{add figure, explain more if needed}
+  \item A Cross Attention Mechanism to attend to the important parts of from each extracted feature.
+\end{itemize}
+Which are ultimately decoded into an \emph{action}, $\hat{A}$.
+
+\subsection{Feature-wise Linear Modulation}\todo{ref this paper arxiv1709.07871}
+To take a step back from all the excessive RGB data. I wanted to understand how modulating similar views with each other to understand similar observations from each other's perspective. The previous section can be used to achieve this. however, Feature-wise Linear Modulation (FiLM).\todo{ref} FiLM does the following: \todo{insert math}
+
+
+Allowing me to explicitly inject cues from one modality into the other. This, in theory, can teach the model where in the motion depth hints can be important in making a decision from seeing the RGB view. On top of this, its linear nature means the network can be kept at a minimal size. And finally, a FiLM module can be plugged in at multiple different places in the network at different scales. 
+
+I created 3 different modulation configurations: wrist RBG modulated with wrist depth\todo{diagram}, depth modulated wrist RGB\todo{diagram}, and both modulated with each other\todo{diagram}. Then the modulated feature act as the latent representation and an action will be predicted by decoding them. On top of the three configurations, I also FiLMed at different depths: early FiLM, where feature shapes are matched then modulated leading to a coarser scale modulation; also a finer version where the order of down-sampled learning and modulation are swapped.\todo[color=red]{this is not done!!, do finer scala FiLM}
+
+
+\subsection{Derivative Methods}
+The final propositions include 4-way fusion models that take into account ideas from earlier.
+\begin{itemize}
+  \item Fully separated feature extractors, all concatenated before action prediction \todo{add figure}
+  \item Pairwise FiLM between all modalities: wrist RGB and w Depth, then Left Shoulder RGB and Right Shoulder RGB; then concatenated before action prediction\todo{figre}
+  \item Finally 4-way multi-modal cross-attention. \todo{add math and figure if needed}
+\end{itemize}
+
 \subsection{Temporal Understanding of Demonstrations}
-Although, I am preserving the sequential nature of the demonstrations intact in training. There is no implicit underlying mechanism for this. As the scenes and the movements are very repetitive the agent will benefit from reinforcing its understanding of where it is, by learning when it is. So, I will incorporate recurrent models. This is so that the embedding of the current states will on a history of the earlier observations or states.
+The actions in my system are heavily dependent on the context of where the robot came from. And the demonstrations contain coherent and smooth trajectories. Although, I am preserving the sequential nature of the demos in training. There is no implicit underlying mechanism to enforce the agent will learn from this. Due to the partially observable setting of my system, and the robot not knowing any extra information about its state (model-free), it is important to be able to keep a historical understanding of what has happened, or what the agent believes is important for that moment in time.
+
+So, I incorporated recurrent models into the latent representation. This is so that the embedding of the current states will depend on a history of the earlier observations or states.
+
+A pro of RNNs, compared making a bespoke sequential model is they are not length constrained \todo{was an earlier problem in 2d, maybe mention}. The sequences can be of any length which will help model the demos I have with varying episode lengths. Som compared to 3D CNNs \todo{ref}, which can also incorporate spatial and temporal information \todo{ref}
+
+
+Another theoretical advantage is that the long-term memory can be used to have a \todo{mamybe mention the remoark from the then move test, }
 
 \subsubsection{Latent RNN Encodings of Movement Steps}
-I wanted to encode the timestep information into some sort of feature representation which would use the previous states to encode the data. This simple idea was to introduce temporal noise into the decision process. Then act on the final encoding
+To encode timestep information into my already existing features, I added an Long-Short Term Memory (LSTM) network module near the end of the pipeline\todo{add figure}. Meaning the history will be kept in the latent space.
 
-\missingfigure{diagram about feeding the entire demo and training per step}
-
-\todo{problems here were that the entire demo was being used, but the optimisation was getting made at the final state}
-
-\subsubsection{Fine-Grained per Time-Step Training}
-Once I realised my mistake, which was about discarding half my encoded steps and were not using my RNN to its full potential \todo{rewrite} As I have access to ground truth information at every observation step, it would be smart to optimise the loss in a fine-grained manner at every frame.
-\missingfigure{updated diagram to convey the padding and unpacking and training the loss on every frame step}
-This lead to a more robust and confident architecture. The movements of my policy felt less spiky, no more sudden jerks and more calculated reaching. It did still absolutely overfit to the average position, and was not much better at grasping, but the episodic movements were cleaner and I believe enhancing the grasping branch of the network would allow it to be more successful \todo{what the fuck am i talking about, summarise and clean up}
-
+So, this simple idea of introducing temporal noise into the decision process, should in theory allow for more concise predictions that are grounded in what the agent has observed so far.
 
 \subsection{ViT Encodings}\todo{kind of dabled with this but will not be testing it}
 \todo[color=red]{not done much on this, but may be able to talk about how I would go about it or just remove}
 
-\section{Proprioception}\todo{maybe talk about why I left it out earlier in the chapter}
+
+
+\subsection{Proprioception}\todo{maybe talk about why I left it out earlier in the chapter}
 Up until this point, I left proprioceptive data out of the training, mainly because I wanted to train on purely visual feedback to see what it could achieve without any other state information. Secondly, including state information about the robot, would not necessarily immediately help with the 
+
+\subsection{Numerical Foundations}\todo{talk about the general math, like what are the shapes of the data, what is the loss minimising-maximising, and notation}
+
+The policies above are trained in the same way and the only separation is the modular feature extraction blocks, as well as what data they require. All input and output is handled within the network and the policy interface exposed to the agent is compatible with all the ones proposed in this project.
+
+\subsubsection{The Dataset}
+A demonstration of episode length $T$ is defined as: \(\mathcal{D} := \{\langle o_i, ~a_i\rangle\}_{i = 1}^{T} \). Observation, \(o_i \in \mathcal{O}\) is defined as the available modalities to the system with shape \(\mathcal{O} := \mathbb{R}^{c \times W \times H}\). This corresponds the resolution of the sensor (\textbf{W}idth and \textbf{H}eight) also $c \in \left[1, 10\right]$ which correspond to the available modality data concatenated on their channel dimension. The order of $c$ is always:\todo{figure here with the stuff stacked}
+\[
+{RGB}_{wrists}, ~{RGB}_{{left}\_{shoulder}}, ~{RGB}_{{right}\_{shoulder}}, ~{Depth}_{wrist}
+\] 
+where the $RGB$ data is $3$ channels wide while $Depth$ is only 1. \(a_i \in \mathbb{R}^{8 \times 1}\) is the corresponding joint velocities at timestep $i$, which acts as our ground truth. 
+
+The Data Loader, as discussed \todo{ref}, will provide a randomly shuffled batch of $b$ collated demos, along with extra information. \( \langle O^B, ~A^B, ~\left( P^B, ~l^B \right) \rangle\), where \(O^B \in \mathbb{R}^{ B \times c \times W \times H}\). The observation batch size, $B$ is equal to \({\sum_{ d \in \mathcal{D}^B}|d|}\), this is the sum of the length of all demos in this training batch. Similarly, \(A^B \in \mathbb{R}^{B \times 8}\) per joint velocity (7) and final grasp indicator, \(P^B \in \mathbb{R}^{B \times 7}\) per joint angle - the proprioception data. Finally, \(l^B \in \mathbb{Z}^{b}\), contains the original lengths of the individual demos.
+
+Then during the forward pass modalities of interest will be extracted from $O^B$ and features will be extracted depending on what fusion flavour is picked.
+
+
+
+\subsubsection{Fine-Grained per Time-Step Training}\todo[color=green]{math fixing}
+The RNN policy is disconnected from the main system.\todo{link the FusionRNNPolicy appendix} Differently from above, the batched demonstrations will now respect the individual lengths of provided demonstrations. The loader will now emit: \( \langle {O'}^B, ~{A'}^B, ~\left( {P'}^B, ~l^B \right) \rangle\). The \emph{prime} ($'$) indicates a change in their batch dimesion, each now follow $\mathbb{R}^{b \times T_{max} \times \ldots}$ and  $T_{max}$ is the longest demonstration in this batch \(\max l^{B}\). We pad every demo to this length while keeping the original lengths $l^{B}$.
+
+To fit the network to our data quite closely I opted to train the network with information at every step. Meaning every single step $i$ in a demo $mathcal{D}$ with episode length $T$, will have an action predicted with respect to $\mathcal{D}_{t < i}$ and will have an impact on the loss of the system. 
+
+The loss will be calculated using the predicted actions, $\hat{A}$ and the ground truth labels, $A$; as \( \mathcal{L}^{action} = {loss}_{mse}\left(A_{x, t} - \hat{A}_{x, t}\right)\) for $x$ being the batch number in $1..b$ and $t$ the timestep in $1..T_{max}$. A bit mask \(M \in \{0, 1\}^{b \times T_{max}}, ~M_{x, t} = 1, ~t < l^B_x ~else ~0\) will be used to only extract the loss items lying withing the sequence lengths of demos. Finally, the loss per epoch will be normalised by the number of timesteps in the demos provided. \(loss = \frac{1}{\sum_{x, t}M_{x, t}}{\sum_{x = 1}^{b}\sum_{t = 1}^{T_{max}}M_{x, t} \mathcal{L}^{action}}\)
+
+As before\todo{ref to earlier grasp}, the grasping loss is separated in the default configuration of this policy. Giving the final loss as: 
+\[
+  \mathcal{L}^{action} = \mathcal{L}^{pose} + \lambda_{grasp} \mathcal{L}^{grasp}
+\]
+where $\mathcal{L}^{pose}$ and $\mathcal{L}^{grasp}$ are calculated using the same masking method as above.
+
+\missingfigure{updated diagram to convey the padding and unpacking and training the loss on every frame step}
+
 
 \section{Moving to \emph{Active Vision}}
 End-to-end models with absolutely zero fine-grained interactions are quite competent. However, in the chaotic and random environments an agent may be acting in. Planning and specific nudges may prove beneficial. Similar to the 
