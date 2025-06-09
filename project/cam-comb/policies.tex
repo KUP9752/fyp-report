@@ -65,12 +65,22 @@ RGB provides a denser representation of the system and in a configuration with m
 Which are ultimately decoded into an \emph{action}, $\hat{A}$.
 
 \subsection{Feature-wise Linear Modulation}\todo{ref this paper arxiv1709.07871}
-To take a step back from all the excessive RGB data. I wanted to understand how modulating similar views with each other to understand similar observations from each other's perspective. The previous section can be used to achieve this. however, Feature-wise Linear Modulation (FiLM).\todo{ref} FiLM does the following: \todo{insert math}
+To take a step back from all the excessive RGB data. I wanted to understand how modulating similar views with each other to understand similar observations from each other's perspective. Allowing the network to learn and discover its own trends is a fine task, however, implicitly injecting cues from modality into another will, in theory, allow the learning to be more efficient.
 
 
-Allowing me to explicitly inject cues from one modality into the other. This, in theory, can teach the model where in the motion depth hints can be important in making a decision from seeing the RGB view. On top of this, its linear nature means the network can be kept at a minimal size. And finally, a FiLM module can be plugged in at multiple different places in the network at different scales. 
+A light-weight and quick way to bias network parameters with conditional data is Feature-wise Linear Modulation (FiLM).\todo{ref} 
+A FiLM network learns to adaptively influence the weights of another neural network by learning $f_c$ and $h_c$ as functions on the conditional input $\mathbf{x}_i$. So:
 
-I created 3 different modulation configurations: wrist RBG modulated with wrist depth\todo{diagram}, depth modulated wrist RGB\todo{diagram}, and both modulated with each other\todo{diagram}. Then the modulated feature act as the latent representation and an action will be predicted by decoding them. On top of the three configurations, I also FiLMed at different depths: early FiLM, where feature shapes are matched then modulated leading to a coarser scale modulation; also a finer version where the order of down-sampled learning and modulation are swapped.\todo[color=red]{this is not done!!, do finer scala FiLM}
+\[
+\text{FiLM} = \left( \mathbf{F}_{i, c} | \gamma_{i, c}, ~\beta_{i, c} \right) = \gamma_{i, c}\mathbf{F}_{i, c} + \beta_{i, c} \qquad  \gamma_{i, c} = f_c\left(\mathbf{x}_i \right), \beta_{i, c} = h_c \left( \mathbf {x}_i \right)
+\]
+My implementation involves \todo[color=green]{appendix link} creating a simple linear network to generate the two parameters. The singular linear network means the parameters will have shared weights, which makes sense as the modulation is being condition on a single view, and hence a dependence connection. I also initialise this network to be the identity modulation, meaning \(\gamma = 1 \text{and} \beta = 0\). \todo{why, not sure?}
+
+Another inherent benefit is the network can be kept at a minimal size. And finally, a FiLM module can be plugged in at multiple different places in the network at different scales. \todo{explain more maybe}
+
+I created 3 different modulation configurations: wrist RBG modulated with wrist depth\todo{diagram}, depth modulated wrist RGB\todo{diagram}, and both modulated with each other\todo{diagram}. 
+
+Where the modulated features act as the latent encoding, which can be used to predict an action On top of the three configurations, I also FiLMed at different depths: early FiLM, where feature shapes are matched then modulated leading to a coarser scale modulation; also a finer version where the order of down-sampled learning and modulation are swapped.\todo{explain better maybe}
 
 
 \subsection{Derivative Methods}
