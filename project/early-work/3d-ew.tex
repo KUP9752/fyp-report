@@ -65,12 +65,12 @@ So the main dilemma was, should I be wasting time making a comprehensive suite t
 Fixing all the OS dependent issues and getting it running, I decided to stick with RLBench, hoping that the initial setup and early work issues would be the bulk of them. I also got familiar with the codebase during this time and was more confident in fixing any issues.
 
 \section{First Steps in 3D: Reaching Task}\label{sec:3d-reaching-tasks}
-Now deciding to stick with RLBench, first steps were to create some 3d environments and tasks to test capabilities of simple policies on tasks that progressively get more difficult. So, the very first step was to translate translate the 2D task I played with earlier, \ref{subsec:ew-2d-problem}, into a 3D setting. So, I created a simple reaching task. 
+Now deciding to stick with RLBench, the very first step was to translate the 2D task I played with earlier, \ref{subsec:ew-2d-problem}, into a 3D setting. So, the simple reaching task was made. 
 
 \subsection{Designing the Task}
 RLBench provides an intuitive method for quickly creating and validating tasks. Following the tutorials provided by the creator of RLBench and other resources online on CoppeliaSim \todo{link some copsim manuals or information here.} I could now create tasks for my use case.
 
-Tasks are created using the \emph{`task builder'} CLI, which is a user facing interface that talks to the PyRep API which in turn controls CoppeliaSim. This allows the user to use GUI elements within the simulator to create objects, boundaries as well as edit their properties while observing what they look like in different camera view layers. Then to create scene wirings; the automatically created \verb|Task| class is used, where \emph{initialisation}, \emph{episode step} and other task related systems can be created for the scene object to then use to create demonstrations and train robot policies. See Figure \ref{fig:task-builder}.
+Tasks are created using the \emph{`task builder'} CLI \ref{fig:task-builder}, which is a user facing interface that talks to the PyRep API which in turn controls CoppeliaSim. This allows the user to use GUI elements within the simulator to create objects, boundaries as well as edit their properties while observing what they look like in different camera view layers. Then the scene is wired using the automatically created \verb|Task| class. Where \emph{initialisation}, \emph{episode step} and other task related systems can be altered for a \verb|Scene| object to then use.
 
 \begin{figure}[htbp]
   \begin{subfigure}{0.48\linewidth}
@@ -101,9 +101,7 @@ Tasks are created using the \emph{`task builder'} CLI, which is a user facing in
 \end{figure}\todo[color=blue]{reshape, smaller? maybe even move to appendix}
 
 
-The task I created is simple, see Figure \ref{fig:reach-no-obs}. I decided to use the \emph{Panda arm}, as that seemed to be standard and more importantly immediately supported by RLBench. It has 7 Degrees of Freedom (DoF) and a gripper -so the action space is a 8 dimensional vector. Then a red spherical target, which is not tangible, in the simulation it will be visually rendered but the arm will not collide or interact physically with it. Finally, added a proximity sensor to the target (which is not visually rendered) so the task can be immediately classified as completed by the system.
-
-
+The reaching task is simple, see Figure \ref{fig:reach-no-obs}. I decided to use the \emph{Panda arm}, as that seemed to be standard and more importantly immediately supported by RLBench. It has 7 Degrees of Freedom (DoF) and a gripper -so the action space is a 8 dimensional vector. Then a red spherical target, which is not tangible. It will be visually rendered, so the cameras can observe it, however, the arm cannot collide or interact with it physically. Finally, added a proximity sensor to the target (not rendered) so the task can be immediately classified as completed.
 
 % //NOTE: relative paths for images, maybe add submodule once project is finished
 \begin{figure}[htbp]
@@ -128,11 +126,11 @@ The task I created is simple, see Figure \ref{fig:reach-no-obs}. I decided to us
 \end{figure}
 
 \subsection{Setting up the Environment}
-The environment is the all encompassing medium where the simulation happens. The environment contains the information about the scene, the robot: its movement system and control mechanism; information about the observability of the environment in terms of what is available and not available.
+The \verb|Environment| is the all encompassing medium where the simulation happens. The environment contains the information about the scene, the robot: its movement system and control mechanism; and what can be observed.
 
-I kept my environment all consistent throughout the experimentation. The \verb|action_mode| controls what the stepping action requires as a tuple for the robot to move. I opted for velocity control and arbitrarily decided to apply the gripper movement once the movement was completed. 
+I kept my environment all consistent throughout the project, see \ref{lst:env-setup}. The \verb|action_mode| controls what the stepping action requires for the robot to move. I opted for velocity control and arbitrarily decided to apply the gripper movement once the movement was completed.
 
-This doesn't affect the design of policies in any way, as all the demonstrations were collected in the same environment, and the labelled data will be of this kind. Dataset root points to where to load demonstrations from given a task \ref{subsec:saving-demos}. It can be changed on the same environment when loading a different task. Finally, the observation config, which means what should be recorded and can be later accessible by our root as well as the size of the rgb cameras in terms of pixel resolution. Other cameras and sensors can be enabled and disabled using the \verb|CameraConfig| as shown in Listing \ref{lst:env-setup}; as well as the rest of the launching process.
+This doesn't affect the design of policies in any way, as all the demonstrations were collected in the same environment, and the labelled data will be of the same kind. The \verb|dataset_root| points to where to load demonstrations from given a task \ref{subsec:saving-demos}. Different tasks can be loaded on the same active environment, though not at the same time. Finally, the observation config, which control what should be recorded and can be later accessible from the root as well as the size of the rgb cameras in terms of pixel resolution. Other cameras and sensors can be enabled and disabled using the \verb|CameraConfig| as shown in the code snippet \ref{lst:env-setup}; as well as the rest of the launching process.
 
 
 \begin{listing}[H]
@@ -169,8 +167,8 @@ This doesn't affect the design of policies in any way, as all the demonstrations
 %     \begin{minipage}{\linewidth}
 %       \textbf{Aside on RLBench Demonstrations} \par
 
-      Demonstrations are provided encapsulated in a \emph{Demo} class and contain a series of observations (belonging to a class \emph{Observation}). These include state information of the robot and the environment, containing information like the observations of the set cameras and sensors; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, like ignore a camera or a sensor. \par 
-      Demonstrations are created following waypoints. PyRep expects  \emph{Dummy} objects within the scene called ``waypointX'' where sequence number of the waypoint starting from $0$. Then he demonstration engine calculates trajectories to these waypoints in sequence. For example, in Figure \ref{fig:reach-no-obs-hierarchy}, we have `waypoint0' within the target, for which a trajectory will be calculated from the tip of the robot gripper.
+      Demonstrations are provided encapsulated in a \verb|Demo| class and contain a series of observations (belonging to a class \verb|Observation|). These include state information of the robot and the environment, such as sensor and camera readings; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, for example, ignore a camera or a sensor. \par 
+      Demonstrations are created following waypoints. PyRep expects  \verb|Dummy| objects within the scene called ``waypoint$x$'' where sequence number of the waypoint starting from $0$. Then the demonstration engine calculates trajectories to these waypoints in sequence. For example, in Figure \ref{fig:reach-no-obs-hierarchy}, we have `waypoint0' within the target, for which a trajectory will be calculated from the tip of the robot gripper.
 %     \end{minipage}
 %   }
 % \end{center}\todo[color=green]{check centering acts weird sometimes}
@@ -178,7 +176,5 @@ This doesn't affect the design of policies in any way, as all the demonstrations
 By default the demonstrations -which I will refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $128 \times 128$ pixels. I binned this down to $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. This resolution is an arbitrary choice and might need to increase the scale depending on feature extraction proficiency and whether I can identify this to be a limiting factor to learning a task.
 
 \subsubsection{Saving Demonstrations}\label{subsec:saving-demos}
-Final part of the environment is to save demonstrations. To evaluate different policies fairly, I will be needing a way to train them in the same way. So I am planning on controlling the randomisation seed and the fed demos. RLBench provides an interface to save and load demos. However, they do it in an episodic and a slightly convoluted way; for tasks that have clearly defined episodes and variations. I have slightly altered the saving and loading code to easily integrate them into my work. 
-
-I have also recorded all the sensor and all the cameras in these demos, just in case later in the project they are needed. In which case I can just keep using the same demos and keep my findings compatible with earlier results.
+Final part of the environment is to save demonstrations. To evaluate different policies fairly, I will train them on the same data, as well as control any random seeds. RLBench provides an interface to save and load demos. However, they do it in an episodic and a slightly convoluted way; for tasks that have clearly defined episodes and variations. I have slightly altered the saving and loading code to easily integrate them into my work. I have also recorded all the sensor and all the cameras in these demos, just in case they might be required later in the project.
 
