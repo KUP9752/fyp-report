@@ -50,7 +50,7 @@ This therefore lead me to pursue a simpler definition of utility. As before \tod
 
 Unlike before, I didn't use a simple distance colour metric, but used a colour range. This achieves the same effect of extracting the target colours. However, I tuned the HSV high and low specifically to be more accurate. 
 
-Another addition is the use of the wrist point cloud. We can create a spatial mask from the colour range to extract the depth information that is specific to the target region. We can extract points $k$ from \( {pc}^{world}\) where \(m_k \in \{ \text{True, False} \}\) as 
+Another addition is the use of the wrist point cloud. We can create a spatial mask from the colour range to extract the depth information that is specific to the target region. We can extract points $k$ from \( {pc}^{world}\) where \(m_k \in \{ \text{True, False} \}\) as \( \{ {pc}^{target} | m_k = \text{True} \} \) where $m$ comes from the aforementioned colour range extraction.
 
 \subsubsection{Choosing a Candidate Pose}
 Simple idea was exploration. The main reason my \emph{non-active} policies struggled was because the system would refuse to point the gripper towards the target. So I wanted to sample some poses and check if a pose around my current pose would generate a better pose, graded by the utility.
