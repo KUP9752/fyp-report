@@ -48,10 +48,9 @@ The experiments \todo[color=green]{appendix}, show that the `distance' graphs ar
 
 While they were trained on demos for their respective generation methods.They were evaluated using a shared a test set created using just \textbf{ReachObs\_Random}. This was a decision to be able to compare their results with each other and evaluate the differences of spawning techniques
 
-This means that a policy trained on the independent generation is not as good at reaching the target successfully as often, but stull manages to learn to get around the obstacle. Which tracks, as the independent task is easier, and predictions on a harder test set are tougher to fit.
-This is likely due to to saved training demos for independent spawning being less occluded from the start 
+This means that a policy trained on the independent generation is not as good at reaching the target successfully as often, but still manages to learn to get around the obstacle. Which tracks, as the independent task is easier, and predictions on a harder test set are tougher to fit.
+This is likely due to to saved training demos for independent spawning being less occluded from the start. Training and testing the on the demos belonging to this task \ref{fig:ro-indrandom-demo-cams}, the results look a lot similar to what we expect from this model.
 
-\todo[color=red]{running right now, include and say it looks similar}
 
 \begin{figure}[htpb] % htpb allows all placement
   \centering
@@ -66,6 +65,21 @@ This is likely due to to saved training demos for independent spawning being les
     \caption{Success Rate (\%) of Task}\label{subfig:ro-random-demo-success-10}
   \end{subfigure}
   \caption{Policy trained on 10 demos, using the \emph{demo dataset} from \ref{subsec:grasp-data-loading-changes}}\label{fig:ro-random-demo-cams}
+\end{figure}
+
+\begin{figure}[htpb] % htpb allows all placement
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_indrandom-obs-mindist-10demos.png}
+    \caption{Minimum Distance to Target}\label{subfig:ro-indrandom-demo-mindist-10}
+  \end{subfigure}
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_indrandom-demo-success-10demos.png}
+    \caption{Success Rate (\%) of Task}\label{subfig:ro-indrandom-demo-success-10}
+  \end{subfigure}
+  \caption{Policy trained on 10 demos, using the \emph{demo dataset} from \ref{subsec:grasp-data-loading-changes}}\label{fig:ro-indrandom-demo-cams}
 \end{figure}
 
 \subsubsection{Dataset Differences}
