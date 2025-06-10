@@ -1,0 +1,43 @@
+\subsection{FiLM}
+The results here are following the proposed modulation 6 wrist RGB and depth modulation techniques from Section \ref{subsec:policies-film}. 
+
+Each variant of this policy has some hyperparameters associated with it. After some preliminary testing, for \textbf{LATE} models, with the initial learnt down-sampling and the FiLM module
+\begin{itemize}
+  \item Initial Downsampling Network, which does $3$ convolutions takes in a \(\langle 3, ~64, ~64 \rangle\) image and returns features of shape \(\langle 16, ~4, ~4 \rangle \)
+  \item Then the FiLM module takes in two of these feature vectors and does the modulation. The resulting encoding size is \(16 \times 4 \times 4 = 256\) as FiLM does change the shape of the given tensor.
+  \item If there is bi-modulation the final encoding is double the size, $512$, as the modulated vectors are concatenated.
+\end{itemize}
+
+For \textbf{NON-LATE} models:
+\begin{itemize}
+  \item Shallow encoder, used to match the channel dimension of modalities, is a single \verb|Conv2d|  that upsamples the channel dimensions to $6$ while preserving width and height ($64 \times 64$), \todo[color=green]{again appendix}.
+  \item The FiLM network as before does not change the sizes returns \(\langle 12, ~64, ~64 \rangle \) or \(\langle 6, ~64, ~64 \rangle \) respectively if it is bi-modulation or not.
+  \item Finally there is another CNN that encodes these modulated features, see \todo[color=green]{appendix}, which have layers $\left[36, ~72, ~128, ~128\right]$ and $\left[32, ~48, ~64, ~128\right]$ respectively to bi or not. The final feature size is \(\langle 128, ~2, ~2 \rangle\) regardless.
+\end{itemize}
+
+\subsubsection{Grasp Results}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=\linewidth]{assets/evaluation/film/film-grasp-final.png}
+  \caption{Final Distances Reached for the Grasp task}\label{fig:film-grasp-final}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/evaluation/film/film-grasp-success.png}
+    \caption{Grasp success per epoch and over seeds for `Control' and `Test'}\label{subfig:film-grasp-success}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/evaluation/film/film-grasp-control-success-seeds.png}
+    \caption{Success for `Control' per Seed (shared legend)}\label{subfig:film-grasp-control-success-seeds}
+  \end{subfigure}
+  
+  \caption{Grasp Success for the FiLMed configurations}\label{fig:film-grasp-success}
+\end{figure}
+
+\subsubsection{Reach Results}

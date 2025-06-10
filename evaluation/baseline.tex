@@ -1,0 +1,21 @@
+\subsection{Baseline - Naive Modality Concatenation}
+This will be the baseline to compare the rest of the data. A hard set hyperparameter is the encoding CNN, for which the code can be found here \todo[color=green]{appendix code}. The layers of which are set to $\left[32, ~48, ~64, ~128\right]$ and the final encoding is of shape \(\langle 128, ~2, ~2 \rangle\).
+
+
+\subsubsection{Grasp}
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=\linewidth]{assets/evaluation/baseline/base-grasp-final.png}
+  \caption{Final Distances Reached for the Grasp task}\label{fig:base-grasp-final}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\linewidth]{assets/evaluation/baseline/base-grasp-control-success-cams-epochs.png}
+  \caption{Success Rate (\%) of task per cam type over epochs}\label{fig:base-grasp-control-success}
+\end{figure}
+The `test' counterpart had no successes.
+
+
+\subsubsection{Reach with Obstacle}
+

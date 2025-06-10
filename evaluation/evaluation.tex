@@ -7,4 +7,26 @@ Here I will evaluate:
 
 \input{evaluation/eval-setup.tex}
 
-\input{evaluation/eval-results.tex}
+
+\section{Results}\todo{remove}
+  \input{evaluation/baseline.tex}
+
+  \input{evaluation/cam-attn.tex}
+
+  \input{evaluation/film-eval.tex}
+
+\subsection{ResNet}
+I decided with various sizes of ResNet systems\todo[color=green]{reference}. Essentially replacing my feature extraction block with modified versions of \emph{resnet18, resnet34, and resnet50} \todo[color=green]{maybe not mention all, afterall the large ones will be ass when the image is so small}.
+
+added a lot to training time while not improving the results in any way i decided to leave the resnets for my own feature extractors. Maybe I should have put some resiudual connections??
+
+A reason these might not have worked well is because of one of my earlier constraints. The image sizes being \(64 \times 64\) pixels, might not be enough to extract meaningful information with a ResNet. This is likely due to its aggressive pooling between the layers and especially during the residual connection and the aggressiveness only increases in larger models. \todo[color=red]{not actually sure if this is right, fact check, wrote this some time ago} 
+
+
+\subsection{Recurrent Models - Results}
+Not much better in terms of numbers however the model size is lower?? not sure experiment with this the big ass 4 way attention is the most expensive currently and this might be a contender,
+
+talk about the shorter training to get comparable results, smoother trajectories learn occlusions robustly (?? i have not observed this i don't think)
+
+
+This lead to a more robust and confident architecture. The movements of my policy felt less spiky, no more sudden jerks and more calculated reaching. It did still absolutely overfit to the average position, and was not much better at grasping, but the episodic movements were cleaner and I believe enhancing the grasping branch of the network would allow it to be more successful \todo{summarise and clean up}
