@@ -4,16 +4,16 @@ The general setup included training a set of policies with their inherent hyperp
 \subsection{Collected Data}
 The data I chose to collect to reason about these policies are:
 \begin{itemize}
-  \item \textbf{Camera Type} Which cameras or combinations of cameras (and sensors) are being used in the policy to make decisions
-  \item \textbf{Final Distance} (to target) all of my tasks are target centric, hence this can be a measure of competence
+  \item \textbf{Camera Type} A misnomer, indicates which sensors or combinations of sensors are being used in the policy to make decisions from \({RGB}_{wrist, ~left\_shoulder, ~right\_shoulder}\) and \(Depth_{wrist}\).
+  \item \textbf{Final Distance} (to target) all of my tasks are target centric, so final distance within the allowed episode length a measure of competence.
   \item \textbf{Minimum Distance} (to target) as above. The difference is reasoning where a policy might be falling apart, seeing the discrepancies between \emph{min} and \emph{final}
   \item \textbf{Success Rate} All the tasks had slightly differing success criteria, however this is an important measure for competency again. This was mostly measured as a count out of $n$, for $n$ being the length of the test demonstrations. The term ``test demonstrations'' means that a set of demos were recorded with the target and the environment in a fixed state. Loading these back allows us to hae a comparable test between policies and their variables.
-  \item Other policy specific hyperparameters that were relevant to observe. These will be discussed then important.
+  \item Other policy specific hyperparameters that were relevant to observe. These will be discussed when relevant.
 \end{itemize}
 
 \subsection{Reproducibility and Verification}
 All the random aspects that can be controlled, be it \emph{numpy} and \emph{pytorch} random choices or random `live' demos. Seeds are sets for both the libraries, as well as the \verb|DataLoader| seeds being fixed for the entirety of the policies tested here.
-The demos per task are pre-made and saved in the project repository. \todo{ref the final deliverables bit}. I repeated all the tests $5$ times with set seeds for the data shuffling, to observe if training on a different (but controlled) ordering of the demos affects a policy.
+The demos per task are pre-made and saved in the project repository. \todo{ref the final deliverables bit}. I repeated all the tests with $5$ different seeds for the data shuffling, to observe if training on a different (but controlled) ordering of the demos affects a policy.
 
 \section{Test Environments}
 Two main branches of tasks I followed in this project are grasping and occluded reaching tasks.
@@ -26,7 +26,19 @@ Two main branches of tasks I followed in this project are grasping and occluded 
 These two grasping tasks are to assess the contextual 3D understanding of the policy: learning depth information and adapting to differing sizes of targets; as well as learning the workspace before attempting a task \todo{grasp then move, not sure if I have time for this, but If i do defo interesting}
 
 \subsection{Grasp and Depth Understanding - \textbf{Vision\_Random}}
+This task is quite similar to the depth interfacing tests from earlier.\todo{ref DI}. The main difference is that the placement of the targets are random within he workspace, for \emph{training}, \emph{control} and \emph{test} sets. The test is repeated with different sizes of targets, \textbf{normal} and \textbf{smaller} (target scale is half that of normal). The training and the control sets are the same size while the test will be the the other. The reasons for this is to assess:
+\begin{enumerate}
+  \item The effectiveness of the configuration in solving the task it is immediately trained for
+  \item Assess the information extraction from the various views by comparing the discrepancy between control and test.
+\end{enumerate}
+I created two separate variations of this specific task. One where the training and control set is set to be the \textbf{normal} size and we evaluate that on \textbf{smaller} blocks. The next variation is flipping this configuration: control and training are scaled down, while test is normal sized. Mainly to investigate whether the information wew train on has any affect on the policy proficiency.
 
-\subsection{Carrying the Target - \textbf{Grasp\_ThenMove}}
+\textbf{Important Note!}
+The demos saved for all the configurations are tested and checked to appear correctly. However, I have realised that the specifically the \textbf{saved smaller testing demos} which is used in the place of the control or the test, would spawn three of the targets smaller than they need to be. Index 2, 5, 6 \todo{confirm this!} will spawn smaller and hence look smaller. It might be valid to remove these from the later numbers as they might affect the overall success rates of smaller tasks. 
+
+I have not figured out the reasoning for this, it has happened before and no effort to fix this issue as resolved, I speculate that it is an issue with how I control the sizes of targets. The target size is set during the start of an episode, so this means the \verb|Environment| object from PyRep must be either initialising an episode wrong from the way it is saved. This was not an isolated accident with the saved demos, it would happen every once in a while, which means that the issue must have happened during saving the smaller demos. Because the problem is consistently repeated. This should not affect the training, as this set was confirmed to spawn correctly. The evaluation of the results will have to take care of this fact.
+
+
+\subsection{Carrying the Target - \textbf{Grasp\_ThenMove}}\todo{havent run this yet, might remove it depending on what I will do today}
 
 \section{Evaluated Configurations}\todo{not sure about this maybe talk about these per task down the line}
