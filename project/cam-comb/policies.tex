@@ -1,22 +1,9 @@
 \section{Multi-Modal Policies}
-\subsection{Deeper/Better Feature Understanding - RCNN}\todo{I feel like this section is talking about the wrong thing}
-First part of any policy is extracting features from the available views. Experimentation up to this point was using a bespoke CNN architecture. However, I wanted to check if an off-the-shelf model would be able to extract more informative features.
-\todo{describe a problem the resnet would fix}
 
-Another thing I wanted to try was to include off-the-shelf models to help extract features and information from my views. As one of the problems I described faced earlier was from the agent not remembering the earlier information that it has seen, I believed an important part of increasing the workspace understanding would be to incorporate residual connections.
+\subsection{Deeper/Better Feature Understanding - ResNets}\todo{I feel like this section is talking about the wrong thing}
+First part of any policy is extracting features from the available views. Experimentation up to this point was using a bespoke CNN architecture. However, I wanted to check if an off-the-shelf model would be able to extract more informative features. On top of extraction the residual connections the skip connections will help retain some vanishing features into later layers, and will allow them to not disappear. And another possible advantage is to initialise pre-trained weights on this network, then tune on my own data, to keep the training at a minimum.
 
-I experimented with various sizes of ResNet networks \todo[color=green]{reference}. Essentially replacing my feature extraction block with modified versions of \emph{resnet18, resnet34, and resnet50} \todo[color=green]{maybe not mention all, afterall the large ones will be ass when the image is so small}.
-
-They had to be modified because of the size restriction I had on my views.\todo{explain why the kernel size had to be dropped}
-
-I had to modify these, because the unmodified version using a main CNN of kernel size $7$ was too large and appropriate features were not being extracted from the views I was feeding. This was evident from observing the agent act in a test scenario where the arm would do nothing remotely similar to what the demo did, or even what the task is about.\todo{move this at the start of the evaluation chapter}. 
-
-\todo[color=pink]{run the original confirm it does not work, if not get a diagram of kernel sizes 7 and 3 and an explanation why this might be the case.}
-
-
-A reason these might not have worked well is because of one of my earlier constraints. The image sizes being \(64 \times 64\) pixels, might not be enough to extract meaningful information with a ResNet. This is likely due to its aggressive pooling between the layers and especially during the residual connection and the aggressiveness only increases in larger models. \todo[color=red]{not actually sure if this is right, fact check, wrote this some time ago} 
-
-\subsubsection{increasing the camera view for experimentation}\todo[color=red]{larger image trials? expand the task to be lager 128 or even 224 seems common with resnet}
+I had to slightly modify how a pre-determined resnet is configured, as the resolution of my images are quite low the original kernel size, which is $7$, I decided to drop this to $5$, and amend some of the following blocks accordingly. Mainly because a low-level feature at that size is quite large for my resolution and initial experiments seemed to favour a smaller kernel size.
 
 \subsection{Feature Level Fusion}\todo{really long intro, consolidate}
 On top of just naively combining views (or modalities) and expecting the policy to understand what it means to `see' is a tall order. 
