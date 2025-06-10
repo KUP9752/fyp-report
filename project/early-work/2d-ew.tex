@@ -70,12 +70,12 @@ See Figure \ref{fig:phase-regions}, for an explanation of this idea. Giving more
 
 
 \subsubsection{Returning to Small Blocks}
-I also then got a model that was only one more convolutional layer deeper to work on the earlier smaller block size, however, the training time increase between the two were quite large for the same data sizes. Around one hour versus, four hours and change, for about 1000 episodes. Therefore, I continued this experimentation with the larger block size.\todo{data? or not importtant enough?}
+I also then got a model that was only one more convolutional layer deeper to work on the earlier smaller block size, however, the training time increase between the two were quite large for the same data sizes. Around one hour versus, four hours and change, for about 1000 episodes. Therefore, I continued this experimentation with the larger block size.\todo[color=green]{data? or not importtant enough?}
 
 
 \subsection{Next Hurdle: Obstacles}
 The rational next step was to add obstacles to simulate some ablations, which would mimic occlusions in 3D. Although, not visual barriers this was another hurdle the agent had to overcome.
-The expert data moved the agent using a path-finding algorithm, inspired by the $A^*$ algorithm \cite{cui2011based}, explores the cells around it with the heuristic of keeping the Euclidian distance of it and the target low. \todo{pseudocode of this?}
+The expert data moved the agent using a path-finding algorithm, inspired by the $A^*$ algorithm \cite{cui2011based}, explores the cells around it with the heuristic of keeping the Euclidian distance of it and the target low. \todo[color=green]{pseudocode of this? appendix}
 
 \subsubsection{Obstacle Generation}
 I took a simple procedural checkered approach where the canvas was divided into a grid which has cells the size of the agent. Then a cell will either be an obstacle or not with some clever mechanics around ensuring at least a single path from the agent to the target and some uncertainty. Check Figure \ref{fig:obs-gen} for some examples.

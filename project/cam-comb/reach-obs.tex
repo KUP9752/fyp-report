@@ -41,23 +41,24 @@ There are two versions of this task, I thought it might be interesting to random
 \subsection{Running the Task}
 There were a few interesting things of note happening on this task. 
 
-I used the unchanged reaching policy from earlier\todo{ref}. Unsurprisingly this did not perform amazingly, however, there are some important lessons to learn form what we are seeing here. Firstly, I adopted to observe the `minimum distance' to target this time \ref{fig:ro-random-cams}, however the `final distance ' graph can be found in the appendix \todo[color=green]{link appendix}. 
+I used the unchanged reaching policy from earlier\todo{ref}. Unsurprisingly this did not perform amazingly, however, there are some important lessons to learn form what we are seeing here. Firstly, I adopted to observe the `minimum distance' to target this time \ref{subfig:ro-random-demo-mindist-10}, however the `final distance ' graph can be found in the appendix \todo[color=green]{link appendix}. 
 
-\subsubsection{Why is `IndRandom' just worse?}\todo{not sure actually}
-I did not include any figures here as there were too many\todo{should i include figures here}, however some nice ones can be found in \todo{ref the appendix}. To summarise: the models on this version of the task seems to have its `distance' graphs translated slightly up (around $0.1$ metres) while the success rate is halved compared to `Random'. 
+\subsubsection{Why is `IndRandom' just worse?}
+The experiments \todo[color=green]{appendix}, show that the `distance' graphs are translated upwards by roughly $0.1$m while the success rate is halved.
 
-This is unlikely due to the difference in task creation, which explained in \ref{subsec:ro-creating-the-task}. This is because even if their generation strategies are different the rendered scene will have extremely similar properties and an unchanged model being trained on respective demos from each task shouldn't show a consistent trend like this. 
-After making sure the demos were correct and the rendered items in the two scenes were indeed identical, I believe this difference is just random variance. While data collection, during a full pass for the task I create $10$ test demos. These demos are then used to load and reload the same exact scenario to test various configurations of trained policies (for example all different epochs, minibatch sizes \ldots). So, by random chance, during the 3 full repeats in this data collection, the tests created for the `IndRandom' task must have been 
-slightly more challenging. Creating this slight difference in results, however, the trends are similar so the other conclusions track.
+While they were trained on demos for their respective generation methods.They were evaluated using a shared a test set created using just \textbf{ReachObs\_Random}. This was a decision to be able to compare their results with each other and evaluate the differences of spawning techniques
 
-If I have enough time, it might be interesting to evaluate the policies trained from either task with test data generated from demos of both tasks.\todo[color=pink]{the scenes are almost identical do one more run comparing the a policy trained on either task to two sets of test demos??, replace this section with the actual data if done}
+This means that a policy trained on the independent generation is not as good at reaching the target successfully as often, but stull manages to learn to get around the obstacle. Which tracks, as the independent task is easier, and predictions on a harder test set are tougher to fit.
+This is likely due to to saved training demos for independent spawning being less occluded from the start 
+
+\todo[color=red]{running right now, include and say it looks similar}
 
 \begin{figure}[htpb] % htpb allows all placement
   \centering
   \begin{subfigure}{0.45\linewidth}
     \centering
     \includegraphics[width=\linewidth]{assets/cam-comb/reach-obs/ro_random-demo-mindist-10demos.png}
-    \caption{Minimum Distance to Target}\label{subfig:ro-random-demo-dist-10}
+    \caption{Minimum Distance to Target}\label{subfig:ro-random-demo-mindist-10}
   \end{subfigure}
   \begin{subfigure}{0.45\linewidth}
     \centering
@@ -97,13 +98,9 @@ Although, success rate graph looks nice at first glance, there is a distinct lac
 
 The other policies that included the wrist features were also prone to these, however sometimes the assisting camera (left or right shoulder would pick something up) and course-correct.
 
-\subsubsection{`Looking' in Demonstrations}\todo{haven't done this yet}\label{ew-looking-at-target}
-Another solution might be to experiment with the demonstration system to make sure we are pointing the wrist camera (so, the gripper of our robot) towards its target as a demonstration trajectory is calculated. Playing around this idea, I tried changing the demo calculations. However, issues with precalculation of trajectories and basing that off the grippers pose proved challenging to add this information naturally to demonstration that are given.
-
-If we can't implicitly encode the `looking' information through the demonstration that means we will have to inject this information into our agent some other way and teach it to \emph{actively look} for the target. Following previous works such as \todo{find some prior info tracking works add ref} where object priors are incorporated into the learning or with attention mechanisms that figure out what is important in a task without prior object information \todo[color=red]{not quite sure what i meant by attention here, remove?}.  
 
 \subsubsection{Other Cameras}\todo{rename}
-So, we can confirm that the wrist camera alone is not sufficient \todo{ref}, and the combination of wrist and other cameras are almost always better as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target. Combining these ideas I moved onto the next section.
+So, we can confirm that the wrist camera alone is not sufficient \todo{ref}. Combining wrist and other cameras are almost always better as more coverage of the workspace guarantees less occlusions and more information the agent can work with to make decisions. It was clear that the wrist camera alone wasn't going to cut it unless it learnt to look towards the target. Combining these ideas I moved onto the next section.
 
 \section{Attending on a Camera Depending on Colour}\label{sec:reach-obs-naive-cam-attn}\todo{references for all the sections here? and }
 First idea bordering on `active vision' was to selectively accept the encoding from a single camera depending on what it was seeing. So, not necessarily looking around, but accepting the inputs from one of the cameras it has access to, guided by some prior information. This requires at least two camera views to `blend' otherwise given only one camera, it will act like the old policy.

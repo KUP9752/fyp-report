@@ -80,7 +80,7 @@ Looking at graph \ref{subfig:rno-random-dist}, we can see that providing more de
 \subsection{Camera Limitations}
 I started this section by limiting the learning to only the wrist mounted camera, which works well for this specific unobscured task. Introducing some of the other RGB cameras, specifically the \textbf{left shoulder} or the \textbf{right shoulder} views, doesn't drastically benefit the performance, other than just the \textbf{right shoulder} RGB, see \ref{fig:rno-random-cams}. Conversely, combining more than one camera seems to be adding to the deficit, as the features being extracted are likely incompatible due to the various view points. 
 
-As the current fusion system does not allow for optimal multi-view feature extraction, using multiple different cameras are not necessarily benefiting the learning and might even be negating its effectiveness due to diluting the features by concatenating incompatible views. \todo{ref back to this when needed and improve the policy from now on?} 
+As the current fusion system does not allow for optimal multi-view feature extraction, using multiple different cameras are not necessarily benefiting the learning and might even be negating its effectiveness due to diluting the features by concatenating incompatible views. \todo[color=green]{ref back to this when needed and improve the policy from now on?} 
 
 A possible explanation as to why the right shoulder camera alone might be increasing success rate is, I think, solely because of its strategic placement compared to the rest of the cameras. 
 

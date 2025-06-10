@@ -126,9 +126,9 @@ The reaching task is simple, see Figure \ref{fig:reach-no-obs}. I decided to use
 \end{figure}
 
 \subsection{Setting up the Environment}
-The \verb|Environment| is the all encompassing medium where the simulation happens. The environment contains the information about the scene, the robot: its movement system and control mechanism; and what can be observed.
+The \verb|Environment| is the all encompassing medium where the simulation happens. It contains the information about the scene, the robot: its movement system and control mechanism; and what can be observed. The environment is kept consistent throughout the project, see \ref{lst:env-setup}. 
 
-I kept my environment all consistent throughout the project, see \ref{lst:env-setup}. The \verb|action_mode| controls what the stepping action requires for the robot to move. I opted for velocity control and arbitrarily decided to apply the gripper movement once the movement was completed.
+The \verb|action_mode| controls what the stepping action requires for the robot to move. I opted for velocity control and arbitrarily decided to apply the gripper movement once the movement was completed.
 
 This doesn't affect the design of policies in any way, as all the demonstrations were collected in the same environment, and the labelled data will be of the same kind. The \verb|dataset_root| points to where to load demonstrations from given a task \ref{subsec:saving-demos}. Different tasks can be loaded on the same active environment, though not at the same time. Finally, the observation config, which control what should be recorded and can be later accessible from the root as well as the size of the rgb cameras in terms of pixel resolution. Other cameras and sensors can be enabled and disabled using the \verb|CameraConfig| as shown in the code snippet \ref{lst:env-setup}; as well as the rest of the launching process.
 
@@ -161,17 +161,8 @@ This doesn't affect the design of policies in any way, as all the demonstrations
 \end{listing}
 
 \subsubsection{RLBench Demonstrations}
-% NOTE: changed this from being a box, and made an environment section, I think this makes more sense, but review
-% \begin{center}
-%   \fbox{  
-%     \begin{minipage}{\linewidth}
-%       \textbf{Aside on RLBench Demonstrations} \par
-
-      Demonstrations are provided encapsulated in a \verb|Demo| class and contain a series of observations (belonging to a class \verb|Observation|). These include state information of the robot and the environment, such as sensor and camera readings; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, for example, ignore a camera or a sensor. \par 
-      Demonstrations are created following waypoints. PyRep expects  \verb|Dummy| objects within the scene called ``waypoint$x$'' where sequence number of the waypoint starting from $0$. Then the demonstration engine calculates trajectories to these waypoints in sequence. For example, in Figure \ref{fig:reach-no-obs-hierarchy}, we have `waypoint0' within the target, for which a trajectory will be calculated from the tip of the robot gripper.
-%     \end{minipage}
-%   }
-% \end{center}\todo[color=green]{check centering acts weird sometimes}
+Demonstrations are provided encapsulated in a \verb|Demo| class and contain a series of observations (belonging to a class \verb|Observation|). These include state information of the robot and the environment, such as sensor and camera readings; which need to be configured when the environment is started. This modular approach means I can collect demonstrations, then selectively choose what to use, for example, ignore a camera or a sensor. \par 
+Demonstrations are created following waypoints. PyRep expects  \verb|Dummy| objects within the scene called ``waypoint$x$'' where sequence number of the waypoint starting from $0$. Then the demonstration engine calculates trajectories to these waypoints in sequence. For example, in Figure \ref{fig:reach-no-obs-hierarchy}, we have `waypoint0' within the target, for which a trajectory will be calculated from the tip of the robot gripper.
 
 By default the demonstrations -which I will refer to as ``demos'' from now on- and specifically the cameras pre-placed in the scene, produce images of resolution $128 \times 128$ pixels. I binned this down to $64 \times 64$. This comes in handy as I can keep the processing power low and can adapt the policy for higher resolution cameras by scaling it up later on. This resolution is an arbitrary choice and might need to increase the scale depending on feature extraction proficiency and whether I can identify this to be a limiting factor to learning a task.
 
