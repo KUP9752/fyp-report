@@ -1,5 +1,7 @@
 \section{First Approach: 3D Reasoning}
-Main idea here is to not touch the training for the policy. Which is to say, a policy will be learnt as normal from demonstrations using imitation learning. Then during its execution, the robot can use 3D reasoning and possibly planning to move to its optimal state before applying what its learnt from the demonstration (which are specifically relating to the task)
+A problem we have with RLBench demos is that the gripper does not understand to look at the target. Therefore, in an occluded scenario the system needs to actively search for poses to make the target most visible.
+
+So, rather than changing the training of the agent, I want to optimise its movement after training on demos.Which is to say, a policy will be learnt as normal using BC. Then during its execution, the robot can use 3D reasoning and  planning to move to its optimal state before applying what its learnt from the demonstration, increasing the chances of the BC algorithm succeeding in completing the task.
 
 \subsection{Proposed Approach}
 What makes this system is the \emph{optimal pose predictor}, as we want the robot to place itself in a situation where the:
@@ -17,9 +19,9 @@ We can formalise this optimal pose system as follows:
 \[
 p^* = {argmax}_{p \in \mathcal{P}}
   \left[
-    \mathcal{V}\left(p; \mathcal{O}\right)
+    V \left( p; \mathcal{O} \right)
     - 
-    \lambda\mathcal{C}\left(p\right)
+    \lambda C\left( p \right)
   \right]
 \]
 
@@ -27,38 +29,49 @@ Where \(p^* \in \mathcal{P}\), is a (reachable) candidate gripper pose, represen
 
 $\mathcal{O}$ is the given observation. So, any  3D information about the target object and the scene respectively. They can be mesh data about the objects, or possibly point clouds. This approach will initially have to depend on prior knowledge about the target, then later I might be able to encode the target information to be learnt during training so that we can remove the dependence on providing priors.
 
-$\mathcal{V}$ is the visibility score for our target object. We need to define some scoring functions to asses the utility of our current pose within the scene.
+$V$ is the visibility score for our target object. We need to define some scoring functions to asses the utility of our current pose within the scene.
 
-And finally, $\mathcal{C}$, is some sort of constraint or cost function to help shape the choices correctly, it might be a constraint to make sure candidate poses are reachable, or maybe a cost function determining whether a candidate pose is too far from the current configuration. $\lambda$ is just a tunable weight to adjust how much these limitations contribute to out optimal pose finding. To add, there maybe multiple cost functions so we can expand them as: \(\lambda_1\mathcal{C}_1 + \cdots +\lambda_n\mathcal{C}_n \).
+And finally, $C$, is some sort of constraint or cost function to help shape the choices correctly, it might be a constraint to make sure candidate poses are reachable, or maybe a cost function determining whether a candidate pose is too far from the current configuration. $\lambda$ is just a tunable weight to adjust how much these limitations contribute to out optimal pose finding. To add, there maybe multiple cost functions so we can expand them as: \(\lambda_1 C_1 + \cdots +\lambda_n C_n \).
 
 
 \subsection{Implementation}
 Following the plan, the most important part to start with is our utility function, and a way of sampling poses. Then I can start devising constraints to help shape the policy.
 
 \subsubsection{Scoring a Candidate Pose}
-The very first step is to implement an utility function. The initial plan was to use a pretrained segmentation network. Such as MaskRCNN \todo{ref?}. The idea was to segment objects present in the scene and ideally get some bounding boxes of where the system thought the objects were. However, this had some application issues, because these networks were mainly trained with real-life data and pictures the toy tasks that I created without proper graphics overlaying them, would commonly be misclassified or not be classified at all. 
+The very first step is to implement an utility function. The initial plan was to use a pretrained segmentation network. Such as MaskRCNN \todo{ref?}. The idea was to segment objects present in the scene and ideally get some bounding boxes of where the system thought the objects were. 
 
-Along with bounding boxes MaskRCNN also gives uncertainties as well as the label of what it thinks this item is. Which I initially thought I could use as a score for `seeing' the target.From the wrist camera it would almost always find the grippers (which are visible) but it was quite uncertain at marking my main target object, and the very rare times it did mark it it would not be certain what it was. From the many pretrained labels it would guess between: `apple', `fire hydrant', and `traffic light'. This is unideal because in the fully autonomous training stage, the network does not necessarily understand about what its looking for, and it doesn't care what its looking for. This however made it hard to quantify the \emph{vision score} with the uncertainty because firstly it couldn't decide on what it was that it was seeing, meaning I couldn't extract just a label from the MaskRCNN return dictionary and check its uncertainty. On top of this it would sometimes latch onto other things in t he scene, such as the grippers I mentioned (mostly identified them as \todo{i cant remember check again?}). So I either had to label these by hand, which is inefficient, or find a way to have the network learn what its target is through an unsupervised (or at least semi-supervised manner).
-\todo{add figures of bounding box redwo in rwd copy if needed}
+Initial trials proved this problematic. Because, these networks were mainly trained with real-life data and pictures the toy tasks that I created without proper graphics overlaying them, would commonly be misclassified or not be classified at all. 
 
-This therefore lead me to pursue a simpler idea implementing a utility function is to extract the target colour and mask the RGB camera to score its visibility (similar to how it was done in `attn' before \todo{link})
+Along with bounding boxes MaskRCNN also gives uncertainties as well as the label of what it thinks this item is. Which I initially thought I could use as a score for `seeing' the target. From the wrist camera it would almost always find the grippers (which are visible) but it was quite uncertain at marking my main target object, and the very rare times it did mark it it would not be certain what it was. From the many pre-trained labels it would guess between: `apple', `fire hydrant', and `traffic light'. This is unideal because in the fully autonomous training stage, the network does not necessarily understand about what its looking for, and it doesn't care what its looking for. This however made it hard to quantify the \emph{vision score} with the uncertainty because firstly it couldn't decide on what it was, meaning I couldn't extract just a label from the MaskRCNN. Secondly,  it would sometimes latch onto other things in the scene, such as the grippers I mentioned (mostly identified them as \todo{i cant remember check again?}). So I either had to label these by hand, which is inefficient, or find a way to have the network learn what its target is through an unsupervised (or at least semi-supervised manner). 
 
+Training my own version also seemed infeasible. Both because I would need a lot of annotated data on my specific tasks, which though doable would be time consuming. However, the main issue was the time. Spending time to tune and create the perfect feature extractor would waste precious time for the project. Considering the goals of this project, I moved away from this.
 
+This therefore lead me to pursue a simpler definition of utility. As before \todo{ ref cam attn} I was going to extract the colour. However, had plans of integrating the point cloud data and incorporate depth into this score.
 
+Unlike before, I didn't use a simple distance colour metric, but used a colour range. This achieves the same effect of extracting the target colours. However, I tuned the HSV high and low specifically to be more accurate. 
 
+Another addition is the use of the wrist point cloud. We can create a spatial mask from the colour range to extract the depth information that is specific to the target region. We can extract points $k$ from \( {pc}^{world}\) where \(m_k \in \{ \text{True, False} \}\) as 
 
 \subsubsection{Choosing a Candidate Pose}
-Sampling around a sphere from the gripper's pose
+Simple idea was exploration. The main reason my \emph{non-active} policies struggled was because the system would refuse to point the gripper towards the target. So I wanted to sample some poses and check if a pose around my current pose would generate a better pose, graded by the utility.
+
+So, I wanted to limit my sampling on the surface a unit sphere of radius $\mathbf{r}$ where the current position of the gripper $\mathbf{c}$ lies ont he surface of. Therefore, the sphere's centre, $mathbf{O}$ can be found as \(\mathbf{r} = || \mathbf{c} - \mathbf{O} || \).
+
+Once we have that centre, we can sample \(\phi \sim U\left(0, 2\pi\right)\) abd \(u\sim U\left(0, 1\right)\) then set \(\cos \theta = 2u - 1 = \arccos\left(2u - 1\right)\). Using these values we create the unit vector \(\mathbf{u} = \left[ \sin\theta\cos\phi, ~\sin\theta\sin\phi, \cos\theta\right]\) and \(\mathbf{p} = \mathbf{c} + \mathbf{ru}\). Next, we pick the `facing' direction of our orientation, it made sense to always point towards the centre of the sphere. Once all these are set, we need to find the orthonormal basis to fix the roll around the  `facing' axis we have chosen.\todo{ref code, this is boring geometry} Once the full position and hte orientation is established, we can return this 3D matrix back into the pose and quaternion representation, so, we have a sample to test. We can use the \emph{inverse kinematics} of our robot to find out what configuration the joint angles need to be. And with a simple velocity controller, I arbitrarily chose a simple proportional control module system\todo{ref appendix}. We can move our robot to that location.
+
+An important note, I arbitrarily chose the sphere centre to be right below (with a distance $\mathbf{r}$) the gripper position. The inverse kinematics system would frequently not be able to get to the joint configurations for many different radius configurations provided, so, for the final version of this system I adapted the pose sampling to only sample orientations. Rather than changing the position, it would change the orientation of the gripper with a random rotation, and then as before solve it with inverse kinematics. This meant that no position exploration would be happening but the agent would more robustly explore different orientations. 
+
+I initially utilised two constraints in the pose selection, kinematic distance to the next pose, calculated by the absolute joint rotation differences. \(C_{jpos\_dist} = ||\mathbf{p}_{sampled} - \mathbf{p}_{current}||\). And secondly inverse kinematics solver. If it cannot be solved, \(C_{ik}\) blows up and that pose will not be considered. The ik solving discouraged movement because the score is calculated after moving. However, the distance could not immediately be added, because we need to move before getting a observation and scoring it. Therefore, I decided to take only the top $k$ of the samples from the sphere, encouraging only closer movements. And for the only-rotation approach, I just removed the distance restriction. This is because a simple rotation will be cheaper compared to full movement.
+
+In later iterations, with a view estimator and other predictive scoring mechanisms, we can introduce the distance again, as then the entire score calculation can be done without requiring movement.
+
+\subsubsection{Collison Avoidance}
+A final heuristic I added was using action smoothing and back-off if we were getting too close to an object. As we now have access to the projected point cloud from the wrist. And removing the the target from this point cloud.\todo{usign the above calculations} By sampling for the closest $k$ points in the point cloud I estimate the centre of the closest obstacle. And set a repulsion direction away from it.
+Then with some extra parameters: \textbf{clearance} and \textbf{blend} is used to calculate the distance thresholds and how to smoothly transition from full repulsion to the full action. As the wrist camera can see the tips of the grippers, I made sure to ignore these, they are about $0.895$ metres from the camera, so I checked distances above this and below the clearance to act on this information. \todo{see how its done in appendix}
+
 
 \subsubsection{Action Loop}
-Talk about the initial system of starting active, and then 
+There are two actions loops. I equipped the \emph{active agent} with one of the good policies from the earlier chapter. Essentially, there would be an \emph{active action} and a \emph{BC action}. The toggle between the two settings will depend on the utility score and an arbitrary limit to how long the agent can explore will be placed, so that it doesn't get stuck somewhere forever.
 
-\section{Initial Review}\todo{not sure what to name, did some tests and what not this is ass}
-
-\subsubsection{Collision Avoidance}\todo{talk about the distance back- off, action smoothing}
-
-\subsubsection{Modified action loop}
-
-
-\todo{add details on how its implemented and maybe code snippets, graph of the spherical sampling would help a lot here}
+I initially started in active mode, which means that agent would continuously search at the start. This is a bad system because the agent is no where close to the target nor the obstacle. And with only the rotational exploration, it wouldn't be able to move. So the next heuristic was that, the active portion would only kick in once we were close enough to the obstacle, and the vision score was low. The closeness was not euclidean distance but a z-height range, so that slamming into the obstacle form above does not trigger the active mode, which again would get stuck. The final decision system is given here \todo{figure:}
   

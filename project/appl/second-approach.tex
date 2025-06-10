@@ -1,7 +1,13 @@
 \section{Second Approach: View Emsembling}
-\todo{cool name not to do with it yet, explain what this is meant to achieve, from proposal selection}
+We still have the same problem of estimating the best pose for our gripper. Getting the agent to plan using its environment has the drawbacks of needing a lot of prior information about the task. Which leads to inherent coupling to tasks or environments.
+
+What if we could inject the movement of the camera into the RLBench demo system, so the view uncertainty system can be modelled independently of the environment on the data we have received. In short the plan here is to get demos that have multiple observations per timestep (meaning multiple observation collections and not just multiple modalities.) Then we can train a model with inherent uncertainty models to estimate the best pose to be in before executing an action. In theory, this should help eliminate the need for geometrical priors.
 
 \subsection{Proposed Approach}
+The changed demonstration system will give demos as \( \mathcal{D} := \{\langle \{o_i^t\}_{i = 1}^{N}, a^t\rangle\}_{t = 1}^{T}\) for $N$ distinct observations per step in $T$, this will allow us to train an ensemble method with one or more of these observations (but not all) and leverage the information gained 
+
+\subsubsection{Regression Ensembling}
+
 \todo{math foundations, add other subheading for limitations such as adding movement within rlbench demos??}
 
 \subsection{Implementation}

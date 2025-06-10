@@ -119,11 +119,11 @@ Up until this point, I left proprioceptive data out of the training, mainly beca
 The policies above are trained in the same way and the only separation is the modular feature extraction blocks, as well as what data they require. All input and output is handled within the network and the policy interface exposed to the agent is compatible with all the ones proposed in this project.
 
 \subsubsection{The Dataset}
-A demonstration of episode length $T$ is defined as: \(\mathcal{D} := \{\langle o_i, ~a_i\rangle\}_{i = 1}^{T} \). Observation, \(o_i \in \mathcal{O}\) is defined as the available modalities to the system with shape \(\mathcal{O} := \mathbb{R}^{c \times W \times H}\). This corresponds the resolution of the sensor (\textbf{W}idth and \textbf{H}eight) also $c \in \left[1, 10\right]$ which correspond to the available modality data concatenated on their channel dimension. The order of $c$ is always:\todo{figure here with the stuff stacked}
+A demonstration of episode length $T$ is defined as: \(\mathcal{D} := \{\langle o_t, ~a_t\rangle\}_{t = 1}^{T} \). Observation, \(o_t \in \mathcal{O}\) is defined as the available modalities to the system with shape \(\mathcal{O} := \mathbb{R}^{c \times W \times H}\). This corresponds the resolution of the sensor (\textbf{W}idth and \textbf{H}eight) also $c \in \left[1, 10\right]$ which correspond to the available modality data concatenated on their channel dimension. The order of $c$ is always:\todo{figure here with the stuff stacked}
 \[
 {RGB}_{wrists}, ~{RGB}_{{left}\_{shoulder}}, ~{RGB}_{{right}\_{shoulder}}, ~{Depth}_{wrist}
 \] 
-where the $RGB$ data is $3$ channels wide while $Depth$ is only 1. \(a_i \in \mathbb{R}^{8 \times 1}\) is the corresponding joint velocities at timestep $i$, which acts as our ground truth. 
+where the $RGB$ data is $3$ channels wide while $Depth$ is only 1. \(a_t \in \mathbb{R}^{8 \times 1}\) is the corresponding joint velocities at timestep $i$, which acts as our ground truth. 
 
 The Data Loader, as discussed \todo{ref}, will provide a randomly shuffled batch of $b$ collated demos, along with extra information. \( \langle O^B, ~A^B, ~\left( P^B, ~l^B \right) \rangle\), where \(O^B \in \mathbb{R}^{ B \times c \times W \times H}\). The observation batch size, $B$ is equal to \({\sum_{ d \in \mathcal{D}^B}|d|}\), this is the sum of the length of all demos in this training batch. Similarly, \(A^B \in \mathbb{R}^{B \times 8}\) per joint velocity (7) and final grasp indicator, \(P^B \in \mathbb{R}^{B \times 7}\) per joint angle - the proprioception data. Finally, \(l^B \in \mathbb{Z}^{b}\), contains the original lengths of the individual demos.
 
