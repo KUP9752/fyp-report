@@ -6,3 +6,25 @@ talk about the shorter training to get comparable results, smoother trajectories
 
 
 This lead to a more robust and confident architecture. The movements of my policy felt less spiky, no more sudden jerks and more calculated reaching. It did still absolutely overfit to the average position, and was not much better at grasping, but the episodic movements were cleaner and I believe enhancing the grasping branch of the network would allow it to be more successful \todo{summarise and clean up}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/evaluation/rnn/wd-epoch-test-final.png}
+    \caption{Final Distances Reached}\label{subfig:rnn-grasp-final}
+  \end{subfigure}
+
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/evaluation/rnn/wdw-epoch-test-all-final.png}
+    \caption{Final Distances Reached (Including `Test')}\label{subfig:rnn-grasp-final}
+  \end{subfigure}
+  \caption{Wrist RGB and Wrist Depth, Baseline Tuning}\label{fig:}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{assets/evaluation/rnn/wd-epoch-test-final.png}
+  \caption{Baseline Final Distance Distributions Per Camera Config }\label{fig:rnn-grasp-tuning}
+\end{figure}
