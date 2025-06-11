@@ -1,0 +1,44 @@
+\subsection{Separated Understanding of Depth}
+This section is comparing the simple, yet more nuanced fusing techniques introduced in \todo{ref to policies}. Parameters set can be found in Table \ref{tab:sep-dep-params}.
+
+\begin{table}[H]
+\centering
+  \begin{tabular}{|| c | c | c ||}
+  \hline
+  Flavour & Parameter & Value \\
+  \hline
+  
+  \multirow{2}{*}{CNN Encoder Module} & rgb\_layers & [32, 48, 64, 128] \\
+  & depth\_layers & [32, 48, 64, 128] \\
+  \hline
+  \multirow{3}{*}{Cross Attention Module} & embed\_size & 128 \\
+  & num\_heads & 8 \\
+  & deep\_fuse & \texttt{True} \\
+  \hline
+  \end{tabular}\caption{Default Training parameters}\label{tab:sep-dep-params}
+\end{table}
+
+\subsubsection{Grasp - Normal}
+The distributions of final distance is almost identical to the baseline, as they use similar methods and similar convolutions to extract features. The final distance comparison can be found here \todo{appendix}. However, an interesting observation was in the success rates of the tasks Figure \ref{fig:sepdep-normal-success}, where the control success rate more than quadruples the baseline (indicated in blue) at best and at least 37\% better than it in the `control' setting. For both separately fusing the the depth running cross attention on the depth and the rgb features when only the wrist modalities are included.
+
+These being more successful, and greater in magnitude to success rates when any shoulder camera is included means that the task is solvable completely by just wrist modalities and the shoulder cameras are just confusing the grasp decision by diluting the data pool.\todo[color=purple]{diluting the data pool}
+
+So the two best 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{assets/evaluation/sep-dep/grasp-normal-success-cams.png}
+  \caption{(Grasp Success Rate\textbf{normal})}\label{fig:sepdep-normal-success}
+\end{figure}
+
+\subsubsection{Grasp - Smaller}
+The smaller results were identical to the baseline results. The reason is likely the difficulty of learning the smaller grasp task, and the network being tuned to learn the larger task inhibits its ability to perform here. Results are provided in \todo[color=green]{appendix}. Therefore, for higher success rates in the `test' configuration we should tune for it separately. Which highlights the difficulty in creating a single policy to cater to all tasks. Even smaller deviations are causing huge hurdles in learning.
+
+\subsubsection{Reach Obs}
+Somewhat similarly to the grasp tasks. The distances reached are identical within a small error. \todo{appendix} However, a big difference is the success rate (Figure \ref{fig:sep-dep-reach-success}) of the system, which surprisingly is either just about on par or worse than the baseline (included in blue). This means that the separate learning of depth information and later fusion helps the separate grasp\verb|grasp_head| to learn to grasp better than the baseline, yet they add no benefit in the reaching case.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{assets/evaluation/sep-dep/reach-success-cams-epochs.png}
+  \caption{Reach success rates per cam type}\label{fig:sep-dep-reach-success}
+\end{figure}
