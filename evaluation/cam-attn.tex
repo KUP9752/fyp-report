@@ -1,4 +1,4 @@
-\section{Naive Colour Attention - Results}
+\section{Naive Colour Attention Results}
 This is the results relating to the proposed naively active approaches from \ref{sec:reach-obs-naive-cam-attn}.
 The variations of this policy I tested included: \todo{add code for aall the possibilies from test cam attn py file}
 \begin{itemize}
@@ -29,7 +29,7 @@ The very likely reason for this is that, the demonstration trajectories for this
 \todo{show the attn lambda  = 5 results}
 
 
-\subsubsection{Separate Feature Encoders}
+\subsection{Separate Feature Encoders}
 This parameter was more of a test to see if it interacted well in any way. Theoretically both approaches are sound. 
 
 This task is quite unforgiving and errors add up quickly, if the robot gets stuck on the obstacle, it rarely manages to save itself. Evident from the quick increases in minimum distance between epochs $100$ and $200$ for single-CNNs, which capture early fitting due to information abundance, but get confused trying to generalise due to the feature encodings keeping a lot of this uncertainty.
@@ -39,7 +39,7 @@ Conversely, multi-CNNs learn late. Makes sense as more passes allow each CNN (no
 The only interesting remark here is that multi-CNN interacts interestingly with \emph{mean} pooling. Seeing the spiky and jagged Single-CNN graphs we can confirm speculate that merging all views and convoluting them likely confuses the feature extraction and a lot of uncertainty creeps in to the features.
 
 
-\subsubsection{\emph{Mean} and \emph{Max} Pooling}
+\subsection{\emph{Mean} and \emph{Max} Pooling}
 \todo{obseration, put some min dist here}
 The differences here are extremely subtle. General observations both work fairly similarly in terms of the minimum distance they can reach per epoch. A stark difference, however, is how jagged and uncertain \emph{max} is with lower epochs. This is due to max likely sending a similar signal between all views, if more than one view can see the target, they will likely have very similar weights. Which can add indecisiveness, especially when both shoulders are active.
 
@@ -47,10 +47,10 @@ The differences here are extremely subtle. General observations both work fairly
 
 Though, its performance immediately starts good when it is paired with multi-CNN feature encoder. This makes the data less spread out \todo{looking at the minimum dist graphs here} and the policy being capable of moving past the target, even from the start. However, the drawback is, the performance does not get much better for shoulder cameras as training goes on. This is now likely due to how \emph{mean} operates, it relates the score magnitude to depth essentially, more area covered the better. The shoulder cams being at a fixed depth, don't allow them to participate in this benefit. So \emph{max} with Multi-CNN combination is generally more successful than \emph{mean} with combinations using shoulder cams.
 
-\subsubsection{Attention Loss Weights ($\lambda_{attn}$)}
+\subsection{Attention Loss Weights ($\lambda_{attn}$)}
 This didn't seem to make a change at all. However, looking at the loss curves \todo{add a loss curve here, fighting for vram currently}, some potential issues may be that the one loss term is drowning the other one out and scaling it up might not matter, rerun depending on this.
 
 
-\subsubsection{Remarks}
+\subsection{Remarks}
 I thought this policy would be able to fix the shortcomings, which was the final reach toward the obstacle not being executed well. Non-wrist cameras help with the first half of the motion while the wrist camera should be able to generalise to the final reaching motion \todo{explain: due to its self-centric nature}. However the problem is the demos don't force the gripper to `look' towards the target. So, the wrist camera cannot get the benefits from a \emph{mean} pooled configuration. This led to the attention weights being very similar above and below the obstacle. Which counteracts this policy's theoretical benefits.
 

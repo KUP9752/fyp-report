@@ -26,7 +26,7 @@ Two main branches of tasks I followed in this project are grasping and occluded 
 These two grasping tasks are to assess the contextual 3D understanding of the policy: learning depth information and adapting to differing sizes of targets; as well as learning the workspace before attempting a task \todo{grasp then move, not sure if I have time for this, but If i do defo interesting}
 
 \subsection{Grasp and Depth Understanding - \textbf{Vision\_Random}}
-This task is quite similar to the depth interfacing tests from earlier.\todo{ref DI}. The main difference is that the placement of the targets are random within he workspace, for \emph{training}, \emph{control} and \emph{test} sets. The test is repeated with different sizes of targets, \textbf{normal} and \textbf{smaller} (target scale is half that of normal). The training and the control sets are the same size while the test will be the the other. The reasons for this is to assess:
+This task is quite similar to the depth interfacing tests from earlier.\todo{ref DI}. The main difference is that the placement of the targets are random within he workspace, for \emph{training}, \emph{control} and \emph{test} sets. The test is repeated with different sizes of targets, \textbf{normal} and \textbf{smaller}. \textbf{normal} sets the scale of the target to $1$ and \textbf{smaller} sets it to $0.5$. The training and the control sets are the same size while the test will be the the other. The reasons for this is to assess:
 \begin{enumerate}
   \item The effectiveness of the configuration in solving the task it is immediately trained for
   \item Assess the information extraction from the various views by comparing the discrepancy between control and test.
@@ -34,11 +34,27 @@ This task is quite similar to the depth interfacing tests from earlier.\todo{ref
 I created two separate variations of this specific task. One where the training and control set is set to be the \textbf{normal} size and we evaluate that on \textbf{smaller} blocks. The next variation is flipping this configuration: control and training are scaled down, while test is normal sized. Mainly to investigate whether the information wew train on has any affect on the policy proficiency.
 
 \textbf{Important Note!}
-The demos saved for all the configurations are tested and checked to appear correctly. However, I have realised that the specifically the \textbf{saved smaller testing demos} which is used in the place of the control or the test, would spawn three of the targets smaller than they need to be. Indices  \(0, ~5, ~6\)  will spawn smaller and hence look smaller. It might be valid to remove these from the later numbers as they might affect the overall success rates of smaller tasks. 
+The demos saved for all the configurations are tested and checked to appear correctly. However, I have realised that the specifically the \textbf{saved smaller testing demos} which is used in the place of the control or the test, would spawn three of the targets smaller than they should be. Indices  \(0, ~5, ~6\)  will spawn smaller and hence look smaller. I will remove these when evaluating the policies.
 
-I have not figured out the reasoning for this, it has happened before and no effort to fix this issue as resolved, I speculate that it is an issue with how I control the sizes of targets. The target size is set during the start of an episode, so this means the \verb|Environment| object from PyRep must be either initialising an episode wrong from the way it is saved. This was not an isolated accident with the saved demos, it would happen every once in a while, which means that the issue must have happened during saving the smaller demos. Because the problem is consistently repeated. This should not affect the training, as this set was confirmed to spawn correctly. The evaluation of the results will have to take care of this fact.
-
+I have not figured out the reasoning for this, it seems to randomly happen, I speculate that it is an issue with how I control the sizes of targets. The target size is set during the start of an episode, so this means the \verb|Environment| object from PyRep must have initialised it wrong when the demos were being saved. This is not an isolated incident and sometimes happens while resetting the environment. However, the ideal part is if it is encoded in the saved demos, it is at least controlled. The \textbf{smaller} training set is confirmed to spawn correctly. The evaluation of the results will consider this.
 
 \subsection{Carrying the Target - \textbf{Grasp\_ThenMove}}\todo{havent run this yet, might remove it depending on what I will do today}
 
-\section{Evaluated Configurations}\todo{not sure about this maybe talk about these per task down the line}
+\section{Training Parameters}
+Most policies were trained using the configuration in Table \ref{tab:eval-training-params}. Any other setting that was enabled will be discussed in their respective sections. The \emph{italics} are variables that are inserted during  the test. The \emph{SEED} was locked to \( \left[ 3790, ~1901, ~4248, ~6689, ~7653 \right] \) which was a randomly generated set. The \emph{Epochs} was a variable range depending on the test and policy type.
+
+\begin{table}[ht]
+\centering
+  \begin{tabular}{|| c | c ||}
+  \hline
+  Parameter & Value \\
+  \hline
+  minibatch\_size & 10 \\
+  lr & $1\times 10^{-3}$ \\
+  shuffle\_data & \texttt{True} \\
+  dataset\_to\_use & \texttt{demo} \\
+  epochs & \emph{Epochs} \\
+  lock\_loader\_seed & \emph{SEED} \\
+  \hline
+  \end{tabular}\caption{Default Training parameters}\label{tab:eval-training-params}
+\end{table}

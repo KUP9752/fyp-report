@@ -5,15 +5,19 @@ Here I will evaluate:
   \item Compare the proposed active vision approaches to non-active systems from before
 \end{enumerate}\todo{split later if needed}
 
+% Setuo
 \input{evaluation/eval-setup.tex}
 
+% Naive Cam-Attention (from reach-obs)
+\input{evaluation/cam-attn.tex}
 
-\section{Results}\todo{remove}
+\section{Multi-Modal Results}
+
   \input{evaluation/baseline.tex}
 
-  \input{evaluation/cam-attn.tex}
-
   \input{evaluation/film-eval.tex}
+
+  
 
 \subsection{ResNet}
 I decided with various sizes of ResNet systems\todo[color=green]{reference}. Essentially replacing my feature extraction block with modified versions of \emph{resnet18, resnet34, and resnet50} \todo[color=green]{maybe not mention all, afterall the large ones will be ass when the image is so small}.

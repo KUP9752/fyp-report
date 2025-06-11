@@ -1,11 +1,10 @@
 \subsection{Baseline - Naive Modality Concatenation}
 This will be the baseline to compare the rest of the data. A hard set hyperparameter is the encoding CNN, for which the code can be found here \todo[color=green]{appendix code}. The layers of which are set to $\left[32, ~48, ~64, ~128\right]$ and the final encoding is of shape \(\langle 128, ~2, ~2 \rangle\).
 
-\subsubsection{Grasp}
-The metric used to evaluate the quality of grasp will include a combination of task success and final reached distance. This is because in the depth interfacing grasp task, we want to firstly see ``how close can a trained policy get if tested on the same sizes targets as training'' and ``how close can it get if tested on targets of different size''
+\subsubsection{Grasp - Normal}
+Firstly, I trained the policy with \textbf{normal} sizes. Looking at \ref{fig:base-grasp-final-normal}, it is clear that the `test' cases don't work very well. Surprisingly, the left and right shoulder combination is not amazing at this task. This is likely due to the distance of the shoulder cameras. The smaller target appears even smaller from further away, and likely harder to understand where it is. 
 
-
-Firstly, I trained the policy with \textbf{normal} sizes, meaning the \emph{scale} of the target is set to $1$. And trained on \textbf{smaller} targets, $\text{scale} =  0.5$. Looking at \ref{fig:base-grasp-final-normal}, it is clear that the test cases don't work very well. Surprisingly, the left and right shoulder combination is not amazing at this task. This is likely due to the distance  of the shoulder cameras. The smaller target appears even smaller from further away, and likely harder to understand where it is. Otherwise the system was mostly consistent, reaching around $8$ to $10$ centimeters from the target, which is close but very good. Which can be confirmed by looking at the success rates. Task is successful when the grippers grab the cube. The task does not have a singular success recorded for `test'. And `control' lingers around the average $13$\% rate per seed. This is unexpectedly low. Earlier grasping experiments conducted during development, namely in Section \ref{sec:grasping-tasks}, had higher success. However, this task is inherently harder due to the randomness. Therefore, I believe the grasping mechanisms might not be learning well enough in this version of the task. If, this is a trend, and not the baseline's fault, I might have to investigate why deeper.\todo{is it baselines fault,  (i dont think so)}
+Otherwise the system was mostly consistent, reaching around $8$ to $10$ centimeters from the target, which is close but not very good. Which can be confirmed by looking at the success rates. The task does not have a singular success recorded for `test'. And `control' lingers around the average $13$\% rate per seed. This is unexpectedly low. Earlier grasping experiments conducted during development, namely in Section \ref{sec:grasping-tasks}, had higher success. However, this task is inherently harder due to the randomness. Therefore, I believe the grasping mechanisms might not be learning well enough in this version of the task. If, this is a trend, and not the baseline's fault, I might have to investigate why deeper.\todo{is it baselines fault,  (i dont think so)}
 
 \begin{figure}[htpb]
   \centering
@@ -15,12 +14,12 @@ Firstly, I trained the policy with \textbf{normal} sizes, meaning the \emph{scal
 
 \begin{figure}[htpb]
   \centering
-  \includegraphics[width=0.6\linewidth]{assets/evaluation/baseline/base-grasp-control-success-cams-epochs.png}
+  \includegraphics[scale = 0.3]{assets/evaluation/baseline/base-grasp-control-success-cams-epochs.png}
   \caption{Success Rate (\%) of task per cam type over epochs}\label{fig:base-grasp-control-success-normal}
 \end{figure}
-The `test' counterpart had no successes.
 
-Secondly, I flipped the parameters, trained on \textbf{smaller} and tested on \textbf{normal}. I have pruned the wrong test demos from the results, so there are only $7$ control checks and $10$ test checks. Looking at Figure \ref{fig:base-grasp-final-smaller}, We can see similar trends in the control being learnt better. This is expected due to the training set aligning better with the control set of checks. However, unlike the earlier graph, the agent learns to get closer to the target, especially using just the wrist RGB camera. `Test' again performs comparably worse, however, interestingly this performs as well as `control' from Figure \ref{fig:base-grasp-final-normal}, check the scale differences in graphs. 
+\subsubsection{Grasp - Smaller}
+Secondly, I flipped the parameters, trained on \textbf{smaller} and tested on \textbf{normal}. I have pruned the wrong test demos from the results, so there are only $7$ control `checks' and $10$ `test' checks. Looking at Figure \ref{fig:base-grasp-final-smaller}, We can see similar trends in the control being learnt better. This is expected due to the training set aligning better with the control set of checks. However, unlike the earlier graph, the agent learns to get closer to the target, especially using just the wrist RGB camera. `Test' again performs comparably worse, however, interestingly this performs as well as `control' from Figure \ref{fig:base-grasp-final-normal}, check the scale differences in graphs. 
 
 Disappointingly, the success is even worse. Figure \ref{fig:base-grasp-success-smaller}, has the correct scales! This means that there are rarely any successes across epochs and seeds for either check. Meaning the plateau from the `control' final distances in \ref{fig:base-grasp-final-smaller}, must have been the agent smashing into the cube as there is no success for wrist RGB in that epoch range. \todo{put data from the grasping pics, this might be interesting here}
 
