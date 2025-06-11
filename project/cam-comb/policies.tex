@@ -1,10 +1,5 @@
 \section{Multi-Modal Policies}
 
-\subsection{Deeper/Better Feature Understanding - ResNets}\todo[color=red]{REMOVE}
-First part of any policy is extracting features from the available views. Experimentation up to this point was using a bespoke CNN architecture. However, I wanted to check if an off-the-shelf model would be able to extract more informative features. On top of extraction the residual connections the skip connections will help retain some vanishing features into later layers, and will allow them to not disappear. And another possible advantage is to initialise pre-trained weights on this network, then tune on my own data, to keep the training at a minimum.
-
-I had to slightly modify how a pre-determined resnet is configured, as the resolution of my images are quite low the original kernel size, which is $7$, I decided to drop this to $5$, and amend some of the following blocks accordingly. Mainly because a low-level feature at that size is quite large for my resolution and initial experiments seemed to favour a smaller kernel size.
-
 \subsection{Feature Level Fusion}\todo{really long intro, consolidate}
 On top of just naively combining views (or modalities) and expecting the policy to understand what it means to `see' is a tall order. 
 
