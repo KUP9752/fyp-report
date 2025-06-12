@@ -12,9 +12,7 @@ An essential process when using a camera is calibration. This is required so tha
 While calibrating we need to have some idea of physical properties of the camera (\emph{intrinsic}) and information about the mappings of the scene (\emph{extrinsic}).
 
 \subsubsection{Intrinsic Parameters}\label{sec:intrinsic}
-
-These cover the internal characteristics of the camera, and how the captured three dimensional (3D) world data will be projected down onto the two dimensional (2D) image plane.
-Some important parameters are:
+These cover the internal characteristics of the camera, and how the captured three dimensional (3D) world data will be projected down onto the two dimensional (2D) image plane. Some important parameters are:
 
 \begin{itemize}
   \item \textbf{Focal Length ($f$):} The distance netween the camera lens and the image sensor. Determines field of view (FOV) and required for scaling the scene.
@@ -24,40 +22,31 @@ Some important parameters are:
 \end{itemize}
 
 \subsubsection{Extrinsic Parameters}
-Extrinsic parameters represent the physical placement of the camera in the scenes. Such as the position and orientation of the camera in the scene. Using these values we can map  3D representation of the world the camera sees (which is in world coordinates) into the camera coordinate system.
-\\\\
-The mapping of parameters to the camera view is shown in Figure \ref{fig:in-extrinsic}.
+Extrinsic parameters represent the physical placement of the camera in the scenes. Such as the position and orientation of the camera in the scene. Using these values we can map  3D representation of the world the camera sees (which is in world coordinates) into the camera coordinate system. The mapping of parameters to the camera view is shown in Figure \ref{fig:in-extrinsic}.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.8\textwidth]{assets/background/in-extrinsic.png}
-  \caption{Intrinsic and extrinsic parameter mappings \cite{mphy0026camera}}\label{fig:in-extrinsic}
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/background/in-extrinsic.png}
+    \caption{Intrinsic and extrinsic parameter mappings \cite{mphy0026camera}}\label{fig:in-extrinsic}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/background/pinhole-cam.jpg}
+    \caption{Pinhole camera model \cite{solem2012programming}}\label{fig:pinhole}
+  \end{subfigure}
+  \caption{Camera Models}\label{fig:cam-models}
 \end{figure}
 
 \subsection {The Pin-Hole Camera}
 One of the most foundational and widely used models to describe this calibration is the \emph{pin-hole} (or the  \emph{projective}) camera model \cite{solem2012programming}. 
 
 \subsubsection{Mathematics Behind the Pin-Hole Model}
-The light passes through a single point, called the camera centre, $C$, before it is projected onto the 2D image plane (giving the name pin-hole). 
-
-
-A 3D point $\textbf{X}$ is projected onto image point $\textbf{x}$ using the equation:
-\[\lambda \textbf{x} = P\textbf{X}\]
-where $P$ is the a 3x4 matrix called the camera (or \emph{projection}) matrix and $\textbf{X}$ is 1x4 and has four elements in homogenous coordinates, \(\textbf{X} = [x, y, z, w]\) and $\lambda$ is the inverse depth of the 3D point. Which can be needed if we want all coordinates to be homogenous with the last value ($w$) normalised to $1$.
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.4\textwidth]{assets/background/pinhole-cam.jpg}
-  \caption{Pinhole camera model \cite{solem2012programming}}\label{fig:pinhole}
-\end{figure}
-
-The Camera Matrix, P can will all calibration values for the camera. so:
-\[P = K \left[R \mid t\right] \]
-
-\todo[color=green]{make a better image for final}
-
-R is the (3x3) rotational matrix describing the orientation of the camera, and t a (3x1) translational vector describing the position of C.
-Also the intrinsic calibration matrix, K, will encode camera attributes discussed above.
+The light passes through a single point, called the camera centre, $C$, before it is projected onto the 2D image plane (giving the name pin-hole). A 3D point $\textbf{X}$ is projected onto image point $\textbf{x}$ using the equation:
+\(\lambda \textbf{x} = P\textbf{X}\). where $P$ is the a 3x4 matrix called the camera (or \emph{projection}) matrix and $\textbf{X}$ is 1x4 and has four elements in homogenous coordinates, \(\textbf{X} = [x, y, z, w]\) and $\lambda$ is the inverse depth of the 3D point. Which can be needed if we want all coordinates to be homogenous with the last value ($w$) normalised to $1$.
+The Camera Matrix, P can will all calibration values for the camera. So: \(P = K \left[R \mid t\right] \), $R$ is the ($3 \times 3$) rotational matrix describing the orientation of the camera, and t a ($3 \times 1$) translational vector describing the position of C.Also the intrinsic calibration matrix, K, will encode camera attributes discussed above.
 \[
   K = 
   \begin{bmatrix}
@@ -69,15 +58,9 @@ Also the intrinsic calibration matrix, K, will encode camera attributes discusse
   f_x = \alpha f_y
 \]
 
-Where the values are from \ref{sec:intrinsic} and $\alpha$ is the aspect ratio used for non-square pixel elements (usually safe to assume $a=1$).
-
-A simple calibration method is to use a reference object, with known dimensions $dX and dY$. Then we can measure the distance from the camera to the object $dZ$. After obtaining the image we can measure the image plane size of our object $dx, dy$ in pixels and extract the focal point as:
-
-\[ 
+Where the values are from \ref{sec:intrinsic} and $\alpha$ is the aspect ratio used for non-square pixel elements (usually safe to assume $a=1$). A simple calibration method is to use a reference object, with known dimensions $dX and dY$. Then we can measure the distance from the camera to the object $dZ$. After obtaining the image we can measure the image plane size of our object $dx, dy$ in pixels and extract the focal point as: \(
   f_x = \frac{dx}{dX} dZ , \hspace{1cm} f_y = \frac{dy}{dY}dZ
-  \]
-  
-Or we can use a calibration image to project and use that for calibration, see Figure \ref{fig:calin-dots}
+  \)Or we can use a calibration image to project and use that for calibration, see Figure \ref{fig:calin-dots}
 
   \begin{figure}[h]
     \centering
@@ -142,7 +125,7 @@ Therefore, choice of camera model significantly affects how a robot can perceive
 
       \begin{figure}[h]
         \centering
-        \includegraphics[width=0.9\textwidth]{assets/background/occlusion.png}
+        \includegraphics[width=0.7\textwidth]{assets/background/occlusion.png}
         \caption{Example of an occluded object \cite{occlusionimage}}\label{fig:occlusion}
       \end{figure}
       \todo[color=green]{better image}

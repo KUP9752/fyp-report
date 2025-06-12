@@ -35,7 +35,7 @@ This mimics exploration-based RL learning systems where given a list of trajecto
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{assets/rel-work/augmentation-miles.png}
+  \includegraphics[width=0.7\linewidth]{assets/rel-work/augmentation-miles.png}
   \caption{Process of creating augmented training data \cite{papagiannis2024milesmakingimitationlearning}}\label{fig:aug-miles}
 \end{figure}
 
@@ -56,16 +56,14 @@ Taking a third-person-view look to the classical grasping task, \emph{Wang et al
 They, again, follow a few-shot learning approach. The model comprises of two separate agents, a next-best-view (NBV) agent for optimal viewpoints and next-best-pose (NBP) for determining the gripper's action based on the previous agent's output. Active perceptions is achieved by alternating between sensor and motor action interfaces in each episode; which then leads to the learning of the tasks. These tasks are usually of sequential nature as the asynchronous approach works best with such systems, as they discuss.
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.7\textwidth]{assets/rel-work/ota-asynch-policy.png}
+  \includegraphics[width=0.5\textwidth]{assets/rel-work/ota-asynch-policy.png}
   \caption{Comparison of regular RL and asynchronous active vision-action decision processes \cite{wang2024observeactasynchronousactive}}\label{fig:oat-neurons}
 \end{figure}
 
 They follow a POMDP (\ref{sec:pomdp}) formulation to model the problem:
-\[
+\(
   \langle \mathcal{O}, \mathcal{A}^c, P, \mathcal{A}^g, \mathcal{O}', P', R, \gamma \rangle
-\]
-
-where $\mathcal{O}$ and $\mathcal{O}'$ represent the observation spaces at times $t$ and $t'$ the NBV policy $\pi_v$, determines the camera viewpoint action $a_t^c \in \mathcal{A}^c$, given an observation $o_t \in \mathcal{O}$, and obtains a new observation $o_{t'} \in \mathcal{O}'$ through the transition probability $p\left(o_{t'} \mid o_t, a_t^c\right) \in P$. Finally, the NBP policy, $\pi_g$, then determines the gripper action $a^g_{t'} \in \mathcal{A}^g$ based on the new observation $o_{t'}$. then using the transition probability $p'\left(o_{t+1} \mid o_t, a^c_t\right) \in P'$ the next scene observation can be obtained and reward $r_{t+1} \in R$ will be provided. So, the model will be learning these policies: $\pi^*_v$ and $\pi^*_g$ then try to jointly maximise the return for the joint reward for this collective task: 
+\) where $\mathcal{O}$ and $\mathcal{O}'$ represent the observation spaces at times $t$ and $t'$ the NBV policy $\pi_v$, determines the camera viewpoint action $a_t^c \in \mathcal{A}^c$, given an observation $o_t \in \mathcal{O}$, and obtains a new observation $o_{t'} \in \mathcal{O}'$ through the transition probability $p\left(o_{t'} \mid o_t, a_t^c\right) \in P$. Finally, the NBP policy, $\pi_g$, then determines the gripper action $a^g_{t'} \in \mathcal{A}^g$ based on the new observation $o_{t'}$. then using the transition probability $p'\left(o_{t+1} \mid o_t, a^c_t\right) \in P'$ the next scene observation can be obtained and reward $r_{t+1} \in R$ will be provided. So, the model will be learning these policies: $\pi^*_v$ and $\pi^*_g$ then try to jointly maximise the return for the joint reward for this collective task: 
 \[
   \pi_v^*, \pi_g^* = 
   arg~\underset{\pi_v, \pi_g}{max} 
@@ -84,7 +82,7 @@ The information gain metric, allows the system to explore viewpoints in the neig
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.9\textwidth]{assets/rel-work/target-grasp.png}
+  \includegraphics[width=0.6\textwidth]{assets/rel-work/target-grasp.png}
   \caption{How the gripper perceives and finds best poses using object bounding box priors \cite{breyer2022closedloopnextbestviewplanningtargetdriven}}\label{fig:closedloop}
 \end{figure}
 \todo[color=green]{make a better image for final}

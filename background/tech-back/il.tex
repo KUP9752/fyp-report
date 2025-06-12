@@ -1,11 +1,6 @@
 \section{Imitation Learning (IL)}\label{sec:il}
-  While traditional Reinforcement learning models focus on interactions with the environment to optimise a reward signal to find an optimal policy, these can be sample inefficient, or very challenging in high-dimensional tasks. So, another approach we can take in teaching robots is Imitation Learning (IL) where an agent learns directly from expert demonstrations \cite{attia2018globaloverviewimitationlearning}, potentially bypassing the need of extensive exploration such an adjacent RL system would need.
-
-  Imitation Learning, or as some literature refers: \emph{Learning from Demonstrations (LfD)}\cite{ARGALL2009469}; is a form of \emph{Supervised Learning} \cite{hastie2009overview,cunningham2008supervised}, where the model is presented with labelled expert demonstrations and a model is learnt from those.
-  
-  The roots of this idea comes from humans and animals \cite{bakker1996robot} learning from observations to copy movements from carers \emph{(supervisors)} for survival This approach is beneficial for systems where the exploration of the action space is dangerous, expensive or inefficient.\todo{examples?, autonomous driving, healthcaare applications, robot manipulation ... }
-
-  We can broadly classify IL into two main categories, \textbf{Behavioural Cloning} and \textbf{Inverse Reinforcement Learning} each addressing the challenge of learning from demonstration slightly differently.
+  While traditional Reinforcement learning models focus on interactions with the environment to optimise a reward signal to find an optimal policy, these can be sample inefficient, or very challenging in high-dimensional tasks. So, another approach we can take in teaching robots is Imitation Learning (IL) where an agent learns directly from expert demonstrations \cite{attia2018globaloverviewimitationlearning}, potentially bypassing the need of extensive exploration such an adjacent RL system would need. Imitation Learning, or as some literature refers: \emph{Learning from Demonstrations (LfD)} \cite{ARGALL2009469}; is a form of \emph{Supervised Learning} \cite{hastie2009overview,cunningham2008supervised}, where the model is presented with labelled expert demonstrations and a model is learnt from those.
+  The roots of this idea comes from humans and animals \cite{bakker1996robot} learning from observations to copy movements from carers \emph{(supervisors)} for survival This approach is beneficial for systems where the exploration of the action space is dangerous, expensive or inefficient. We can broadly classify IL into two main categories, \textbf{Behavioural Cloning} and \textbf{Inverse Reinforcement Learning} each addressing the challenge of learning from demonstration slightly differently.
 
 
 \subsection{Behavioural Cloning (BC)}\label{sec:bc}
@@ -13,71 +8,34 @@
  Then using supervised learning methods and treating the demonstrations as the training data we can predict a policy $\pi_\theta\left(a | s\right)$ along with a loss function $L \left( a_i^*, \pi_\theta\left(s_i^*\right) \right)$. The loss function is typically Mean-Squared Loss (MSE) for continuous and Cross-Entropy for discrete actions.
 
  However, one big downside of this method is that the demonstrations are heavily coupled to the model, meaning slight deviations from the given behaviour in the learnt optimal policy might lead the agent into unfamiliar states. Which then can lead to compounding errors known as covariate shift, and should be controlled for stability of learning \cite{mehta2024stablebccontrollingcovariateshift}. 
- \label{para:covariate-shift}
+ \label{para:covariate-shift}. Another issue a method like this faces is the adaptation problem. The model does not understand but copies. So, without shaped-rewards (like RL) and dubious quality demonstrations, the agent might not be very capable.
  
- Another issue a method like this faces is the adaptation problem. The model will not adapt to its environment but solely copy behaviour. As there is no reward signal optimise for, this means that unlike RL approaches, it cannot adapt to the environment. Adding on, if the \emph{expert} demonstrations are of low quality or have mistakes, the agent might learn these mistakes as a part of its policy, and never be able to correct itself due to the missing context.
-
-
 \subsection{Inverse Reinforcement Learning (IRL)}
-Building on top of mimicking action, Inverse Reinforcement Learning (IRL) aims to recover the underlying reward function that the expert is unknowingly optimising for in the demonstrations. So once the reward function is learnt, the agent can optimise for it and derive the required optimal policy for the task.
+As before in \ref{sec:bc}, this method will be provided the expert demonstrations $\tau^*$. Although, this time the model will assume the expert is acting according to some unknown reward function $R\left(s, a\right)$. And differently to BC, IRL methods aim to estimate this reward function which can later be used to derive the optimal policy. Allowing RL approaches to apply to a broader set of problems.
 
- 
-As before in \ref{sec:bc}, this method will be provided the expert demonstrations $\tau^*$. Although, this time the model will assume the expert is acting according to some unknown reward function $R\left(s, a\right)$. And differently to BC, IRL methods aim to estimate this reward function which can later be used to derive the optimal policy. An general example framework is GAIL (Generative Adversarial Imitation Learning) \ref{sec:gail}.
+This also allows policies to be agent agnostic (to the extend of simulation training applying to the real world, though with caveats) as the reward function is more transferrable compared to the optimal policy \cite{russell1998learning}.
 
-IRL mainly allows the RL methods from earlier to apply to a broader set of problems, where it would be hard to generalise a reward function but demonstrations are available (e.g. in the form of recordings) or easy to create demonstrations compared to manually architecting a reward function \cite{ARORA2021103500}. This also allows policies to be agent agnostic (to the extend of simulation training applying to the real world, though with caveats) as the reward function is more transferrable compared to the optimal policy \cite{russell1998learning}.
+And an interesting side product is the reward function that the model learns. It can be extracted for downstream applications. While being more tolerant and robust to faulty demonstrations due to errors being -ideally- outliers in the data and the predicted reward can correctly discourage such actions. 
 
-And an interesting side product is the reward function that the model predicts and/or learns, is that it can be extracted for use in other applications unlike BC. While being more tolerant and robust to faulty demonstrations due to errors being -ideally- outliers in the data and the predicted reward can correctly discourage such actions. Although, as with BC, IRL is also sensitive to the correctness of prior knowledge and demonstrations.
-
-However, there are also drawbacks. One of the most prominent being the solution complexity disproportionately grows compared to the problem size \cite{ARORA2021103500}. each iteration is dominated by the complexity of solving the underlying MDP with the currently learnt reward function, which is polynomial in size of its parameters. Which are exponential in the number of dimensions of the state vector. On top of this as the problem size increases the sample complexity must also increase, meaning the expert should cover more trajectories in the training set for sufficient coverage of the state space and the optimal prediction of the underlying reward. Also, it is hard to verify an IRL policy, this is because even if we have the correct model architecture with the rewards, and optimal policy; the model might learn it slightly differently which might lead to wild changes inn its output, making it difficult to evaluate.
+However, demonstration quality sensitivity is still present. As well as the solution complexity disproportionately grows compared to the problem size \cite{ARORA2021103500}. Each iteration is dominated by the complexity of solving the underlying MDP with the currently learnt reward function, which is polynomial in size of its parameters. Which are exponential in the number of dimensions of the state vector. On top of this as the problem size increases the sample complexity must also increase, meaning the expert should cover more trajectories in the training set for sufficient coverage of the state space and the optimal prediction of the underlying reward. And finally, verifying that correct reward is predicted is hard as it is inherently variable what is learnt.
 
 
 \section{Demonstration Quality and Abundance}
-
 A unique challenge of learning from demonstrations is that the quality of the provided information should be good, in terms of achieving optimal solutions, so then an agent can also infer the optimal policy. But also, there should be enough demonstrations so that the agent can generalise to more scenarios.
 
 \subsubsection{Few-Shot Learning}\label{sec:few-shot}
-This paradigm allows models to generalise behaviours from a limited number of demonstrations. This is done to overcome the problem of having to provide large collections of manually curated or at least verified data \cite{fewshotsurvey}. A usual approach is to use generative models (see \ref{sec:gail}) to create more data from the distributions of the data available. Main reason is to mitigate issues such as covariate shifts in the sampled data.
+This paradigm allows models to generalise behaviours from a limited number of demonstrations. This is done to overcome the problem of having to provide large collections of manually curated or at least verified data \cite{fewshotsurvey}. A usual approach is to use generative models (see \ref{sec:gail}) to create more data from the distributions of the data available. Main reason is to mitigate issues such as covariate shifts in the sampled data. An extreme end of this paradigm is \emph{one-shot} learning (such as \cite{vitiello2023one}) where the learning must be done on a single demonstration.
 
-An extreme end of this paradigm is \emph{one-shot} learning (such as \cite{vitiello2023one}) where the learning must be done on a single demonstration.
+\section{Imitation or Reinforcement? - Hybrid Approaches}
 
-\section{Imitation or Reinforcement?}
-As explored until here, both of these learning system break into multiple branches within themselves and have differing qualities which must be matched with the task to perform the learning as efficiently and optimally as possible. Here is the highlighted strengths and use cases:
-
-% make "h!" if this causes issues
-% //NOTE: table can be reintroduced, doesn't add much tho
-% \begin{table}[h!]
-%   \centering
-%     \begin{tabularx}{\textwidth}{|X|X|}
-%     \hline
-%     \textbf{Reinforcement Learning} & \textbf{Imitation Learning} \\
-%     \hline
-%     Interacts with real environment & Quicker learning with expert demonstrations \\
-%     Suitable for autonomous exploration tasks & No need to design a reward function \\
-%     Can be unstable or slow to converge & Limited by quality of expert data \\
-%     Adaptable to diverse tasks & Possibility of bad generalisations with unseen data, constrained to experts' guidance \\
-%     \hline
-%     \end{tabularx}
-% \end{table}
-
-Therefore, while they each offer unique advantages, they also come with their own limitations. While RL allows for breadth in exploration of the problem, IL allows speedy learning but is coupled critically to the quality and quantity or those demonstrations. 
-
-However, there are mixed approaches aiming to combing the strengths of these methods while aiming to mitigate some of their individual weaknesses.
-\todo[color=green]{check! is IRL a hybrid approach?}
-
-\subsection{Hybrid Approaches}
-
-
-\subsubsection{Offline Reinforcement Learning}
+\subsection{Offline Reinforcement Learning}
 This ideas extends the \emph{data-driven} paradigm of IL and composes it with traditional RL approaches. As opposed to Online Reinforcement Learning, which iteratively collects experience and interacts with a given environment which is then used to improve the policy for the next episodes of iteration. This can be impractical due to data collection being costly (e.g. in robotics and healthcare domains) and sometimes dangerous (like autonomous driving). 
 
 So offline RL, relies on previously collected data instead of fresh environmental interaction \cite{levine2020offlinereinforcementlearningtutorial}. With help from advancements in deep learning, it has been made possible to create generalisable \emph{decision making engines} \cite{levine2020offlinereinforcementlearningtutorial} if sufficient prior data can be obtained.
 
-\subsubsection{Fighting Distributional Shifts: DAgger}
+\subsection{Fighting Distributional Shifts: DAgger}
 Another interesting solution to the problem mentioned above \ref{para:covariate-shift} is the Dataset Aggregation (DAgger) \cite{ross2011reductionimitationlearningstructured}. This is used to fight distribution shifts in standard BC \ref{sec:bc}. A policy is trained on expert demonstrations by because of the shift, there may be non-encountered states during deployment. So, DAgger iteratively collects new data; this new data, in the form or state-action pairs gets added to the training and gradually improves robustness of a policy against novel situations. Although, the constant expert supervision, while generating new data makes it costly for real-world applications; or where a algorithmic reward system is not in place.
 
-\subsubsection{Generative Adversarial Imitation Learning (GAIL)}\label{sec:gail}
+\subsection{Generative Adversarial Imitation Learning (GAIL)}\label{sec:gail}
 
 GAIL \cite{ho2016generativeadversarialimitationlearning}  takes inspiration form Generative Adversarial Networks (GANs) \cite{goodfellow2014generativeadversarialnetworks} and can create model-free algorithms for IL in robots. GANs are deep learning models for generative tasks, they are mainly given a distribution of data and can generate synthetic data from following that distribution. For IL, they are useful for creating useful samples for self-supervision.
-
-% \subsubsection{Deep Q Learning from Demonstrations (DQLfD)}
-% \todo{not sure, remove?}
