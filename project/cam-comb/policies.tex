@@ -10,7 +10,7 @@ The step after extracting representation is to learn how we can make the most of
 
 So, after extracting features from available sensors. Using multiple feature extractors means that these features will need to be merged before making a final decision on movement.
 
-If these extracted features can be thought of as encoded information, as with latent models, multiple extractors will lead to to many encodings. So, the next challenge becomes merging; and not just how but when to merge features from one view to another. I will explain their potential positives and investigate the consequences of each.\todo[color=green]{this might be a good segue or part in presentation}
+If these extracted features can be thought of as encoded information, as with latent models, multiple extractors will lead to to many encodings. So, the next challenge becomes merging; and not just how but when to merge features from one view to another. I will explain their potential positives and investigate the consequences of each.\todo[color=purple]{this might be a good segue or part in presentation}
 
 \subsubsection{Early Fusion}
 Fuse different modalities into a single input and run through the encoding model. This usually involves combining the raw data sources. Before any information is extracted or the data is modelled in any way.
@@ -35,7 +35,7 @@ An example of early fusion, this is the naive method of just stacking the views 
 
 Firstly, for the RGB cameras, there is definite misalignment, all these cameras have different poses and will disagree on what they see. Leading to features not lining up, leaving us with a non-optimal and more importantly a brittle\todo{explain brittle? or does the next senetence take care of it} policy. This could lead to unintended coupling of information which can lead to the agent making wrong choices during inference when the same views don't necessarily align during rollout.\todo{simple diagram of overlaid squares (arrow) model (arrow) representation} This will act as a baseline to compare other fusion strategies.
 
-\subsection{Understadning Depth Separately}\label{subsec:policies-understand-depth-sep}
+\subsection{Understanding Depth Separately}\label{subsec:policies-understand-depth-sep}
 RGB provides a denser representation of the system and in a configuration with multiple RGB views the depth information may be drowned out. Therefore, an important first step was to learn the depth features separately and then make them influence the action. The idea here is to have a RGB encoder and a separate Depth encoder CNNs, then learn the best way to merge this data together. I propose three different methods to do this:
 
 \begin{itemize}
@@ -46,57 +46,62 @@ RGB provides a denser representation of the system and in a configuration with m
 \end{itemize}
 Which are ultimately decoded into an \emph{action}, $\hat{A}$.
 
-\subsection{Feature-wise Linear Modulation}\label{subsec:policies-film}\todo{ref this paper arxiv1709.07871}
+\subsection{Feature-wise Linear Modulation}\label{subsec:policies-film}
 To take a step back from all the excessive RGB data. I wanted to understand how modulating similar views with each other to understand similar observations from each other's perspective. Allowing the network to learn and discover its own trends is a fine task, however, implicitly injecting cues from modality into another will, in theory, allow the learning to be more efficient.
 
-
-A light-weight and quick way to bias network parameters with conditional data is Feature-wise Linear Modulation (FiLM).\todo{ref} 
-A FiLM network learns to adaptively influence the weights of another neural network by learning $f_c$ and $h_c$ as functions on the conditional input $\mathbf{x}_i$. So:
+A light-weight and quick way to bias network parameters with conditional data is Feature-wise Linear Modulation (FiLM) \cite{perez2017film}. A FiLM network learns to adaptively influence the weights of another neural network by learning $f_c$ and $h_c$ as functions on the conditional input $\mathbf{x}_i$. So:
 
 \[
 \text{FiLM} = \left( \mathbf{F}_{i, c} | \gamma_{i, c}, ~\beta_{i, c} \right) = \gamma_{i, c}\mathbf{F}_{i, c} + \beta_{i, c} \qquad  \gamma_{i, c} = f_c\left(\mathbf{x}_i \right), \beta_{i, c} = h_c \left( \mathbf {x}_i \right)
 \]
-My implementation involves \todo[color=green]{appendix link} creating a simple linear network to generate the two parameters. The singular linear network means the parameters will have shared weights, which makes sense as the modulation is being condition on a single view, and hence a dependence connection. I also initialise this network to be the identity modulation, meaning \(\gamma = 1 ~\text{and} ~\beta = 0\). \todo{why, not sure?}
+My implementation involves creating a simple linear network to generate the two parameters. So, my implementation of \(\phi\left(\mathbf{X}, \mathbf{Z}\right) = f\left(\mathbf{Z}\right)\mathbf{X} + h\left(Z\right)\) where $\mathbf{Z}$ is the modulator/condition, and $\mathbf{X}$ is the modulated modality. I defined $f$ and $h$ to be the two chunked parts of a linear network module, this means the parameters will have shared weights, which makes sense as the modulation is being conditioned on a single view, and hence a dependence between its scale and bias is expected. The 2D data is projected then pooled to handle the transitions between the dimensional differences.
 
-Another inherent benefit is the network can be kept at a minimal size. And finally, a FiLM module can be plugged in at multiple different places in the network at different scales. \todo{explain more maybe}
+I also initialise this network to be the identity modulation, meaning \(\gamma = 1 ~\text{and} ~\beta = 0\). This is helpful because it will stabilise the learning. Starting off with no modulation, it will respect the already aligned wrist and depth data. Then during training these cross-modal features will slowly fuse. And more importantly random a random initial bias might add suboptimal premature bias. Another inherent benefit is the network can be kept at a minimal size. This is one of the reasons to settle on a simple FiLM module compared to the likes of for example a cross-attention module as before. 
 
-I created 3 different modulation configurations: wrist RBG modulated with wrist depth\todo{diagram}, depth modulated wrist RGB\todo{diagram}, and both modulated with each other\todo{diagram}. 
+I created 3 different modulation configurations: wrist RBG modulated with wrist depth\todo{diagram}, depth modulated wrist RGB\todo{diagram}, and both modulated with each other\todo{diagram}. Where the modulated features act as the latent encoding, which can be used to predict an action as before.
 
-Where the modulated features act as the latent encoding, which can be used to predict an action On top of the three configurations, I also FiLMed at different depths: early FiLM, where feature shapes are matched then modulated leading to a coarser scale modulation; also a finer version where the order of down-sampled learning and modulation are swapped.\todo{explain better maybe}
+A final positive, is that a FiLM module can be plugged in at multiple different places in the network at different scales. This allows for fine-tuning in when to modulate. For example, modulate on the raw inputs, run a cnn extract some high level features and modulate then, or wait to modulate later. As the resolution of my sensors is not too large I decided to do two configurations: early FiLM, where feature shapes are matched then modulated leading to a coarser scale modulation; also a finer version where the order of down-sampled learning and modulation are swapped, so modulations is done on the learnt representation of RGB and depth values.\todo{diagrams here}
 
 
-\subsection{Derivative Methods}
+\subsection{Derivative Methods}\label{subsec:derivative-methods}
 The final propositions include 4-way fusion models that take into account ideas from earlier.
 \begin{itemize}
   \item Fully separated feature extractors, all concatenated before action prediction \todo{add figure}
   \item Pairwise FiLM between all modalities: wrist RGB and w Depth, then Left Shoulder RGB and Right Shoulder RGB; then concatenated before action prediction\todo{figre}
   \item Finally 4-way multi-modal cross-attention. \todo{add math and figure if needed}
 \end{itemize}
+These are all derived from the previous sections, and extending these ideas to all the sensors. Separating, all feature extractors allows us to learn representation for each, however it will place a lot of learning strain on the later decoder to give us a valid action. 
+
+FiLM modules in theory are should be better at aligning already agreeable data, however would it be valid modulate the shoulders to each other and then to the modulated output of the wrist. This was mostly a curiosity, to see if there is a linear relationship that can be learnt between all the data streams.
+
+And finally, 4-way cross attention. This is quite a promising system. The main idea is to patch the image into parts, and then run them through a vision transformer (ViT) along with positional information to attend to features within their own representation and also to each other. Creating a feature encoding, capsulating the relationship between regions of the sensors as well as the other sensor. \todo{more math about the positional encodings here etc} This is separate fron the attention system in \ref{subsec:policies-understand-depth-sep}, however, this accepts and all modality combinations and will take care of that. Although, I arbitrarily decided it should have at least two views, otherwise it would only do self attention, which might be useful in training, however, not contributing anything into fusion.
 
 \subsection{Temporal Understanding of Demonstrations}
 The actions in my system are heavily dependent on the context of where the robot came from. And the demonstrations contain coherent and smooth trajectories. Although, I am preserving the sequential nature of the demos in training. There is no implicit underlying mechanism to enforce the agent will learn from this. Due to the partially observable setting of my system, and the robot not knowing any extra information about its state (model-free), it is important to be able to keep a historical understanding of what has happened, or what the agent believes is important for that moment in time.
 
 So, I incorporated recurrent models into the latent representation. This is so that the embedding of the current states will depend on a history of the earlier observations or states.
-\todo{justify the reason ther are 2 layers of the lstm}
 A pro of RNNs, compared making a bespoke sequential model is they are not length constrained \todo{was an earlier problem in 2d, maybe mention}. The sequences can be of any length which will help model the demos I have with varying episode lengths. Som compared to 3D CNNs \todo{ref}, which can also incorporate spatial and temporal information \todo{ref}
 
 
 Another theoretical advantage is that the long-term memory can be used to have a \todo{mamybe mention the remoark from the then move test, }
 
 \subsubsection{Latent RNN Encodings of Movement Steps}
-To encode timestep information into my already existing features, I added an Long-Short Term Memory (LSTM) network module near the end of the pipeline\todo{add figure}. Meaning the history will be kept in the latent space.
+To encode timestep information into my already existing features, I added an Long-Short Term Memory (LSTM), which is a type of Recurrent Neural Network (RNN) \todo{cite} network module near the end of the pipeline\todo{add figure}. Meaning the history will be kept in the latent space.
 
-So, this simple idea of introducing temporal noise into the decision process, should in theory allow for more concise predictions that are grounded in what the agent has observed so far.
+So, this simple idea of introducing temporal noise into the decision process, should in theory allow for more concise predictions that are grounded in what the agent has observed so far. I kept the design modular so that any flavour of feature fusion from above can then be fed through this RNN, allowing the encoding of latent fused embeddings to then be temporally learnt.
 
-\subsection{ViT Encodings}\todo{kind of dabled with this but will not be testing it}
+\subsection{ViT Time-Stamped Encodings}\todo{kind of dabled with this but will not be testing it}
 \todo[color=red]{not done much on this, but may be able to talk about how I would go about it or just remove}
+A similar idea to the RNN method above was to do a full vision transformer similar to \ref{subsec:derivative-methods}, but on top of positional encodings to denote the image patch, I was also going to encode temporal information of where in the sequence that frame came from. Following a very natural language processing (NLP) approach to transformers.\todo{ref here}
+
+\todo{talk about the implementation of this in math maybe a diagram}
 
 
 
 \subsection{Proprioception}\todo{maybe talk about why I left it out earlier in the chapter}
 Up until this point, I left proprioceptive data out of the training, mainly because I wanted to train on purely visual feedback to see what it could achieve without any other state information. Secondly, including state information about the robot, would not necessarily immediately help with the task learning. \todo{quick explanation of proprio data and maybe a diagram}
 
-To investigate I created a simple feature projection network. That takes in the $7$-dimensional joint position data and learns to project it to a higher dimension, to add to the extracted view features before the final movement decision. The main benefit of this, it gives us a modular system that can be attached to any of the other systems for quick testing.
+To investigate I created a simple feature projection network. That takes in the $7$-dimensional joint position data and learns to project it to a higher dimension, to add to the extracted view features before the final movement decision. The main benefit of this, it gives us a modular system that can be attached to any of the other systems for quick testing. As most parts of this system.
 
 \subsection{Numerical Foundations}\todo{talk about the general math, like what are the shapes of the data, what is the loss minimising-maximising, and notation}
 

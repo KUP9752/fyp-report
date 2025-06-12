@@ -1,9 +1,9 @@
-\section{First Approach: 3D Reasoning}
+\section{First Approach: 3D Reasoning}\label{sec:appl-1}
 A problem we have with RLBench demos is that the gripper does not understand to look at the target. Therefore, in an occluded scenario the system needs to actively search for poses to make the target most visible.
 
 So, rather than changing the training of the agent, I want to optimise its movement after training on demos.Which is to say, a policy will be learnt as normal using BC. Then during its execution, the robot can use 3D reasoning and  planning to move to its optimal state before applying what its learnt from the demonstration, increasing the chances of the BC algorithm succeeding in completing the task.
 
-\subsection{Proposed Approach}
+\subsection{Proposed Approach}\label{subsec:appl-first-proposed}
 What makes this system is the \emph{optimal pose predictor}, as we want the robot to place itself in a situation where the:
 \begin{itemize}
   \item Object visibility is maximised
@@ -52,7 +52,7 @@ Unlike before, I didn't use a simple distance colour metric, but used a colour r
 
 Another addition is the use of the wrist point cloud. We can create a spatial mask from the colour range to extract the depth information that is specific to the target region. We can extract points $k$ from \( {pc}^{world}\) where \(m_k \in \{ \text{True, False} \}\) as \( \{ {pc}^{target} | m_k = \text{True} \} \) where $m$ comes from the aforementioned colour range extraction.
 
-\subsubsection{Choosing a Candidate Pose}
+\subsubsection{Choosing a Candidate Pose}\label{sec:appl-first-choose-pose}
 Simple idea was exploration. The main reason my \emph{non-active} policies struggled was because the system would refuse to point the gripper towards the target. So I wanted to sample some poses and check if a pose around my current pose would generate a better pose, graded by the utility.
 
 So, I wanted to limit my sampling on the surface a unit sphere of radius $\mathbf{r}$ where the current position of the gripper $\mathbf{c}$ lies ont he surface of. Therefore, the sphere's centre, $mathbf{O}$ can be found as \(\mathbf{r} = || \mathbf{c} - \mathbf{O} || \).

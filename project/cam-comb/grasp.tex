@@ -115,9 +115,10 @@ So I devised a new dataset to help process data in batches of entire demos. \ver
 \subsection{Masking the Loss}
 The other approach I tried was to mask the grasping losses and keep them restrained to the last few frames of the action.Keeping $loss_{bce}$ to be non-zero only while regressing the last few items in the batch. As the batches are now defined as whole demonstrations (see \ref{subsec:grasp-data-loading-changes}), we can make a simple bit mask to match the lengths of demos in our training batch.
 
-Looking at the saved demonstration for this specific task, only the last $14$ frames are labelled `grasp'. The total length of the demo is $64$ observations. Wanting to test the effects of \(\left[15, 28\right]\) ($+ 1$ and $\times 2$ of label length), I ran the earlier tests.
+Looking at the saved demonstration for this specific task, only the last $14$ frames are labelled `grasp'. The total length of the demo is $64$ observations. Wanting to test the effects of \(\left[15, 28\right]\) which is respectively one more and two times the label length, I did similar tests as earlier. I suspected that \(k = 28\) would be the sweet spot, capturing enough closeness data while the labels are balanced. However, Figure \ref{fig:grasp-last-k-final} makes it clear that there this does not really matter in the grand scheme of things. The proficiency of reaching for a single demo is the same. Their success rates also were very similar \todo[color=green]{appendix}, the only difference being $k = 15$ was around 10\% less successful while the other two were within error. This means that the masking does not add any additional benefit to the grasping task, and I will not use it to save on calculations moving forward.
 
-
-I suspected that \(k = 28\) would be the sweet spot, capturing enough closeness data while the labels are balanced
-
-\todo[color=red]{write conclusions here, add figure}
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=\linewidth]{assets/cam-comb/grasp-simple/last-k-dist.png}
+  \caption{Final Distance Reached}\label{fig:grasp-last-k-final}
+\end{figure}

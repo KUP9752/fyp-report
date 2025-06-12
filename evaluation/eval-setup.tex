@@ -11,16 +11,20 @@ The data I chose to collect to reason about these policies are:
   \item Other policy specific hyperparameters, will be discussed when relevant
 \end{itemize}
 
+All the data collection is done on a machine equipped with a RTX 3090 with 24GB of VRAM and an Intel 13700KF running Ubuntu 24.04.2 LTS using RLBench and PyRep version 4.1.0 run within a Python 3.11.12 virtual environment. The requirements can be found in the project repository (\ref{subsec:conc-materials}).
+
 \subsection{Reproducibility and Verification}
 All the random aspects that can be controlled, be it \emph{numpy} and \emph{pytorch} random choices or random `live' demos. Seeds are sets for both the libraries, as well as the \verb|DataLoader| seeds being fixed for the entirety of the policies tested here.
-The demos per task are pre-made and saved in the project repository. \todo{ref the final deliverables bit}. I repeated all the tests with $5$ different seeds for the data shuffling, to observe if training on a different (but controlled) ordering of the demos affects a policy.
+The demos per task are pre-made and saved in the project repository. \todo{ref the final deliverables bit}. I repeated all the tests with $5$ different seeds for the data shuffling, to observe if training on a different (but controlled) ordering of the demos affects the final policy.
 
-\section{Test Environments}
+Also, each test task has an associated `testing' and `training' demonstration set associated with it. Depending on its parameters these will be found in the project repository (see \ref{subsec:conc-materials}) under \verb|'src/3d/kup-bench/data/test/*demo(s)/_'| and \verb|'src/3d/kup-bench/data/*demo(s)/_'| where `\_' indicated the task name. All the evaluation carried out here uses corresponding task's `training' set (always the first 10 to keep training times manageable) then does the tests on the `test'. Tests with multiple configuration parameters will have clearly indicated folder names in this directory. RLBench is capable of loading these demos into the simulator with some of my library changes implemented in \verb|~/kup-bench/rlbench|. `Loading a demo' means the objects are initialised exactly as they are when the demo was first created, and does not mean the trajectories will be used. I used this as a method of exactly repeating environment configurations.
+
+\section{Testing Task Environments}
 Two main branches of tasks I followed in this project are grasping and occluded reaching tasks.
 
-\subsection{Reaching with an Obstacle - \textbf{ReachObs\_Random}}
+\subsection{Reaching with an Obstacle - \textbf{ReachObs\_Random}}\todo[color=red]{write something here}
 
-\textbf{ReachObs\_IndRandom} is not discussed here in depth, due to the similarity of the tasks, and the independent version not being any more interesting. Some results for this test can be found here\todo{add appendix}.
+\textbf{ReachObs\_IndRandom} is not discussed here in depth, due to the similarity of the tasks, and the independent version not being any more interesting. Tests were run on this and any interesting ones are included here \todo{add appendix if needed}
 
 \subsection{Grasping}
 These two grasping tasks are to assess the contextual 3D understanding of the policy: learning depth information and adapting to differing sizes of targets; as well as learning the workspace before attempting a task \todo{grasp then move, not sure if I have time for this, but If i do defo interesting}
@@ -33,7 +37,7 @@ This task is quite similar to the depth interfacing tests from earlier.\todo{ref
 \end{enumerate}
 I created two separate variations of this specific task. One where the training and control set is set to be the \textbf{normal} size and we evaluate that on \textbf{smaller} blocks. The next variation is flipping this configuration: control and training are scaled down, while test is normal sized. Mainly to investigate whether the information wew train on has any affect on the policy proficiency.
 
-\textbf{Important Note!}
+\subsubsection{Important Note!}
 The demos saved for all the configurations are tested and checked to appear correctly. However, I have realised that the specifically the \textbf{saved smaller testing demos} which is used in the place of the control or the test, would spawn three of the targets smaller than they should be. Indices  \(0, ~5, ~6\)  will spawn smaller and hence look smaller. I will remove these when evaluating the policies.
 
 I have not figured out the reasoning for this, it seems to randomly happen, I speculate that it is an issue with how I control the sizes of targets. The target size is set during the start of an episode, so this means the \verb|Environment| object from PyRep must have initialised it wrong when the demos were being saved. This is not an isolated incident and sometimes happens while resetting the environment. However, the ideal part is if it is encoded in the saved demos, it is at least controlled. The \textbf{smaller} training set is confirmed to spawn correctly. The evaluation of the results will consider this.

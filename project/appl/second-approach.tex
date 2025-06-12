@@ -4,11 +4,35 @@ We still have the same problem of estimating the best pose for our gripper. Gett
 What if we could inject the movement of the camera into the RLBench demo system, so the view uncertainty system can be modelled independently of the environment on the data we have received. In short the plan here is to get demos that have multiple observations per timestep (meaning multiple observation collections and not just multiple modalities.) Then we can train a model with inherent uncertainty models to estimate the best pose to be in before executing an action. In theory, this should help eliminate the need for geometrical priors.
 
 \subsection{Proposed Approach}
-The changed demonstration system will give demos as \( \mathcal{D} := \{\langle \{o_i^t\}_{i = 1}^{N}, a^t\rangle\}_{t = 1}^{T}\) for $N$ distinct observations per step in $T$, this will allow us to train an ensemble method with one or more of these observations (but not all) and leverage the information gained 
+Firstly the demonstration system needs to change to allow for multiple observations to be recorded for a single step in the action. The changed demonstration system will give demos as \( \mathcal{D} := \{\langle \{o_i^t\}_{i = 1}^{N}, a^t\rangle\}_{t = 1}^{T}\) for $N$ distinct observations per step in $T$, this will allow us to train an ensemble method with one or more of these observations (but not all) and leverage the information gained. Then we can have any number of predictive models, $f_k$, which will use a random subset of each observation set per demo. But still use the entire demo in learning the action model. So a demo set \(\mathcal{D}_k = \{\{ \langle o_s^t, ~a^t \}_{s \in O_s} \}_{t = 1}^T\) can be constructed where \(O_s = \{o_i^t | s_{m, i} = \text{True}\}\) which are the set of selected demos. This selector can be represented in many way, for example: \(s_{m, i} \in \{\text{True}, \text{False}\}^{M \times N}\). All it does it select $m$ observations from the demo to be flattened later, it should select at least one, otherwise the linear constraints of trajectories I had so far will break.
+To ensure that the training can be mirroring how models are trained so far, \(\hat{a}_k = f_k\left(o_i\right)\) during inference, where $o_i$ is the current live observation.
+
+Each mo
 
 \subsubsection{Regression Ensembling}
 
-\todo{math foundations, add other subheading for limitations such as adding movement within rlbench demos??}
+
+\subsubsection{Types of Uncertainty}
+In an ensemble model there are different kinds of unknowns \cite{Gal2016Uncertainty, H_llermeier_2021, valdenegrotoro2022deeperlookaleatoricepistemic}. \textbf{epistemic} uncertainty, which comes from the gaps and the randomness in the data. In this case, not covering every possible valid state in our environment and only training on the demonstrations provided will contribute to this kind. Hence, it refers to a lack of knowledge.
+
+The second, \textbf{aleatoric}, is solely statistical; it refers to the randomness in the data. For example, when requesting a demo from RLBench, the trajectory calculation engine will sample points along the waypoints and will generate us a `random' path as there is a stochastic component, especially in getting a non-linear path. These two components are usually combined to represent `predictive' uncertainty. However, if the epistemic and aleatoric uncertainties can be separated we can use the gap in the knowledge, interpreting that as a model $f_k$ does not have enough information to solve this task. Therefore, we can use this as a measure, a utility score as \ref{subsec:appl-first-proposed} proposes.
+
+The whole idea for this model came to mind when I learnt about uncertainty separation and when I cam across this paper \cite{ansari2024eqr}. Although, we are not having abundant high quality data might affect the results, in theory the demonstrations provided are perfect. They are optimal routes by definition. Therefore, we might be \todo[color=red]{not sure about this section}
+
+
+\subsubsection{Action Loop}
+And generating enough for a subset model $f_k$ to gain enough insight might allow us to stay within distribution and if were were to step out of it, with an aleatoric threshold, we can seamlessly flip back to active-mode and sample different poses to check the uncertainty of. A subtle advantage this over \ref{sec:appl-1} is that we can train an ensemble on the poses to predict the utility of the of the pose before moving to it, which should speed up the system somewhat.
+
 
 \subsection{Implementation}
-\todo{need to make something here not sure what yet but I need at least one thing to compare the main thing}
+To be able to record demonstrations that provide multiple observations I had to hook into the demonstrations system somehow.
+
+\subsubsection{Task Level}
+The \verb|Scene|'s demo collection method is complicated and intertwined. With the bad experience I had with RLBench non-deterministically stopping to work, I wanted to stay clear off it if I could. The first idea I had was, during creation of a demonstration. The task that is associated with the scene will be stepped. which means the \verb|<Task>.step()| function will be called.So the initial idea was to hook in here, every time the task environment was stepped I could move the gripper slightly. Using a similar method to \ref{sec:appl-first-choose-pose}, and then collate these into a demo once the task was complete. 
+I had two major issues with this. Firstly, the call chain to get to \verb|<Task>.step()| is incredible deep, there are 4 class jumps: we go from the \verb|TaskEnvironment| to \verb|Scene| to \verb|PyRep| to finally our task. All of these carry an internal state of observations and what is visited, and no return values are used because of this. However, the task object is not necessarily persistent, it is a template that can be loaded and unloaded and is quite frequently. Therefore, I changed my mind and moved onto injecting the extra demo step at the recording level within step.
+
+\subsubsection{Recording Level}\todo[color=red]{}
+looking at this now this is extremely doable? maybe do and then exaplain i did not have time to evaluate at this system
+
+\subsection{Remarks}\todo{}
+Finally, active learning paradigms can be employed here to teach the most uncertain models further, however, I will not be doing continuous training in this project, but it might be interesting to consider.

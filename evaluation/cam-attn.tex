@@ -14,13 +14,8 @@ These were tested over multiple RGB camera combinations, namely:
   \item Wrist and Left Shoulder
   \item Left and Right Shoulder
 \end{enumerate}
-No single camera was tested, as the idea of this policy is to investigate the interaction between cameras and their features.
+No `single' camera was tested, as the idea of this policy is to investigate the interaction between cameras and their features. They were tested for increasing epochs in \(\left[100, ~200, ~500, ~1000, ~2000\right]\) to observe longer training trends. Finally, I collected the attention weights for the different cameras during the episodes and separated them between when they happen in the episode. This is to investigate whether the weights change from above or below the obstacle.
 
-Finally, they were tested for increasing epochs in \(\left[100, ~200, ~500, ~1000, ~2000\right]\) to observe longer training trends.
-
-The policies were trained on the first 10 of the saved demos under \todo{put the repo data link, and add to appendix} and tested on the 10 test demos saved under \todo{again same, copy link etc}.
-
-Finally, I collected the attention weights for the different cameras during the episodes and 
 
 \subsection{Observations}
 The main takeaway from this task was how it favoured longer epochs of training. The most success and lowest distances to target were recoded in the $500$ to $1000$ range, then the success rate starts decreasing again, meaning overtraining and no more benefit.\todo[color=purple]{}
@@ -28,6 +23,38 @@ The main takeaway from this task was how it favoured longer epochs of training. 
 The very likely reason for this is that, the demonstration trajectories for this task are a lot more varied due to the obstacle. More importantly the choice to move around the obstacle, there are demos that force the arm to go to the left go back and down, or left then down. This high variation means the agent needs longer time to average out motions in strict Behavioural Cloning settings, and takes longer.
 \todo{show the attn lambda  = 5 results}
 
+
+\begin{figure}[htpb]
+  \centering
+  \begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-max-mindist.png}
+    \caption{Minimum Distance (`max' pool)}\label{subfig:cam-attn-max-mindist-cnn}
+  \end{subfigure}
+
+  \begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-mean-mindist.png}
+    \caption{Mean}\label{subfig:cam-attn-mean-mindist-cnn}
+  \end{subfigure}
+  \caption{Minimum distances reached per pooling method}\label{fig:cam-attn-mindist-cnn}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-max-success.png}
+    \caption{Minimum Distance (`max' pool)}\label{subfig:cam-attn-max-success-cnn}
+  \end{subfigure}
+
+  \begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-mean-success.png}
+    \caption{Mean}\label{subfig:cam-attn-mean-success-cnn}
+  \end{subfigure}
+  \caption{Minimum distances reached per pooling method}\label{fig:cam-attn-success-cnn}
+\end{figure}
 
 \subsection{Separate Feature Encoders}
 This parameter was more of a test to see if it interacted well in any way. Theoretically both approaches are sound. 
@@ -52,5 +79,5 @@ This didn't seem to make a change at all. However, looking at the loss curves \t
 
 
 \subsection{Remarks}
-I thought this policy would be able to fix the shortcomings, which was the final reach toward the obstacle not being executed well. Non-wrist cameras help with the first half of the motion while the wrist camera should be able to generalise to the final reaching motion \todo{explain: due to its self-centric nature}. However the problem is the demos don't force the gripper to `look' towards the target. So, the wrist camera cannot get the benefits from a \emph{mean} pooled configuration. This led to the attention weights being very similar above and below the obstacle. Which counteracts this policy's theoretical benefits.
+I thought this policy would be able to fix the shortcomings of the naive policies by selectively attending on a view, even if the views are static. These shortcomings included the final reach toward the obstacle not being executed well. Non-wrist cameras help with the first half of the motion while the wrist camera should be able to generalise to the final reaching motion \todo{explain: due to its self-centric nature}. However the problem is the demos don't force the gripper to `look' towards the target. So, the wrist camera cannot get the benefits from a \emph{mean} pooled configuration, which will include intrinsic depth data however, the agent does not learn to face the target. This led to the attention weights heavily weighting a single view during rollout. Which counteracts this policy's theoretical benefits as attention will be mainly focused on a single target.\todo{put the weights in a table there is some interesting ones in eval plots}
 
