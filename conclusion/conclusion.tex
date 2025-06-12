@@ -7,30 +7,25 @@ I will conclude the report here with:
 \end{itemize}
 
 \section{Concluding Remarks}
-how active vision is a remerging area of study, however, an area with a steep learning curve and important priors not unlike its usual priors provided 
+In this work I personally explored the steep learning curve of getting into Robot Learning (Chapter \ref{ch:early-work}). Depending heavily on 3D simulation frameworks, such as CoppeliaSim and Bullet, quickly made me realise that prior information is not only useful for an active vision task; but also crucial for a project of this scale. Here I pivoted the main goals of the project to align it with learning personally alongside my agent.
 
+I proposed simple, yet capable behaviourally cloned policies for the tasks I created, then iterated on them with various fusion policies to find the sweet spot of what a robot can extract from a scene, with limited visibility, both in terms of information: what fits in the scene; and in terms of resolution of what fits in the sensor. I have uncovered some surprising results, regarding when data dilution and extraneous features play a huge role in shaping a policy and how small low-level changes in a modality can make or break the proficiency of a system.
 
-Chapter 3 I learnt about using CoppeliaSim and 3D simulators, novel for me and quite a challenge ...
+Finally, in Chapter \ref{ch:appl}, by using information from my findings about feature extraction workspace understanding of my robot, I proposed two separately active learning systems. First,depending heavily on information priors, such as task geometry and colours. This system was tougher to manage, it required extreme fine tuning  per-task and without the information it could use to effectively plan, it was quite helpless. My second proposition, however promising, was unfortunately not materialised. This was mainly due to the constraints I was working with within the simulator architecture. Although, not closed down, significant changes that this proposition required were not feasible in the timeline of this project along with all th prior work. Therefore, I leave the execution and evaluation of this system as an exercise to the reader.
 
-
-In chapter 4 explored various tasks, though simple, to test the understanding capability of a robot given minimal views and data (with minimlal resolution) conclusions, I proposed potential feature alignment mostly for personal understanding and furthering the 
-
-In chapter 5, using my learnings so far, I proposed some active policies and explored their feasability as well as theri performance
-
-
-
+In conclusion, although I may not have hugely interesting results to share, I learnt a lot about three dimensional data management and modelling as well as robotics in general.
 
 \section{Declarations}
-  \subsection{Sustainability and Ethical Considerations}i
-  \todo{talk about machine learning and powerdraw for datacentres in consumiong insurmountable amounts of energy for training, any machine learning research although intellectually interesting might contribute to the rise of AI, talk about this and how it is tangential but important to acknowledge}
+  \subsection{Sustainability and Ethical Considerations}
+  Although maybe not immediately related to the outcome or the goals of the project, I have used a lot of GPU resources which in turn uses a lot of energy. Although, my personal contribution might be insignificant; I sincerely believe that nature is sacred and it is our moral obligation to understand the value in it and protect it. With advancements in Machine Learning and Artificial Intelligence, reliance on raw compute power and hence data centres is growing rapidly. Much of which are still using fossil fuels. I think the environmental impact of training models should be heavily considered. Again, I do not believe the dent I might have caused is relevant, yet no act is insignificant to nature. So, to say, I believe any research in the AI community should incorporate their long term environmental impacts as well as other ethical concerns, alongside innovation and performance.
 
   \subsection{Use of Generative AI}
-  Generative AI is an important tool in modern times and can be quite a time-saver if used correctly. 
+  Generative AI is an important tool in modern times and is a tool that should be mastered for efficient working. 
   I declare that I have used Generative AI tools in this project in line with Imperial College's guidance and principles. Generative AI has not in any way been involved in the intellectual material produced in this project such as the report or the code. However, it was used in areas such as:
   \begin{itemize}
     \item Creating appealing and clear plots using \verb|matplotlib| and \verb|seaborn| \todo{ref these?} using data I have collected.
-    \item Formatting the bibliography and helping generate BiBTeX style bibliographies where it wasn't specifically provided by an author.
-    \item Quick initial searches to help find some pivotal papers and kickstart my individual research into a topic.
+    \item Formatting the bibliography and helping generate BiBTeX style bibliographies where it wasn't specifically provided by an author; as well as formatting these references.
+    \item General help with LaTeX figure and section formatting, with occasional questions about compilation errors.
   \end{itemize}
 
   \subsection{Project Materials}
@@ -42,4 +37,6 @@ In chapter 5, using my learnings so far, I proposed some active policies and exp
   \end{itemize}
 
 \section{Future Work}
-\todo{talk about the final active vision policy and whatnot, keep it fairly short maybe 1 or max 2 subheadings here} 
+This project started with the vision of creating an active vision policy with an articulating arm mounted camera separate from the arm what was to be used for grasping and reaching. However, during the timeline of the project I identified that, to get to that level of complexity I had to understand the basics and pivoted to a more experimental side of understanding how 3D simulators, complex machine learning models, and most importantly robot understanding works with those models.
+
+So, a good continuation this project paves the road to, is expanding in the area of \emph{full-active} vision, which I will coin to mean active perception separated from the action needed to complete the task. This should create more human-like capabilities in solving tasks and allow humans to better teach such agents how to act.

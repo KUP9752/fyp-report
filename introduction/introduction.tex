@@ -1,25 +1,22 @@
 \chapter{Introduction}
 \section{Motivation}
     
-  Sight is one of the most fundamental senses we - humans- posses. \todo{stats about vision, and the interesting paper I found on visual ensemvles and summary statistic} Our brains are evolved to process information quickly to allow us to reason with this information and react external stimuli. We also rely heavily on this skill to navigate the world; make sense of the unknown by observing it. Robots are no different. As the robotics industry evolved over the many decades, Computer Vision \todo{ref somethinhg} Based solutions became a staple in allowing machines to \emph{see}.
+  Sight is one of the most fundamental senses we posses. Two-thirds of our brain is devoted to processing vision \cite{fixot1957ophthalmology}. Our brains have evolved to process information quickly to allow us to reason with this information and react external stimuli. We also rely heavily on this skill to navigate the world; make sense of the unknown by observing it. Robots are no different. As the robotics industry evolved over the many decades, Computer Vision based solutions became a staple in allowing machines to \emph{see}.
 
-  Reinforcement \todo{ref} and Imitation Learning \todo{ref} are two prominent methods in tuning such visual robots. Where a robot will be fitted with an assortment of cameras and sensors to perceive its environment. These cameras can be mounted in many configurations: Mounted on their wrists \cite{chi2024UMIinthewild,openXEmbodimentRoboticLearning2024}, over the shoulder \cite{wang2024observeactasynchronousactive}, or in some cases placed around the environment \cite{exploringActiveVision2024chuang} that the robot is interacting to allow entire scenes to be observed. These configurations are not mutually exclusive and multiple can be used to maximise information gain. A major problem this introduces is cost and mobility:
-  \begin{itemize}
-    \item Third-person cameras are challenging to incorporate into non-static tasks. And on-body solutions, like wrist-mounting, provide limited visual understanding with occlusions and increased environmental entropy becoming a challenge. 
-    \item Multi-view setups are usually big and clunky \todo{ref here}, losing on dexterity and more importantly stop being general-use robots
-  \end{itemize} 
+  Reinforcement (RL) \cite{silver2015} and Imitation Learning (IL) \cite{attia2018globaloverviewimitationlearning, ARGALL2009469} are two prominent methods in tuning such visual robots. IL becoming more popular as it tends help converge on solutions quicker. Regardless of the methodology, a robot will be fitted with an assortment of cameras and sensors to perceive its environment. These cameras can be mounted in many configurations: Mounted on their wrists \cite{chi2024UMIinthewild,openXEmbodimentRoboticLearning2024}, over the shoulder \cite{wang2024observeactasynchronousactive}, or in some cases placed around the environment \cite{exploringActiveVision2024chuang} that the robot is interacting in; allowing entire scenes to be observed. These configurations are not mutually exclusive and multiple can be used to maximise information gain. 
+  
+  A major problem this introduces is cost and mobility. Third-person cameras are challenging to incorporate into non-static tasks. And on-body solutions, like wrist-mounting, provide limited visual understanding with occlusions and increasing environmental entropy, which is an important hurdle to overcome. Also, multi-view setups are usually big and clunky (for example the setup here \cite{zhao2024alohaunleashed}), losing on dexterity and more importantly stop being general-use robots.
 
   To take inspiration from humans: we use our eyes which can be operated independently from our other extremities. This optimising aspect of human visual feedback \cite{findlay2003active,maiello2021humans,goodman2018using} is one of the cornerstones of human learning and environment manipulation. Take, for example, a USB stick and its port. It is unlikely (impossible even) to ensure success in the first insertion attempt. However, shifting our view to make sure the port, the USB stick, and our hand are \emph{in-frame}, meaning we can see them clearly. The success rate of the next attempt sky-rockets.
   
-  Therefore, a possible solution to robot observation uncertainty is to actively explore the environment and understand the environment before acting. In this project I will explore what it means for a robot to view and understand what it is seeing. And explore geometric reasoning and uncertainty ensemble methods to overcome problems arising from static observations.
-
+  Therefore, a possible solution to robot observation uncertainty is to actively explore the environment and understand the environment before acting. In this project I will explore, behavioral cloning paradigms (relating to IL) and understand what it means for a robot to perceive and understand what it is seeing. Combining this with geometric reasoning and uncertainty ensemble methods I will attempt to overcome problems arising from static or fixed observations.
 
 \section{Contributions}
-  This is an experimentation-driven project. With end goal being of understanding 3D tasks and robots' reasoning of them to create competent active vision policies. The work is laid out as follows:
+  This is an experimentation-driven project. With end goal being, understanding 3D tasks and robots' reasoning of them to create competent active vision policies learnt from demonstrations. The work is laid out as follows:
 
   \begin{itemize}
     \item Explore CoppeliaSim and propose some reaching and grasping tasks for training my policies on (Sections \ref{sec:3d-reaching-tasks}, \ref{sec:grasping-tasks}, \ref{sec:reach-obs})
-    \item Propose and explore ideas of feature fusion to increase the learning potential and the competency of robot policies (Sections \ref{sec:depth-interfacing}, \ref{sec:multi-modal-policies}, \ref{sec:proposed-fusion})
+    \item Explore ideas of feature fusion to increase the learning potential with limited demonstrations and the competency of robot policies (Sections \ref{sec:depth-interfacing}, \ref{sec:multi-modal-policies}, \ref{sec:proposed-fusion})
     \item Design and reason about the foundations of two active vision policies and their implementations (Chapter \ref{ch:appl})
     \item Finally, evaluate and compare the competencies and potential drawbacks of the various policies and feature fusion methods (Chapter \ref{ch:eval})
   \end{itemize}
