@@ -3,14 +3,7 @@
 \subsection{Feature Level Fusion}\todo{really long intro, consolidate}
 On top of just naively combining views (or modalities) and expecting the policy to understand what it means to `see' is a tall order. 
 
-I have adopted a model-free approach in making these policies, and decided to use representations of information for predicting the next motion.
-\todo{maybe more on latent representations and encoder models, here with refs}
-
-The step after extracting representation is to learn how we can make the most of the information by incorporating the various views and sensors and seeing what combination of feature extraction and their fusion allows the most information gain.
-
-So, after extracting features from available sensors. Using multiple feature extractors means that these features will need to be merged before making a final decision on movement.
-
-If these extracted features can be thought of as encoded information, as with latent models, multiple extractors will lead to to many encodings. So, the next challenge becomes merging; and not just how but when to merge features from one view to another. I will explain their potential positives and investigate the consequences of each.\todo[color=purple]{this might be a good segue or part in presentation}
+If these extracted features can be thought of as encoded information, as with latent representation models\todo{ref here and maybe mention earlier on the report}, multiple extractors will lead to to many encodings. So, the next challenge becomes merging; and not just how but when to merge features from one view to another. I will explain their potential positives and investigate the consequences of each.\todo[color=purple]{this might be a good segue or part in presentation}
 
 \subsubsection{Early Fusion}
 Fuse different modalities into a single input and run through the encoding model. This usually involves combining the raw data sources. Before any information is extracted or the data is modelled in any way.
@@ -20,31 +13,60 @@ Therefore, its advantages mostly lie in its simplicity. No dedicated processing 
 \subsubsection{Late Fusion}
 This is the complete opposite of early fusion. Each modality will be run through its own model and predict a representation. The immediate advantage is that each model can learn a rich representation relating to only its given modality
 
-
 \subsubsection{Intermediate Fusion}
 This is the most common middle-ground. While separated feature learners can be used per desired modality, the representation extracted from them will be fused together. Then this aggregated latent representation can be passed through another model to get the final predictions. This is a tradeoff based system between early and late fusion. Most of the proposed systems will follow this idea.
 
 \todo{i will argue separating the grasping network will be late fusion fuse at the actionn level and not separating it will be fully intermediate}
 
 \section{Proposed Fusion Methods}\label{sec:proposed-fusion}
-I designed a a poly-policy which can be instantiated in any fusion configuration to handle its given modalities differently before making a final movement prediction. \todo{make a diagram - consult the sheet}
+I designed a modular poly-policy which can be instantiated in any fusion configuration to handle its given modalities differently before making a final movement prediction. The modularity is within the `Feature Encoding' block shown in Figure \ref{fig:policies-skeleton-idea}\todo[color=blue]{maybe move to appendix}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[scale=0.1]{assets/cam-comb/policies/general-diagram.png}
+  \caption{Main Skeleton of the proposed policy structure}\label{fig:policies-skeleton-idea}
+\end{figure}
 
 \todo{add the fusingEncoder and the config to the appendix}
 \subsection{Simple Stacking}
 An example of early fusion, this is the naive method of just stacking the views on the channel dimension, and has clear disadvantages for this specific system.
 
-Firstly, for the RGB cameras, there is definite misalignment, all these cameras have different poses and will disagree on what they see. Leading to features not lining up, leaving us with a non-optimal and more importantly a brittle\todo{explain brittle? or does the next senetence take care of it} policy. This could lead to unintended coupling of information which can lead to the agent making wrong choices during inference when the same views don't necessarily align during rollout.\todo{simple diagram of overlaid squares (arrow) model (arrow) representation} This will act as a baseline to compare other fusion strategies.
+Firstly, for the RGB cameras, there is definite misalignment, all these cameras have different poses and will disagree on what they see. Leading to features not lining up, leaving us with a non-optimal and more importantly a brittle\todo{explain brittle? or does the next senetence take care of it} policy. Meaning it could lead to unintended coupling of information which can lead to the agent making wrong choices during inference when the same views don't necessarily align during rollout.\todo{simple diagram of overlaid squares (arrow) model (arrow) representation} This will act as a baseline to compare other fusion strategies.
 
 \subsection{Understanding Depth Separately}\label{subsec:policies-understand-depth-sep}
-RGB provides a denser representation of the system and in a configuration with multiple RGB views the depth information may be drowned out. Therefore, an important first step was to learn the depth features separately and then make them influence the action. The idea here is to have a RGB encoder and a separate Depth encoder CNNs, then learn the best way to merge this data together. I propose three different methods to do this:
+RGB provides a denser representation of the system and in a configuration with multiple RGB views the depth information may be drowned out. Therefore, an important first step was to learn the depth features separately and then make them influence the action. The idea here is to have a RGB encoder and a separate Depth encoder CNNs, then learn the best way to merge this data together. I propose three different methods to do this whish are highlighted in Figure \ref{fig:policies-sep-dep-diagrams}.
 
-\begin{itemize}
-  \item Concatenation of the features from each CNN \todo{add figure, explain more if needed}
-  \item A second layer CNN, convolve the RGB outputs and the Depth outputs to learn joint features \todo{add figure, explain more if needed}
-  \item A shallower secondary CNN to learn simple \emph{gating} from already extracted RGB and Depth features. \todo{add figure, explain more if needed}
-  \item A Cross Attention Mechanism to attend to the important parts of from each extracted feature.
-\end{itemize}
-Which are ultimately decoded into an \emph{action}, $\hat{A}$.
+\begin{figure}[htpb]
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/cam-comb/policies/wlr_d-feats-diagram.png}
+    \caption{Simple concatenation of the features from each CNN}\label{subfig:policies-wlr_d}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/cam-comb/policies/wlr_d-feats-diagram.png}
+    \caption{A second layer CNN, convolving the outputs in a learnable manner}\label{subfig:policies-wrl_d-feats}
+  \end{subfigure}
+  \vspace{0.5cm}
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/cam-comb/policies/wlr_d-gated-diagram.png}
+    \caption{A shallower secondary CNN to learn simple \emph{gating} from already extracted RGB and Depth features.}\label{subfig:policies-wrl_d-gated}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \includegraphics[width=0.7\linewidth]{assets/cam-comb/policies/wlr_d-attn-diagram.png}
+    \caption{A Cross Attention Mechanism to attend to the important parts of from each extracted feature.}\label{subfig:policies-wrl_d-attn}
+  \end{subfigure}
+  \caption{Proposed Systems}\label{fig:policies-sep-dep-diagrams}
+\end{figure}
+Which are ultimately decoded into an \emph{action}, $\hat{a}$.
+
+To elaborate \ref{subfig:policies-wrl_d-attn} further. the cross attention module takes in the the two modalities and firstly runs a small Conv to get to match their channels. Once matched to attend to features I used the Key-Query-Value attention \cite{vaswani2023attentionneed} between the two modalitiesm using the \verb|MultiHeadAttention| module \cite{pytorch}. Setting the query to the first modality and the key and value to the other modality I can get the score, \( a_{i, j} \propto \frac{Q_i^TK_j}/\sqrt{ch}\), I pass in 3D values and they are flattened before attention, so $ch$ is the original channel dimension after the first convolution, holding the encoded information about the modalities. After concatenating all the heads and running a softmax on the scores we will be able to get our output, which the score weighted `value' vector: \(\sum_{j}{{a'}_{i, j}v_j}\). The reason we set the value to our other modality is to `weight' it according how the first modality \emph{attends} to features in he second modality. The cross attention module I propose does it both ways. So, the RGB features will be weighted by Depth interactions and vice versa. Then similar to \ref{subfig:policies-wrl_d-feats} a learner CNN module will learn to distill this information down.\todo{shorten maybe not sure how this reads?}
+
 
 \subsection{Feature-wise Linear Modulation}\label{subsec:policies-film}
 To take a step back from all the excessive RGB data. I wanted to understand how modulating similar views with each other to understand similar observations from each other's perspective. Allowing the network to learn and discover its own trends is a fine task, however, implicitly injecting cues from modality into another will, in theory, allow the learning to be more efficient.
@@ -64,12 +86,14 @@ A final positive, is that a FiLM module can be plugged in at multiple different 
 
 
 \subsection{Derivative Methods}\label{subsec:derivative-methods}
-The final propositions include 4-way fusion models that take into account ideas from earlier.
+The final propositions include 4-way fusion models that take into account ideas from earlier:
 \begin{itemize}
   \item Fully separated feature extractors, all concatenated before action prediction \todo{add figure}
-  \item Pairwise FiLM between all modalities: wrist RGB and w Depth, then Left Shoulder RGB and Right Shoulder RGB; then concatenated before action prediction\todo{figre}
+  \item Learning the wrist and shoulder groups separately. First with a naive CNN to fuse them, then an attention module as before to merge them.
+  \item Pairwise FiLM between all modalities: wrist RGB and wrist Depth, then Left Shoulder RGB and Right Shoulder RGB; then concatenated before action prediction\todo{figre}
   \item Finally 4-way multi-modal cross-attention. \todo{add math and figure if needed}
 \end{itemize}
+
 These are all derived from the previous sections, and extending these ideas to all the sensors. Separating, all feature extractors allows us to learn representation for each, however it will place a lot of learning strain on the later decoder to give us a valid action. 
 
 FiLM modules in theory are should be better at aligning already agreeable data, however would it be valid modulate the shoulders to each other and then to the modulated output of the wrist. This was mostly a curiosity, to see if there is a linear relationship that can be learnt between all the data streams.

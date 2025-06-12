@@ -1,6 +1,6 @@
 \section{Naive Colour Attention Results}
-This is the results relating to the proposed naively active approaches from \ref{sec:reach-obs-naive-cam-attn}.
-The variations of this policy I tested included: \todo{add code for aall the possibilies from test cam attn py file}
+This is the results relating to the proposed naively active approaches from \ref{sec:reach-obs-naive-cam-attn}. The numbers here are from the reaching test (\ref{eval-setup-reach-obs}).
+The variations of this policy I tested included:
 \begin{itemize}
   \item Separate or joint Feature Encoders (\verb|is_multi_cnn|)
   \item \emph{mean} or \emph{max} pooling for the colour score (\verb||)
@@ -21,7 +21,6 @@ No `single' camera was tested, as the idea of this policy is to investigate the 
 The main takeaway from this task was how it favoured longer epochs of training. The most success and lowest distances to target were recoded in the $500$ to $1000$ range, then the success rate starts decreasing again, meaning overtraining and no more benefit.\todo[color=purple]{}
 
 The very likely reason for this is that, the demonstration trajectories for this task are a lot more varied due to the obstacle. More importantly the choice to move around the obstacle, there are demos that force the arm to go to the left go back and down, or left then down. This high variation means the agent needs longer time to average out motions in strict Behavioural Cloning settings, and takes longer.
-\todo{show the attn lambda  = 5 results}
 
 
 \begin{figure}[htpb]
@@ -51,7 +50,7 @@ The very likely reason for this is that, the demonstration trajectories for this
   \begin{subfigure}{\linewidth}
     \centering
     \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-mean-success.png}
-    \caption{Mean}\label{subfig:cam-attn-mean-success-cnn}
+    \caption{Minimum Distance (`mean' pooling)}\label{subfig:cam-attn-mean-success-cnn}
   \end{subfigure}
   \caption{Minimum distances reached per pooling method}\label{fig:cam-attn-success-cnn}
 \end{figure}
@@ -63,12 +62,11 @@ This task is quite unforgiving and errors add up quickly, if the robot gets stuc
 
 Conversely, multi-CNNs learn late. Makes sense as more passes allow each CNN (now seeing only one frame not all) to learn slowly. Therefore, the multi-CNN policies have a more decisive dip in minimum distance reinforcing the idea that training for loner allows them to capture pose specific information that is helpful to the system in solving this task.
 
-The only interesting remark here is that multi-CNN interacts interestingly with \emph{mean} pooling. Seeing the spiky and jagged Single-CNN graphs we can confirm speculate that merging all views and convoluting them likely confuses the feature extraction and a lot of uncertainty creeps in to the features.
+The only interesting remark here is that multi-CNN interacts interestingly with \emph{mean} pooling, see Figure \ref{sunfig:cam-attn-mean-mindist}. Seeing the spiky and jagged Single-CNN graphs we can confirm  that merging all views and convoluting them likely confuses the feature extraction and a lot of uncertainty creeps into the features.
 
 
 \subsection{\emph{Mean} and \emph{Max} Pooling}
-\todo{obseration, put some min dist here}
-The differences here are extremely subtle. General observations both work fairly similarly in terms of the minimum distance they can reach per epoch. A stark difference, however, is how jagged and uncertain \emph{max} is with lower epochs. This is due to max likely sending a similar signal between all views, if more than one view can see the target, they will likely have very similar weights. Which can add indecisiveness, especially when both shoulders are active.
+The differences here are extremely subtle. General observations both work fairly similarly in terms of the minimum distance they can reach per epoch, excluding `max' and the shoulder cameras\todo{talk about the attention weights about this}. A stark difference, however, is how jagged and uncertain \emph{max} is with lower epochs. This is due to max likely sending a similar signal between all views, , if more than one view can see the target, they will likely have very similar weights. Which can add indecisiveness, especially when both shoulders are active.
 
 \emph{Mean} is not necessarily any better when single-CNNs are used. Again, due to uncertainty creeping in, but from the view understanding.
 

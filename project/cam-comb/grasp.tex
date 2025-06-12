@@ -93,12 +93,12 @@ My initial response was to tweak and weight the grasping loss component, $\lambd
   \centering
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=0.8\linewidth]{assets/cam-comb/grasp-simple/tuning-normal-old-policy-lambda-g.png}
+    \includegraphics[width=\linewidth]{assets/cam-comb/grasp-simple/tuning-normal-old-policy-lambda-g.png}
     \caption{Average Final Distance vs $\lambda_{gripper}$}\label{subfig:grasp-tuning-lambda-g}
   \end{subfigure}
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=0.8\linewidth]{assets/cam-comb/grasp-simple/tuning-normal-old-policy-success-lambda-g.png}
+    \includegraphics[width=\linewidth]{assets/cam-comb/grasp-simple/tuning-normal-old-policy-success-lambda-g.png}
     \caption{Successful Completions vs $\lambda_{gripper}$}\label{subfig:grasp-tuning-lambda-g-success}
   \end{subfigure}
   \caption{A test run using multiple $\lambda_{gripper}$ values}\label{fig:grasp-tuning-lambda-g}
@@ -108,14 +108,16 @@ My initial response was to tweak and weight the grasping loss component, $\lambd
 \subsubsection{Data Loading Changes}\label{subsec:grasp-data-loading-changes}\todo[color=purple]{the sequential thing, the importnat bit may come later but leave this here for note}\todo{shorten?}
 Following the above approach I wanted to streamline the data loading mechanisms that were currently being used. As discussed above, in \ref{subsec:reach-data-loading}, the demonstrations are flattened before loading. So, the dataset is of type \verb|list[Observation]| where the `list' can be of any sequential or \emph{ArrayLike} type. This meant the batch size parameter within the loading directly related to how many frames were getting fed into the system at a time. So, for each epoch we see all the demos, however we only update the parameters of the network per batch and the batch size is determined by the loader.
 
-Realising not training with entirety of a demo in batch. For example if the demonstration has $50$ frames, but the `minibatch\_size' is only $32$ we would see all the demonstrations in dataset given, yet we will see them in slices of $32$. As I omitted shuffling, to preserve the sequential nature of demos\todo[color=pink]{shuffled vs not shuffeld, might be done for randomobs, maybe link that section} the model updates will be done in uncontrolled slices. This is because a demo does not have a fixed episode length and different demos for the same task, can be of different lengths.
+Realising not training with entirety of a demo in batch. For example if the demonstration has $50$ frames, but the `minibatch\_size' is only $32$ we would see all the demonstrations in dataset given, yet we will see them in slices of $32$. As I omitted shuffling, to preserve the sequential nature of demos the model updates will be done in uncontrolled slices. This is because a demo does not have a fixed episode length and different demos for the same task, can be of different lengths.
 
 So I devised a new dataset to help process data in batches of entire demos. \verb|DemoDataset| held the data in terms of \verb|list[Demo]|. A drawback is that the demos are different lengths, so more collating and computation needs to be done before feeding this into a torch model. However, a developer experience positive, was that shuffling was painless, I could shuffle on the loader level and that would mean the frames within a demo will be the same sequential order but the demos themselves can be fed in different orders per epoch, which should help with the generalisability of the models trained on th is loader.\todo[color=green]{include demodataset in appendix}. Although I believed this new \emph{demo dataset} was mostly better, I would later learn an quirky behaviour of the \emph{obs dataset}\todo{also add to appendix, maybe even add to the earlier section in reach}.
 
 \subsection{Masking the Loss}
 The other approach I tried was to mask the grasping losses and keep them restrained to the last few frames of the action.Keeping $loss_{bce}$ to be non-zero only while regressing the last few items in the batch. As the batches are now defined as whole demonstrations (see \ref{subsec:grasp-data-loading-changes}), we can make a simple bit mask to match the lengths of demos in our training batch.
 
-Looking at the saved demonstration for this specific task, only the last $14$ frames are labelled `grasp'. The total length of the demo is $64$ observations. Wanting to test the effects of \(\left[15, 28\right]\) which is respectively one more and two times the label length, I did similar tests as earlier. I suspected that \(k = 28\) would be the sweet spot, capturing enough closeness data while the labels are balanced. However, Figure \ref{fig:grasp-last-k-final} makes it clear that there this does not really matter in the grand scheme of things. The proficiency of reaching for a single demo is the same. Their success rates also were very similar \todo[color=green]{appendix}, the only difference being $k = 15$ was around 10\% less successful while the other two were within error. This means that the masking does not add any additional benefit to the grasping task, and I will not use it to save on calculations moving forward.
+Looking at the saved demonstration for this specific task, only the last $14$ frames are labelled `grasp'. The total length of the demo is $64$ observations. To see howw this affects the learning I wanted to test \(\left[15, 28\right]\) which is respectively one more and two times the label length. This made sense as I would compare using all the frames (unbalanced), all the grasp labels and one non-grasp for contrast (unbalanced again but skewing towards grasp) and finally a fully balanced dataset.
+
+I suspected that \(k = 28\) would be the sweet spot, capturing enough closeness data while the labels are balanced. However, Figure \ref{fig:grasp-last-k-final} makes it clear that there this does not really matter in the grand scheme of things. The proficiency of reaching for a single demo is the same. Their success rates also were very similar \todo[color=green]{appendix}, the only difference being $k = 15$ was around 10\% less successful while the other two were within error, hence I did not include it here. This means that the masking does not add any additional benefit to the grasping task, and I will not use it to save on calculations moving forward.
 
 \begin{figure}[htpb]
   \centering

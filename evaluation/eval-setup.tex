@@ -22,7 +22,8 @@ Also, each test task has an associated `testing' and `training' demonstration se
 \section{Testing Task Environments}
 Two main branches of tasks I followed in this project are grasping and occluded reaching tasks.
 
-\subsection{Reaching with an Obstacle - \textbf{ReachObs\_Random}}\todo[color=red]{write something here}
+\subsection{Reaching with an Obstacle - \textbf{ReachObs\_Random}}\label{eval-setup-reach-obs}
+\todo[color=red]{write something here}
 
 \textbf{ReachObs\_IndRandom} is not discussed here in depth, due to the similarity of the tasks, and the independent version not being any more interesting. Tests were run on this and any interesting ones are included here \todo{add appendix if needed}
 
@@ -42,7 +43,7 @@ The demos saved for all the configurations are tested and checked to appear corr
 
 I have not figured out the reasoning for this, it seems to randomly happen, I speculate that it is an issue with how I control the sizes of targets. The target size is set during the start of an episode, so this means the \verb|Environment| object from PyRep must have initialised it wrong when the demos were being saved. This is not an isolated incident and sometimes happens while resetting the environment. However, the ideal part is if it is encoded in the saved demos, it is at least controlled. The \textbf{smaller} training set is confirmed to spawn correctly. The evaluation of the results will consider this.
 
-\subsection{Carrying the Target - \textbf{Grasp\_ThenMove}}\todo{havent run this yet, might remove it depending on what I will do today}
+\subsection{Carrying the Target - \textbf{Grasp\_ThenMove}}\todo[color=red]{havent run this yet, might remove it depending on what I will do today}
 
 \section{Parameters}
 
