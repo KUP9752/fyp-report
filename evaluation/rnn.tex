@@ -1,30 +1,54 @@
-\section{Recurrent Models}
+\subsection{Recurrent Models}
+Quite differently I started with tuning a possible RNN model. There were too many variables to be running different epoch configurations and getting a fine-tuned definite answer would be difficult. Some parameters that are frozen can be found in Table \ref{tab:rnn-params}.
 
-Not much better in terms of numbers however the model size is lower?? not sure experiment with this the big ass 4 way attention is the most expensive currently and this might be a contender,
+\begin{table}[ht]
+\centering
+  \begin{tabular}{|| c | c ||}
+  \hline
+  Parameter & Value \\
+  \hline
+  \multirow{2}{*}{input\_size} & 512 \\
+  & \emph{or the fusion encoding size} \\
+  \hline
+  hidden\_size & 256\\
+  num\_layes & 2 \\
+  batch\_first & \texttt{True} \\
+  bidirectional & \texttt{False} \\
+  \hline
+  \end{tabular}\caption{LSTM initialisation parameters}\label{tab:rnn-params}
+\end{table}
 
-talk about the shorter training to get comparable results, smoother trajectories learn occlusions robustly (?? i have not observed this i don't think)
+\subsubsection{Baseline Tuning}
+I started with experimenting with the baseline. Planning to find the most promising training length before I applied the promising fusion methods to architecture. Looking at the final distance distributions for various epochs in Figure \ref{fig:rnn-grasp-final-wd}, I realised that the most promising models were trained were generally shorter durations and $400$ to the $600$ epochs mark. These were optimal in reaching, getting around the 11 cm mark from the object. However, their grasp success was not amazing\todo{add a grasp success figure here or in the appendix.} 
 
+Finally testing the LSTM with multiple modalities, Figure \ref{fig:rnn-grasp-tuning}, it is clear that the wrist combinations act better with shorter training, though, wrist and wrist depth together hangs behind quite a bit. This is likely due to consistent motion patterns the task as well as the easy distributional alignment the wrist cameras inherently produces. It is surprising that the inclusion of the depth camera struggles, bringing the density around 2.1 and having a more prominent second peak at 0.45 metres. These are likely due to the test data, however, gives another insight into to the non-optimal nature of the data fusion of the baseline.
 
-This lead to a more robust and confident architecture. The movements of my policy felt less spiky, no more sudden jerks and more calculated reaching. It did still absolutely overfit to the average position, and was not much better at grasping, but the episodic movements were cleaner and I believe enhancing the grasping branch of the network would allow it to be more successful \todo{summarise and clean up}
+Shoulder combinations however, heavily favour longer training, though not too long. Likely due to the smaller Signal-to-Noise (SNR) ratio. There is just more extraneous data captured by the shoulders and that takes the model longer to fit to it. However, once fit 600 epochs of training, it seems to reach the 14cm mark more often. 
+
+A final qualitative observation I had was the movement competency. Although hard to convey here, observing the robot its movement less spiky, and more than once I observed a smooth trajectory change. It would first start off, doing a generic reach, then around half way around the movement slow down, slightly reposition and reach for the target very competently. I speculate this is the hidden LSTM states coming in handy and providing that encapsulated information of the state the robot is in currently. Allowing it to do BC with episode length awareness like never before.
 
 \begin{figure}[H]
   \centering
   \begin{subfigure}{0.45\linewidth}
     \centering
     \includegraphics[width=\linewidth]{assets/evaluation/rnn/wd-epoch-test-final.png}
-    \caption{Final Distances Reached}\label{subfig:rnn-grasp-final}
+    \caption{Final Distances Distribution, with `test' excluded}\label{subfig:rnn-grasp-final}
   \end{subfigure}
-
+  \hfill
   \begin{subfigure}{0.45\linewidth}
     \centering
     \includegraphics[width=\linewidth]{assets/evaluation/rnn/wdw-epoch-test-all-final.png}
-    \caption{Final Distances Reached (Including `Test')}\label{subfig:rnn-grasp-final}
+    \caption{Reached Final Distances Distribution, inclusing both `control' and `test'}\label{subfig:rnn-grasp-final}
   \end{subfigure}
-  \caption{Wrist RGB and Wrist Depth, Baseline Tuning}\label{fig:}
+  \caption{Wrist RGB and Wrist Depth, Baseline Tuning}\label{fig:rnn-grasp-final-wd}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics{assets/evaluation/rnn/wd-epoch-test-final.png}
+  \includegraphics[width=0.8\linewidth]{assets/evaluation/rnn/400-600-cams.png}
   \caption{Baseline Final Distance Distributions Per Camera Config }\label{fig:rnn-grasp-tuning}
 \end{figure}
+
+\subsubsection{Incorporating Fused Data}
+\todo[color=red]{More data from the final run here, will do this later}
+

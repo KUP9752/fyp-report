@@ -1,0 +1,16 @@
+\subsection{Proprioceptive Data}
+The final part is to expand the input modalities. I opted to a simple experiment on this, due to the ever expanding nature of these evaluations and just wanted to get an idea whether proprioceptive data was in any way beneficial to the system. Introducing a simple joint position encoder network with set parameters, Table \ref{tab:jp-enc-params}. 
+
+\begin{table}[ht]
+\centering
+  \begin{tabular}{|| c | c ||}
+    \hline
+    Parameter & Value \\
+    \hline
+    input\_dim & 7 \\
+    \hline
+    hidden\_layer\_dims & \(\left[64\right]\) \\
+    output\_dim & 128 \\
+    \hline
+  \end{tabular}\caption{Joint Position Encoder parameters}\label{tab:jp-enc-params}
+\end{table}
