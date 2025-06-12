@@ -1,4 +1,4 @@
-\section{Multi-Modal Policies}
+\section{Multi-Modal Policies}\label{sec:multi-modal-policies}
 
 \subsection{Feature Level Fusion}\todo{really long intro, consolidate}
 On top of just naively combining views (or modalities) and expecting the policy to understand what it means to `see' is a tall order. 
@@ -26,7 +26,7 @@ This is the most common middle-ground. While separated feature learners can be u
 
 \todo{i will argue separating the grasping network will be late fusion fuse at the actionn level and not separating it will be fully intermediate}
 
-\section{Proposed Fusion Methods}
+\section{Proposed Fusion Methods}\label{sec:proposed-fusion}
 I designed a a poly-policy which can be instantiated in any fusion configuration to handle its given modalities differently before making a final movement prediction. \todo{make a diagram - consult the sheet}
 
 \todo{add the fusingEncoder and the config to the appendix}
@@ -77,7 +77,7 @@ The final propositions include 4-way fusion models that take into account ideas 
 The actions in my system are heavily dependent on the context of where the robot came from. And the demonstrations contain coherent and smooth trajectories. Although, I am preserving the sequential nature of the demos in training. There is no implicit underlying mechanism to enforce the agent will learn from this. Due to the partially observable setting of my system, and the robot not knowing any extra information about its state (model-free), it is important to be able to keep a historical understanding of what has happened, or what the agent believes is important for that moment in time.
 
 So, I incorporated recurrent models into the latent representation. This is so that the embedding of the current states will depend on a history of the earlier observations or states.
-
+\todo{justify the reason ther are 2 layers of the lstm}
 A pro of RNNs, compared making a bespoke sequential model is they are not length constrained \todo{was an earlier problem in 2d, maybe mention}. The sequences can be of any length which will help model the demos I have with varying episode lengths. Som compared to 3D CNNs \todo{ref}, which can also incorporate spatial and temporal information \todo{ref}
 
 
@@ -94,7 +94,9 @@ So, this simple idea of introducing temporal noise into the decision process, sh
 
 
 \subsection{Proprioception}\todo{maybe talk about why I left it out earlier in the chapter}
-Up until this point, I left proprioceptive data out of the training, mainly because I wanted to train on purely visual feedback to see what it could achieve without any other state information. Secondly, including state information about the robot, would not necessarily immediately help with the 
+Up until this point, I left proprioceptive data out of the training, mainly because I wanted to train on purely visual feedback to see what it could achieve without any other state information. Secondly, including state information about the robot, would not necessarily immediately help with the task learning. \todo{quick explanation of proprio data and maybe a diagram}
+
+To investigate I created a simple feature projection network. That takes in the $7$-dimensional joint position data and learns to project it to a higher dimension, to add to the extracted view features before the final movement decision. The main benefit of this, it gives us a modular system that can be attached to any of the other systems for quick testing.
 
 \subsection{Numerical Foundations}\todo{talk about the general math, like what are the shapes of the data, what is the loss minimising-maximising, and notation}
 
