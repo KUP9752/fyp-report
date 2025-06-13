@@ -58,11 +58,7 @@ A final qualitative observation I had was the movement competency. Although hard
   \caption{Final Distance Distribution at 400 Epochs}\label{fig:rnn-fusing-400}
 \end{figure}
 
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.8\linewidth]{assets/evaluation/rnn/600-cams.png}
-  \caption{Final Distance Distribution at 600 Epochs}\label{fig:rnn-fusing-600}
-\end{figure}
+
 
 Figures \ref{fig:rnn-fusing-400} and \ref{fig:rnn-fusing-600}, make it clear that the shapes of the final distance distributions are similar but with a second sizeable hump near the $0.31$ mark. While the grasping was extremely poor, it never attempts to grasp anything. The average successful grasp attempts was $0.337$ and $0.12$ for unsuccessful, this means it almost never even tries to grasp! What this means is that these policies are not performing as well. Two explanations I have for this is the richer feature encoding, somehow obscures the sequential aspect of the data. As the encoding size scales from fusing model to others, but the hidden LSTM state is static, this bottleneck might be affecting the information retention, and creating a worse system. Another possibility is that the fusing feature encodings have been trained to not assume a downstream LSTM (which also is tuned with the baseline).
 

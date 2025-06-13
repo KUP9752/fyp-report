@@ -14,3 +14,5 @@ The final part is to expand the input modalities. I opted to a simple experiment
     \hline
   \end{tabular}\caption{Joint Position Encoder parameters}\label{tab:jp-enc-params}
 \end{table}
+
+I ran the proprioceptive modules \ref{apx:Z-proprio-dist-wd} and \ref{apx:Z-proprio-dist} on the RNN modules to see if they would make a difference. They are not very helpful for any wrist system, which I suspect is due to similar views getting different proprioceptive data might be confusing the model.  The distributions peaks around the 0.4 m mark, which is quite bad. Therefore, I can conclude that at least for the feature fusion methods I proposed the proprioceptive data is not in any way adding meaningful information. This might be due to its latent data being added on later into the encoding. However, this will need a deep dive into tuning and early-mid fusion of proprioceptive information to answer conclusively.

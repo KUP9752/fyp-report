@@ -27,15 +27,11 @@ There are again some tuned parameters in this section, see Table \ref{tab:deriva
 \end{table}
 
 \subsubsection{Grasp}
-There are two main views of concern here, wrist RGB and Depth (Figure \ref{fig:deriv-normal-final-wd}) and all modalities (Figure \ref{fig:deriv-normal-final-allcams}). only the multi view attention module allows the merging of the wrist modalities, and it does not do a very good job. It overfits extremely and any graph involving this looks exactly like \ref{fig:deriv-normal-final-wd}. This means that the network is attending on the wrong elements in a modality. Likely is finding a correlation with the background of the RGB image and the distant patches of the depth sensor. This may be due to the patching module. Patching size might be the culprit here. Patching in \(8 \times 8\) blocks means that a lot of the image will just be background as around only one patch will have the target object. This causes fixating on unimportant details of the scene and overfitting without regard to extracted features. The stroy was similar for the \textbf{smaller} version.
+There are two main views of concern here, wrist RGB and Depth (Figure \ref{fig:deriv-normal-final-wd}) and all modalities (Figure \ref{fig:deriv-normal-final-allcams}). only the multi view attention module allows the merging of the wrist modalities, and it does not do a very good job. It overfits extremely and any graph involving this looks exactly like \ref{fig:deriv-normal-final-wd}. This means that the network is attending on the wrong elements in a modality. Likely is finding a correlation with the background of the RGB image and the distant patches of the depth sensor. This may be due to the patching module. Patching size might be the culprit here. Patching in \(8 \times 8\) blocks means that a lot of the image will just be background as around only one patch will have the target object. This causes fixating on unimportant details of the scene and overfitting without regard to extracted features. The story is similar for the \textbf{smaller} version.
 
 Only notable addition here is, the wrist and shoulder merger, \verb|WD_LR_ATTN|, performs quite well, similar to its counterpart in \ref{eval:sep-dep}. However, again is on par with the in success rates of the baseline, see Figure \ref{fig:derivatives-all-cams-success}.Again, there is not success for the `test' run!
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.7\linewidth]{assets/evaluation/derivatives/grasp-normal-wd.png}
-  \caption{Wrist and depth}\label{fig:deriv-normal-final-wd}
-\end{figure}
+
 
 \begin{figure}[H]
   \centering

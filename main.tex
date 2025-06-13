@@ -1,14 +1,14 @@
 \documentclass[a4paper, twoside]{report}
 
 \includeonly{
-  introduction/introduction,
-  background/background,
-  project/early-work/ew,
-  project/cam-comb/cam-comb,
-  project/appl/appl,
-  % evaluation/evaluation,
+  % introduction/introduction,
+  % background/background,
+  % project/early-work/ew,
+  % project/cam-comb/cam-comb,
+  % project/appl/appl,
+  evaluation/evaluation,
   conclusion/conclusion,
-  appendix/appendix
+  % appendix/appendix
 }
 
 %% Language and font encodings
@@ -46,12 +46,23 @@
 \include{title/title}
 
 \begin{abstract}
-Your abstract goes here
+  
+  A significant obstacle in robot and computer vision is incomplete data. Information is critical, without knowing; it is impossible to act, react or plan next steps. Robots who plan on external stimuli are no different. To localise and understand where they are and what they should be doing next; they need an accurate representation of the environment around them. And when they are not given accurate data, they need to do something about it.
+
+  Vision, is a critical system. Us humans rely on being able to see, to go bout our daily lives. However, the most important skill we have is reasoning. Sight only attaches onto that as an external sensor. When we cannot fully see something we can reposition, or look at it differently. We can understand what we see, or at least try our best to understand what we are seeing. Robots can benefit from this, but how do we make them \emph{understand} what they see.
+
+  In this project I explored the idea of what a robot can understand from a scene. I created toy scenarios in reaching and grasping tasks. Using Imitation Learning, I demonstrated to an agent how each task can be solved and exposed it to different modalities of inputs. Then tested its ability to extract information by a systematic modular multi-modal fusion framework to assess and evaluate its performance.
+  
+  Once I quantified what the agent understood I then formulated \emph{active vision} policies that are not fully end-to-end due to the intricate nature of tuning specific modules. And evaluated the performance of a 3D reasoning agent in the toy tasks.
+  
+  I find that not enough data and too much data can cause problems of similar nature and limit the true potential of an agent learning to execute a task. At the same time, active intricate systems with limiting prior knowledge requirements that can actively seek within an environment; will show double the success of naive agents. However, at the cost of being calculated yet slow.
 \end{abstract}
 
 \renewcommand{\abstractname}{Acknowledgements}
 \begin{abstract}
-% Thanks mum!
+I would like to thanks all my friends for all their support during my time in university and life in general.
+Would also like to thank my supervisor for proposing such a fascinating project, although I though I was done with ML after doing all ML modules. I really enjoyed working with, and being frustrated at robots.
+And lastly would like to thank my family for their unending support and love.
 \end{abstract}
 
 \tableofcontents

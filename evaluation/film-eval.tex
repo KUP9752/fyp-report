@@ -99,7 +99,7 @@ We finally have a module that seems to improve its success rate, Figure \ref{fig
 
 
 \subsubsection{Reach with Obstacle}
-The heightened depth understanding capabilities are also seen here \ref{fig:film-reach}. The minimum distances reached by the FiLM policies are all below the obstacle and closer than the baseline. In the grasping task, double modulation seems to perform better. However, in the reaching task ``Colour modulated Depth'' variants (\verb|W_Dfilm{_LATE}|) are clearly more successful.\todo{why is this?}
+The heightened depth understanding capabilities are also seen here \ref{fig:film-reach}. The minimum distances reached by the FiLM policies are all below the obstacle and closer than the baseline. In the grasping task, double modulation seems to perform better. However, in the reaching task ``Colour modulated Depth'' variants (\verb|W_Dfilm{_LATE}|) are clearly more successful. I suspect this is because of the obstacle, understanding where it is in relation to the wrist only benefits the learning.
 
 \begin{figure}[htpb]
   \centering

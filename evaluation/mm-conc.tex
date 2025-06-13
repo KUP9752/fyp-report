@@ -1,31 +1,6 @@
 \subsection{Conclusions}
-\subsubsection{Model Parameter Sizes}
-not sure if this stuff is needed what the fuck am i even evaluating
-\begin{table}[ht]
-\centering
-  \begin{tabular}{|| c | c ||}
-  Module name & parameter count \\
-  \hline
-  grasp\_head & \\ \(128 \times \text{encoding\_size} + 8256\)
-  joint position encoder & 8640 \\
-  \hline
-  \end{tabular}\caption{Generic Module Sizes}\label{tab:film-param-counts}
-\end{table}
+General conclusion is that no one task is not solvable immediately by a single method and there are positives and drawbacks of each fusion method. FiLM modulation helps make sense of depth data concretely, which all other systems seem to struggle with greatly. While, there isn't a consistent top performer. While colour modulated depth performs the best in reaching with an obstacle (at $27\%$ success rate) which is almost 3 times the baseline. It performs quite badly in a simple grasp scenario, being beaten by the same modulation techniques but one which now acts on the latent representation.
 
-
-\begin{table}[ht]
-\centering
-  \begin{tabular}{|| c | c | c ||}
-  \hline
-  
-  \hline
-  Config & proprioceptive & \\
-  separate grasp head & $1\times 10^{-3}$ \\
-  \end{tabular}\caption{FiLM model parameters counts}\label{tab:film-param-counts2}
-\end{table}
-
-\todo{compare the feats attn param sizes with the param sizes of film networks for wrist, then compare its capability with other sensors should do many other combinations here }
-
-General conclusion is that no one task is not solvable immediately by a single method and there are drawbacks and pros of each. This makes life complicated for the coming active tests, mainly because the active vision policy is not very competent and secondly \todo{not sure here}
+To finish, to pick the best fusion strategy one must consider the modalities, their significance, their reliance and most importantly their alignment with each other before tuning each for desirable results.
 
 

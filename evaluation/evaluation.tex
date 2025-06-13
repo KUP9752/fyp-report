@@ -30,10 +30,42 @@ Here I will evaluate:
   \input{evaluation/mm-conc.tex}
 
 
-\section{Active Policy Results}\todo[color=red]{}
+\section{Active Policy Results}
+\subsection{3D Reasioning}
+This was quite hard to compare to earlier data, mainly because the systems don't really compare. 
+
+\begin{table}[ht]
+\centering
+  \begin{tabular}{| c | c | c |}
+  \hline
+  Demo Index & Time to completion (s) & Fail Count\\
+  \hline
+  Demo 1  &  \(23.20 \pm 2.31\) & 2 \\
+  Demo 2  &  \(52.33 \pm 18.66\) & 4 \\
+  Demo 3  &  \(31.95 \pm 9.49\) & 3 \\
+  Demo 4  &  \texttt{did not complete} & 7 \\
+  Demo 5  &  \(26.74 \pm 6.96\)  & 4 \\
+  Demo 6  &  \(27.06 \pm 3.29\) & 1 \\
+  Demo 7  &  \texttt{did not complete} & 6 \\
+  Demo 8  &  \texttt{did not complete} & 6 \\
+  Demo 9  &  \(45.01 \pm 8.12\) & 3 \\
+  Demo 10  &  \texttt{did not complete} & 8 \\
+  \hline
+  \end{tabular}\caption{Task Completion on reaching test demos}\label{tab:appl-first-times}
+\end{table}
+The model chosen for the BC aspect of the policy is the baseline
+The run here was repeated 10 times, and if more than 5 attempts were fails, it was classified as \emph{did not complete}, otherwise the median time was added per every failure to the total before averaging. 
+
+This meant that the active policy was really lackluster. RLBench's inverse kinematics (ik) solving is really slow, and the sampling function might not be optimal as the ik solution almost always fails. These are aspects that need improving before I can truly claim this is a performant active vision policy, what should replace the naive ones. For reference, the largest model I have, the 4-way transformer takes $63$ seconds on average to train for $2000$ epochs on 10 demos. Where a more manageable policy like any film module, takes around $15$ seconds for $800$ epochs. 
+However, this active policy gets us a success percentage of $\approx 58\%$ which is more than double what the best film module achieves in the reach task ($\approx 27\%)$. In that regard this policy is successful yet very slow.
 
 
-\section{Evaluation Limitations}\todo[color=red]{}
+\subsection{Ensemble Policy}
+Unfortunately, this policy was not fully implemented and did not get to include it in the evaluation. It would have been nice to compare this against the 3D reasoning active policy.
+
+\section{Evaluation Limitations}
 The main glaring limitation is the sensor size. To keep the testing and the model sizes manageable I refrained from using sensors that are too high resolution. However, as discussed earlier, the comparisons are done on the same resolutions keeping the results comparable and there is no reason to believe the networks and the resolution can't be scaled up while preserving the relationships evaluated here.
+
+The other huge limitation is that the two parts of the project, active vision and feature extraction parts, don't really mix together, however, I attempted to relate them and compare them in some form anyway.
 
 
