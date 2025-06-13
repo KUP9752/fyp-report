@@ -2,6 +2,7 @@
 This is the results relating to the proposed naively active approaches from \ref{sec:reach-obs-naive-cam-attn}. The numbers here are from the reaching test (\ref{eval-setup-reach-obs}).
 The variations of this policy I tested included:
 \begin{itemize}
+  \itemsep0em
   \item Separate or joint Feature Encoders (\verb|is_multi_cnn|)
   \item \emph{mean} or \emph{max} pooling for the colour score (\verb||)
   \item $\lambda_{attn}$ loss parameter that scales the KL divergence of the predicted 
@@ -9,6 +10,7 @@ The variations of this policy I tested included:
 \end{itemize}
 These were tested over multiple RGB camera combinations, namely:
 \begin{enumerate}
+  \itemsep0em
   \item Wrist, Left Shoulder and Right Shoulder
   \item Wrist and Right Shoulder
   \item Wrist and Left Shoulder
@@ -18,22 +20,20 @@ No `single' camera was tested, as the idea of this policy is to investigate the 
 
 
 \subsection{Observations}
-The main takeaway from this task was how it favoured longer epochs of training. The most success and lowest distances to target were recoded in the $500$ to $1000$ range, then the success rate starts decreasing again, meaning overtraining and no more benefit.\todo[color=purple]{}
-
-The very likely reason for this is that, the demonstration trajectories for this task are a lot more varied due to the obstacle. More importantly the choice to move around the obstacle, there are demos that force the arm to go to the left go back and down, or left then down. This high variation means the agent needs longer time to average out motions in strict Behavioural Cloning settings, and takes longer.
+The main takeaway from this task was how it favoured longer epochs of training. The most success and lowest distances to target were recoded in the $500$ to $1000$ range, then the success rate starts decreasing again, meaning overtraining and no more benefit.\todo[color=purple]{} The very likely reason for this is that, the demonstration trajectories for this task are a lot more varied due to the obstacle. More importantly the choice to move around the obstacle, there are demos that force the arm to go to the left go back and down, or left then down. This high variation means the agent needs longer time to average out motions in strict Behavioural Cloning settings, and takes longer.
 
 
 \begin{figure}[htpb]
   \centering
   \begin{subfigure}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-max-mindist.png}
+    \includegraphics[width=0.6\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-max-mindist.png}
     \caption{Minimum Distance (`max' pool)}\label{subfig:cam-attn-max-mindist-cnn}
   \end{subfigure}
 
   \begin{subfigure}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-mean-mindist.png}
+    \includegraphics[width=0.6\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-mean-mindist.png}
     \caption{Mean}\label{subfig:cam-attn-mean-mindist-cnn}
   \end{subfigure}
   \caption{Minimum distances reached per pooling method}\label{fig:cam-attn-mindist-cnn}
@@ -41,15 +41,15 @@ The very likely reason for this is that, the demonstration trajectories for this
 
 \begin{figure}[htpb]
   \centering
-  \begin{subfigure}{\linewidth}
+  \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-max-success.png}
+    \includegraphics[width=0.9\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-max-success.png}
     \caption{Minimum Distance (`max' pool)}\label{subfig:cam-attn-max-success-cnn}
   \end{subfigure}
-
-  \begin{subfigure}{\linewidth}
+  \hfill
+  \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-mean-success.png}
+    \includegraphics[width=0.9\linewidth]{assets/evaluation/cam-attn/ro_random-cam_attn-mean-success.png}
     \caption{Minimum Distance (`mean' pooling)}\label{subfig:cam-attn-mean-success-cnn}
   \end{subfigure}
   \caption{Minimum distances reached per pooling method}\label{fig:cam-attn-success-cnn}
@@ -60,22 +60,19 @@ This parameter was more of a test to see if it interacted well in any way. Theor
 
 This task is quite unforgiving and errors add up quickly, if the robot gets stuck on the obstacle, it rarely manages to save itself. Evident from the quick increases in minimum distance between epochs $100$ and $200$ for single-CNNs, which capture early fitting due to information abundance, but get confused trying to generalise due to the feature encodings keeping a lot of this uncertainty.
 
-Conversely, multi-CNNs learn late. Makes sense as more passes allow each CNN (now seeing only one frame not all) to learn slowly. Therefore, the multi-CNN policies have a more decisive dip in minimum distance reinforcing the idea that training for loner allows them to capture pose specific information that is helpful to the system in solving this task.
-
-The only interesting remark here is that multi-CNN interacts interestingly with \emph{mean} pooling, see Figure \ref{sunfig:cam-attn-mean-mindist}. Seeing the spiky and jagged Single-CNN graphs we can confirm  that merging all views and convoluting them likely confuses the feature extraction and a lot of uncertainty creeps into the features.
+Conversely, multi-CNNs learn late. Makes sense as more passes allow each CNN (now seeing only one frame not all) to learn slowly. Therefore, the multi-CNN policies have a more decisive dip in minimum distance reinforcing the idea that training for longer allows them to capture pose specific information that is helpful to the system in solving this task. Multi-CNN interacts interestingly with \emph{mean} pooling, see Figure \ref{subfig:cam-attn-mean-mindist-cnn}. Seeing the spiky and jagged Single-CNN graphs we can confirm that merging all views and convoluting them likely confuses the feature extraction and a lot of uncertainty creeps into the features, especially because the view poses are so different.
 
 
 \subsection{\emph{Mean} and \emph{Max} Pooling}
-The differences here are extremely subtle. General observations both work fairly similarly in terms of the minimum distance they can reach per epoch, excluding `max' and the shoulder cameras\todo{talk about the attention weights about this}. A stark difference, however, is how jagged and uncertain \emph{max} is with lower epochs. This is due to max likely sending a similar signal between all views, , if more than one view can see the target, they will likely have very similar weights. Which can add indecisiveness, especially when both shoulders are active.
+The differences here are extremely subtle. Both work fairly similarly in terms of the minimum distance they can reach per epoch, excluding `max' and the shoulder cameras\todo{talk about the attention weights about this}. A stark difference, however, is how jagged and uncertain \emph{max} is with lower epochs. This is due to max likely sending a similar signal between all views, if more than one view can see the target, they will likely have very similar weights. Which can add indecisiveness, especially when both shoulders are active.
 
 \emph{Mean} is not necessarily any better when single-CNNs are used. Again, due to uncertainty creeping in, but from the view understanding.
 
-Though, its performance immediately starts good when it is paired with multi-CNN feature encoder. This makes the data less spread out \todo{looking at the minimum dist graphs here} and the policy being capable of moving past the target, even from the start. However, the drawback is, the performance does not get much better for shoulder cameras as training goes on. This is now likely due to how \emph{mean} operates, it relates the score magnitude to depth essentially, more area covered the better. The shoulder cams being at a fixed depth, don't allow them to participate in this benefit. So \emph{max} with Multi-CNN combination is generally more successful than \emph{mean} with combinations using shoulder cams.
+Though, its performance immediately starts good when it is paired with multi-CNN feature encoder. This makes the data less spread out (\ref{subfig:cam-attn-mean-mindist-cnn}) and the policy being capable of moving past the target, even from the start. However, the drawback is, the performance does not get much better for shoulder cameras as training goes on. This is now likely due to how \emph{mean} operates, it relates the score magnitude to depth essentially, more area covered the better. The shoulder cams being at a fixed depth, don't allow them to participate in this benefit. So \emph{max} with Multi-CNN combination is generally more successful than \emph{mean} with combinations using shoulder cams.
 
 \subsection{Attention Loss Weights ($\lambda_{attn}$)}
 This didn't seem to make a change at all. However, looking at the loss curves \todo{add a loss curve here, fighting for vram currently}, some potential issues may be that the one loss term is drowning the other one out and scaling it up might not matter, rerun depending on this.
 
-
 \subsection{Remarks}
-I thought this policy would be able to fix the shortcomings of the naive policies by selectively attending on a view, even if the views are static. These shortcomings included the final reach toward the obstacle not being executed well. Non-wrist cameras help with the first half of the motion while the wrist camera should be able to generalise to the final reaching motion \todo{explain: due to its self-centric nature}. However the problem is the demos don't force the gripper to `look' towards the target. So, the wrist camera cannot get the benefits from a \emph{mean} pooled configuration, which will include intrinsic depth data however, the agent does not learn to face the target. This led to the attention weights heavily weighting a single view during rollout. Which counteracts this policy's theoretical benefits as attention will be mainly focused on a single target.\todo{put the weights in a table there is some interesting ones in eval plots}
+I thought this policy would be able to fix the shortcomings of the naive policies by selectively attending on a view, even if the views are static. These shortcomings included the final reach toward the obstacle not being executed well. Non-wrist cameras help with the first half of the motion while the wrist camera should be able to generalise to the final reaching motion. However the problem is the demos don't force the gripper to `look' towards the target. So, the wrist camera cannot get the benefits from a \emph{mean} pooled configuration, which will include intrinsic depth data however, the agent does not learn to face the target. This led to the attention weights heavily weighting a single view during rollout. Which counteracts this policy's theoretical benefits as attention will be mainly focused on a single target.
 

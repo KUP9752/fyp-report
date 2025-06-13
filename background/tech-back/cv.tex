@@ -69,37 +69,29 @@ Where the values are from \ref{sec:intrinsic} and $\alpha$ is the aspect ratio u
   \end{figure}
 
 \subsection{Other Camera Models for Robotics}
-The pin-hole camera system gives us an insight into the translation of captured light into interpretable data. Although, useful for theoretical analysis, real-world cameras deviate from this idealised system quite a lot.
-There are different lens models like the \emph{thin-lens} model which -opposing the pin-hole model- doesn't assume an infinitely small aperture. Mimicking the real world closer as cameras need lenses to focus the light. And these lenses add to the intrinsic properties of the camera.
+The pin-hole camera system gives us an insight into the translation of captured light into interpretable data. Although, useful for theoretical analysis, real-world cameras deviate from this idealised system quite a lot. Some camera models:
+\begin{itemize}
+  \itemsep0em
+  \item\textbf{Different Fields of View (FOV)}
+  Cameras providing different FOVs such as fish-eye or wide-angle cameras, for different degrees of vision. For example, 360-degree cameras for surveillance or autonomous driving. Where the distortion of the image must be corrected in processing.
 
-\subsubsection{Different Fields of View (FOV)}
-Cameras providing different FOVs such as fish-eye or wide-angle cameras, for different degrees of vision. For example, 360-degree cameras for surveillance or autonomous driving. Where the distortion of the image must be corrected in processing.
-
-\subsubsection{Multiple Cameras}
-\emph{Stereo camera models} (Binocular vision) for depth measurement incorporation into the image. Two cameras which are a known distance apart can be used to perceive depth by computing the disparity between corresponding points in both images (triangulation) \cite{hamzah2016literature}. This can also be scaled to \emph{n-view stereo vision} to reduce occlusion problems while increasing redundancy in the number of viewpoints there are.\label{sec:nview}
-
-\subsubsection{Active Depth Cameras}
-These go beyond stereo vision. Such as \emph{Time-of-Flight (ToF)} cameras that emit infra-red light and measure the time it takes to reflect back, and using speed of light in calculating the depth directly \cite{foix2011tof,zanuttigh2016time}. Or \emph{structured light} cameras that project a known pattern onto a surface and observe its deformation to calculate the depth. These two are usually more concise compared to stereo vision because they offer robust depth sensing regardless of surface textures or differing lighting conditions.
-\\\\
-Therefore, choice of camera model significantly affects how a robot can perceive its environment and its calibration impacts the degree of correctness.
-
-\subsection{Visual Perception and Object Recognition}
+  \item\textbf{Multiple Cameras}
+  \emph{Stereo camera models} (Binocular vision) for depth measurement incorporation into the image. Two cameras which are a known distance apart can be used to perceive depth by computing the disparity between corresponding points in both images (triangulation) \cite{hamzah2016literature}. This can also be scaled to \emph{n-view stereo vision} to reduce occlusion problems while increasing redundancy in the number of viewpoints there are.\label{sec:nview}
+  
+  \item\textbf{Active Depth Cameras}
+  These go beyond stereo vision. Such as \emph{Time-of-Flight (ToF)} cameras that emit infra-red light and measure the time it takes to reflect back, and using speed of light in calculating the depth directly \cite{foix2011tof,zanuttigh2016time}. Or \emph{structured light} cameras that project a known pattern onto a surface and observe its deformation to calculate the depth. These two are usually more concise compared to stereo vision because they offer robust depth sensing regardless of surface textures or differing lighting conditions.
+  There are different lens models like the \emph{thin-lens} model which -opposing the pin-hole model- doesn't assume an infinitely small aperture. Mimicking the real world closer as cameras need lenses to focus the light. And these lenses add to the intrinsic properties of the camera.
+\end{itemize}
+  Therefore, choice of camera model significantly affects how a robot can perceive its environment and its calibration impacts the degree of correctness.
+  
+  \subsection{Visual Perception and Object Recognition}
   The goal of computer vision within robotics is to alow the robot to infer meaningful information about its surroundings and later use that information to achieve its goals. So, perception starts with understanding what is in the scene to a macro and micro level. 
   
   \subsubsection{Low-Level Vision}
     These are fundamental visual features without caring about the details of what the overlying object may be. Such as: detecting colours, corners, edges of objects. 
 
   \subsubsection{High-Level Vision}
-    This, on the other hand, is where the learnt small information can be transformed up to generalise into tasks such as object recognition, motion tracking and most importantly scene interpretation.
-    \\\\
-    Traditional Computer Vision approaches relied on manually crafted systems to extract features from images:
-    \begin{itemize}
-      \item \textbf{Edge Detection:} Identifying mathematically distinct features such as edges and corners \cite{marr1980theory} which can then be used for object recognition. Using methods such as Canny Edge detection \cite{canny1986computational} and Harris Corner Detector \cite{derpanis2004harris}.
-      \item \textbf{Feature Descriptors:} Extracting keypoints and descriptors from images, allowing for object matching across different scales and orientations. Utilising methods like SIFT (Scale-Invariant Feature Transform), SURF (Speeded-Up Robust Features) \cite{wu2013comparative,juan2009comparison} and ORB (Oriented FAST and Rotated BRIEF) \cite{rublee2011orb}.
-      \item \textbf{Template Matching:} Compares an input image to stored reference images to detect images that are in the known objects database. Usually useful when the environment can be controlled \cite{brunelli2009template}.
-    \end{itemize}
-
-    However successful these methods have been in structured settings, they don't necessarily do well with large variations in object appearance, real-world noise and dynamic backgrounds. Therefore, these can't necessarily be easily extended to work in a dynamic robotics setting.
+    Traditional Computer Vision approaches relied on manually crafted systems to extract features from images, such as \textbf{Edge Detection:} \cite{canny1986computational, derpanis2004harris}, \textbf{Feature Descriptors:}\cite{wu2013comparative,juan2009comparison, rublee2011orb}, and \textbf{Template Matching:}\cite{brunelli2009template}.However successful these methods have been in structured settings, they don't necessarily do well with large variations in object appearance, real-world noise and dynamic backgrounds. Therefore, these can't necessarily be easily extended to work in a dynamic robotics setting.
 
     \subsubsection{Deep Learning-Based Approaches}
     Modern object detection and recognition is mostly reliant on deep learning methods:

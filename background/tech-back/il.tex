@@ -19,13 +19,6 @@ And an interesting side product is the reward function that the model learns. It
 
 However, demonstration quality sensitivity is still present. As well as the solution complexity disproportionately grows compared to the problem size \cite{ARORA2021103500}. Each iteration is dominated by the complexity of solving the underlying MDP with the currently learnt reward function, which is polynomial in size of its parameters. Which are exponential in the number of dimensions of the state vector. On top of this as the problem size increases the sample complexity must also increase, meaning the expert should cover more trajectories in the training set for sufficient coverage of the state space and the optimal prediction of the underlying reward. And finally, verifying that correct reward is predicted is hard as it is inherently variable what is learnt.
 
-
-\section{Demonstration Quality and Abundance}
-A unique challenge of learning from demonstrations is that the quality of the provided information should be good, in terms of achieving optimal solutions, so then an agent can also infer the optimal policy. But also, there should be enough demonstrations so that the agent can generalise to more scenarios.
-
-\subsubsection{Few-Shot Learning}\label{sec:few-shot}
-This paradigm allows models to generalise behaviours from a limited number of demonstrations. This is done to overcome the problem of having to provide large collections of manually curated or at least verified data \cite{fewshotsurvey}. A usual approach is to use generative models (see \ref{sec:gail}) to create more data from the distributions of the data available. Main reason is to mitigate issues such as covariate shifts in the sampled data. An extreme end of this paradigm is \emph{one-shot} learning (such as \cite{vitiello2023one}) where the learning must be done on a single demonstration.
-
 \section{Imitation or Reinforcement? - Hybrid Approaches}
 
 \subsection{Offline Reinforcement Learning}

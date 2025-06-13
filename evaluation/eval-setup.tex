@@ -23,27 +23,24 @@ Also, each test task has an associated `testing' and `training' demonstration se
 Two main branches of tasks I followed in this project are grasping and occluded reaching tasks.
 
 \subsection{Reaching with an Obstacle - \textbf{ReachObs\_Random}}\label{eval-setup-reach-obs}
-\todo[color=red]{write something here}
+This is my staple occlusion task. The premise is simple we spawn a target behind a tangible obstacle. This is the very same task created in Section \ref{sec:reach-obs}. We are testing whether the policies can learn to avoid the obstacle, while still learning to reach for the target behind it. So, I will be comparing the `minimum distance', which is a reliable metric in this case because the majority of the demos move to the side, so to achieve a good `min distance' the robot needs to know to reach for the obstacle. And secondly, as expected we want to check for successes, yes the agent knows to get within an $x$ distance of th target, but can it complete the task? This is signalled by the simulator if there is a collision. Finally, this task was usually ran for more epochs as trends showed improvement even up to $2000$ epochs.
 
-\textbf{ReachObs\_IndRandom} is not discussed here in depth, due to the similarity of the tasks, and the independent version not being any more interesting. Tests were run on this and any interesting ones are included here \todo{add appendix if needed}
-
-\subsection{Grasping}
-These two grasping tasks are to assess the contextual 3D understanding of the policy: learning depth information and adapting to differing sizes of targets; as well as learning the workspace before attempting a task \todo{grasp then move, not sure if I have time for this, but If i do defo interesting}
+\textbf{ReachObs\_IndRandom} is not discussed here in depth, due to the similarity of the tasks, and the independent version not being any more interesting. Tests were run on this and any interesting results will be discussed.
 
 \subsection{Grasp and Depth Understanding - \textbf{Vision\_Random}}
-This task is quite similar to the depth interfacing tests from earlier.\todo{ref DI}. The main difference is that the placement of the targets are random within he workspace, for \emph{training}, \emph{control} and \emph{test} sets. The test is repeated with different sizes of targets, \textbf{normal} and \textbf{smaller}. \textbf{normal} sets the scale of the target to $1$ and \textbf{smaller} sets it to $0.5$. The training and the control sets are the same size while the test will be the the other. The reasons for this is to assess:
+This task exists to test the contextual 3D understanding of the policy: learning depth information and adapting to differing sizes of targets, quite similarly to the depth interfacing tests from earlier, section \ref{sec:depth-interfacing}. The main difference is that the placement of the targets are random within he workspace, for `training', `control' and `test' sets. The test is repeated with different sizes of targets, \textbf{normal} and \textbf{smaller}. \textbf{normal} sets the scale of the target to $1$ and \textbf{smaller} sets it to $0.5$. The training and the control sets are the same size while the test will be the the other. The reasons for this is to assess:
 \begin{enumerate}
+  \itemsep0em
   \item The effectiveness of the configuration in solving the task it is immediately trained for
   \item Assess the information extraction from the various views by comparing the discrepancy between control and test.
 \end{enumerate}
-I created two separate variations of this specific task. One where the training and control set is set to be the \textbf{normal} size and we evaluate that on \textbf{smaller} blocks. The next variation is flipping this configuration: control and training are scaled down, while test is normal sized. Mainly to investigate whether the information wew train on has any affect on the policy proficiency.
+
+All tests were trained over \(\left[ 100, ~200, ~400, ~600, ~800\right]\) epochs, after identifying this task does not benefit from training for too long. Unlike reaching. I created two separate variations of this specific task. One where the training and control set is set to be the \textbf{normal} size and we evaluate that on \textbf{smaller} blocks. The next variation is flipping this configuration: control and training are scaled down, while test is normal sized. Mainly to investigate whether the information trained on has any affect on the policy proficiency and 3D understanding.
 
 \subsubsection{Important Note!}
-The demos saved for all the configurations are tested and checked to appear correctly. However, I have realised that the specifically the \textbf{saved smaller testing demos} which is used in the place of the control or the test, would spawn three of the targets smaller than they should be. Indices  \(0, ~5, ~6\)  will spawn smaller and hence look smaller. I will remove these when evaluating the policies.
+The demos saved for all the configurations are tested and checked to appear correctly. However, I have realised that the specifically the \textbf{saved smaller testing demos} which is used in the place of the control or the test, would spawn three of the targets smaller than they should be. Indices  \(0, ~5, ~6\)  will spawn smaller and hence look smaller. These are removed from the distance as well as the success graphs when evaluating.
 
-I have not figured out the reasoning for this, it seems to randomly happen, I speculate that it is an issue with how I control the sizes of targets. The target size is set during the start of an episode, so this means the \verb|Environment| object from PyRep must have initialised it wrong when the demos were being saved. This is not an isolated incident and sometimes happens while resetting the environment. However, the ideal part is if it is encoded in the saved demos, it is at least controlled. The \textbf{smaller} training set is confirmed to spawn correctly. The evaluation of the results will consider this.
-
-\subsection{Carrying the Target - \textbf{Grasp\_ThenMove}}\todo[color=red]{havent run this yet, might remove it depending on what I will do today}
+I have not figured out the reasoning for this, it seems to randomly happen, I speculate that it is an issue with how I control the sizes of targets. The target size is set during the start of an episode, so this means the \verb|Environment| object from PyRep must have initialised it wrong when the demos were being saved. This is not an isolated incident and RLBench sometimes spawned malformed demos while resetting the environment. However, the ideal part is if it is encoded in the saved demos, it is at least controlled. The \textbf{smaller} training set is confirmed to spawn correctly, meaning the training is not affected in any way.
 
 \section{Parameters}
 
@@ -71,7 +68,7 @@ Most policies were trained using the configuration in Table \ref{tab:eval-traini
   shuffle\_data & \texttt{True} \\
   dataset\_to\_use & \texttt{`demo'} \\
   epochs & \emph{Epochs} \\
-  lock\_loader\_seed & \emph{SEED} \\
+  lock\_loader\_seed & \emph{Seed} \\
   \hline
   \end{tabular}\caption{Default Training parameters}\label{tab:eval-training-params}
 \end{table}

@@ -1,16 +1,14 @@
 \section{End-to-End Learning for Robot Control}
 
-  End-to-end refers to a robot learning approach where the robot determines certain \textbf{policies} (actions to perform a certain task) from raw inputs from the action space. The action space can include anything that we think the robot may benefit form knowing. This means the 
-  robot learns to map sensory inputs directly to motor commands, bypassing the need for intermediate steps such as feature extraction or state estimation. This approach leverages deep learning techniques \cite{Schmidhuber2015nn}, particularly convolutional neural networks (CNNs) and recurrent neural networks (RNNs), to process high-dimensional sensory data and generate appropriate actions. Which can then be used in techniques like Reinforcement Learning \ref{sec:rl} or Imitation Learning \ref{sec:il}. Therefore, recent advancements in machine learning technologies has also reshaped the field of robotics and helps move it forward \cite{Pierson18082017,newbury2023graspSynthReview,liu2021DRLminireview}.
+  End-to-end refers to a robot learning approach where the robot determines certain \textbf{policies}from raw inputs from the action space. The action space can include anything that we think the robot may benefit form knowing. This means the robot learns to map sensory inputs directly to motor commands, bypassing the need for intermediate steps such as feature extraction or state estimation. This approach leverages deep learning techniques \cite{Schmidhuber2015nn}, particularly convolutional neural networks (CNNs) and recurrent neural networks (RNNs), to process high-dimensional sensory data and generate appropriate actions. Which can then be used in techniques like Reinforcement Learning \ref{sec:rl} or Imitation Learning \ref{sec:il}. Therefore, recent advancements in machine learning technologies has also reshaped the field of robotics and helps move it forward \cite{Pierson18082017,newbury2023graspSynthReview,liu2021DRLminireview}.
 
   \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/intro/endtoend.png}
+    \includegraphics[width=0.6\textwidth]{assets/intro/endtoend.png}
     \caption{Diagram showcasing simple end to end learning ideas, modified from \cite{johns2024}}\label{fig:end2end}
   \end{figure}
-  \todo[color=green]{make a better image for final}
 
-  This contrasts with the classical approaches\todo[color=green]{citations here from the older theory papers maybe}. Classical robotics involves separating the behaviour of a robot into smaller tasks, where each task is managed by a distinct module and the system is functional when the pipeline comes together. Although good at precisely executing repetitive tasks, this approach requires complex and often handcrafted solutions for each module. This can lead to difficulties in scaling and adapting to new tasks or environments. 
+  This contrasts with the classical approaches. Classical robotics involves separating the behaviour of a robot into smaller tasks, where each task is managed by a distinct module and the system is functional when the pipeline comes together. Although good at precisely executing repetitive tasks, this approach requires complex and often handcrafted solutions for each module. This can lead to difficulties in scaling and adapting to new tasks or environments. 
   
   Therefore, the cutting-edge research in robotics concerns end-to-end systems in making multi-modal robots, which can be tuned for specific tasks if needed, using their capabilities of complex decision-making withing the given environments.
 

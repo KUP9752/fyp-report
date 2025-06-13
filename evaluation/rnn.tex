@@ -19,11 +19,11 @@ Quite differently I started with tuning a possible RNN model. There were too man
 \end{table}
 
 \subsubsection{Baseline Tuning}
-I started with experimenting with the baseline. Planning to find the most promising training length before I applied the promising fusion methods to architecture. Looking at the final distance distributions for various epochs in Figure \ref{fig:rnn-grasp-final-wd}, I realised that the most promising models were trained were generally shorter durations and $400$ to the $600$ epochs mark. These were optimal in reaching, getting around the 11 cm mark from the object. However, their grasp success was not amazing\todo{add a grasp success figure here or in the appendix.} 
+I started with experimenting with the baseline. Planning to find the most promising training length before I applied the promising fusion methods to architecture. Looking at the final distance distributions for various epochs in Figure \ref{fig:rnn-grasp-final-wd}, I realised that the most promising models were trained were generally shorter durations and $400$ to the $600$ epochs mark. These were optimal in reaching, getting around the 11 cm mark from the object. However, their grasp success was troubling, wrist RGB and the depth together were successful around 8\% - 10\% while the others were not grasping at all.
 
-Finally testing the LSTM with multiple modalities, Figure \ref{fig:rnn-grasp-tuning}, it is clear that the wrist combinations act better with shorter training, though, wrist and wrist depth together hangs behind quite a bit. This is likely due to consistent motion patterns the task as well as the easy distributional alignment the wrist cameras inherently produces. It is surprising that the inclusion of the depth camera struggles, bringing the density around 2.1 and having a more prominent second peak at 0.45 metres. These are likely due to the test data, however, gives another insight into to the non-optimal nature of the data fusion of the baseline.
+Then including the different views, Figure \ref{fig:rnn-grasp-tuning}, it is clear that the wrist combinations act better with shorter training, though, wrist and wrist depth together hangs behind quite a bit. This is likely due to consistent motion patterns the task as well as the easy distributional alignment the wrist cameras inherently produces. It is surprising that the inclusion of the depth camera struggles, bringing the density around 2.1 and having a more prominent second peak at 0.45 metres. These are likely due to the `test' data, however, gives another insight into to the non-optimal nature of the data fusion of the baseline.
 
-Shoulder combinations however, heavily favour longer training, though not too long. Likely due to the smaller Signal-to-Noise (SNR) ratio. There is just more extraneous data captured by the shoulders and that takes the model longer to fit to it. However, once fit 600 epochs of training, it seems to reach the 14cm mark more often. 
+Shoulder combinations however, heavily favour longer training, though not too long. Likely due to the smaller Signal-to-Noise (SNR) ratio. There is just more extraneous data captured by the shoulders and that takes the model longer to fit to it. However, once fit 600 epochs of training, it seems to reach the 0.14 mark more often. 
 
 A final qualitative observation I had was the movement competency. Although hard to convey here, observing the robot its movement less spiky, and more than once I observed a smooth trajectory change. It would first start off, doing a generic reach, then around half way around the movement slow down, slightly reposition and reach for the target very competently. I speculate this is the hidden LSTM states coming in handy and providing that encapsulated information of the state the robot is in currently. Allowing it to do BC with episode length awareness like never before.
 
@@ -52,3 +52,20 @@ A final qualitative observation I had was the movement competency. Although hard
 \subsubsection{Incorporating Fused Data}
 \todo[color=red]{More data from the final run here, will do this later}
 
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\linewidth]{assets/evaluation/rnn/400-cams.png}
+  \caption{Final Distance Distribution at 400 Epochs}\label{fig:rnn-fusing-400}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\linewidth]{assets/evaluation/rnn/600-cams.png}
+  \caption{Final Distance Distribution at 600 Epochs}\label{fig:rnn-fusing-600}
+\end{figure}
+
+Figures \ref{fig:rnn-fusing-400} and \ref{fig:rnn-fusing-600}, make it clear that the shapes of the final distance distributions are similar but with a second sizeable hump near the $0.31$ mark. While the grasping was extremely poor, it never attempts to grasp anything. The average successful grasp attempts was $0.337$ and $0.12$ for unsuccessful, this means it almost never even tries to grasp! What this means is that these policies are not performing as well. Two explanations I have for this is the richer feature encoding, somehow obscures the sequential aspect of the data. As the encoding size scales from fusing model to others, but the hidden LSTM state is static, this bottleneck might be affecting the information retention, and creating a worse system. Another possibility is that the fusing feature encodings have been trained to not assume a downstream LSTM (which also is tuned with the baseline).
+
+Positively, observing the motions again, its movements were confident and smooth, although, the overfitting aspect was easily visible, it would always move to the bottom left quadrant. Smaller epochs were also not a fix for this, the tuning has to be specifically adjusted to match the LSTM behaviour.
+
+The teaching was more miserable, because th observation is almost always the same, whether the obstacle is in view or the table (target is almost never seen). The LSTM would always think its in a similar state. And learning the slight left swerving motion to avoid the obstacle it would just swerve all the time. I I believe the reaching will benefit from an RNN policy once it can find a good view, but otherwise, it was the worst performance of the bunch.

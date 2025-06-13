@@ -1,10 +1,15 @@
 \documentclass[a4paper, twoside]{report}
 
-% \includeonly{
-%   % project/cam-comb/cam-comb,
-%   project/cam-comb/cam-comb,
-%   evaluation/evaluation
-% }
+\includeonly{
+  introduction/introduction,
+  background/background,
+  project/early-work/ew,
+  project/cam-comb/cam-comb,
+  project/appl/appl,
+  % evaluation/evaluation,
+  conclusion/conclusion,
+  appendix/appendix
+}
 
 %% Language and font encodings
 \usepackage[english]{babel}
@@ -32,7 +37,7 @@
 \usepackage{float}
 \usepackage{multirow}
 
-\title{Robot Policy Learning with Active Vision}
+\title{APPLe: Active Perception Policy Learning and Multi-Modal Feature Combinations}
 \author{Kağan Uğur Pekgöz}
 % Update supervisor and other title stuff in title/title.tex
 
@@ -68,7 +73,7 @@ Your abstract goes here
 \bibliographystyle{unsrt}
 \bibliography{bibs/intro, bibs/background, bibs/rel-work, bibs/general}
 
-% \include{appendix/appendix}
+\include{appendix/appendix}
 
 
 \end{document}

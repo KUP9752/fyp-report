@@ -1,16 +1,18 @@
 \chapter{Evaluation}\label{ch:eval}
 Here I will evaluate:
 \begin{enumerate}
-  \item Findings from the FDC investigations
-  \item Compare the proposed active vision approaches to non-active systems from before
+  \item Explain the evaluation methodology
+  \item The multi-modal fusing policies I proposed
+  \item Compare the proposed active vision approaches to non-active
 \end{enumerate}\todo{split later if needed}
 
-% Setuo
+% Setup
 \input{evaluation/eval-setup.tex}
 
 % Naive Cam-Attention (from reach-obs)
 \input{evaluation/cam-attn.tex}
 
+% all the fusing stuff
 \section{Multi-Modal Results}
 
   \input{evaluation/baseline.tex}
@@ -32,7 +34,6 @@ Here I will evaluate:
 
 
 \section{Evaluation Limitations}\todo[color=red]{}
-The main glaring limitation is the sensor size. To keep the testing and the model sizes manageable I refrained. from using sensors that are too high resolution. However, as discussed earlier, the comparisons are done on the same resolutions keeping the results comparable and there is no 
-
+The main glaring limitation is the sensor size. To keep the testing and the model sizes manageable I refrained from using sensors that are too high resolution. However, as discussed earlier, the comparisons are done on the same resolutions keeping the results comparable and there is no reason to believe the networks and the resolution can't be scaled up while preserving the relationships evaluated here.
 
 

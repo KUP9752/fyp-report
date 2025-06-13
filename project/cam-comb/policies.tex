@@ -19,13 +19,8 @@ This is the most common middle-ground. While separated feature learners can be u
 \todo{i will argue separating the grasping network will be late fusion fuse at the actionn level and not separating it will be fully intermediate}
 
 \section{Proposed Fusion Methods}\label{sec:proposed-fusion}
-I designed a modular poly-policy which can be instantiated in any fusion configuration to handle its given modalities differently before making a final movement prediction. The modularity is within the `Feature Encoding' block shown in Figure \ref{fig:policies-skeleton-idea}\todo[color=blue]{maybe move to appendix}
+I designed a modular poly-policy which can be instantiated in any fusion configuration to handle its given modalities differently before making a final movement prediction. The modularity is within the `Feature Encoding' block shown in Figure \ref{fig:policies-skeleton-idea}
 
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.2\linewidth]{assets/cam-comb/policies/general-diagram.png}
-  \caption{Main Skeleton of the proposed policy structure}\label{fig:policies-skeleton-idea}
-\end{figure}
 
 \todo{add the fusingEncoder and the config to the appendix}
 \subsection{Simple Stacking}
@@ -58,7 +53,7 @@ RGB provides a denser representation of the system and in a configuration with m
   \hfill
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=0.5\linewidth]{assets/cam-comb/policies/wlr_d-attn-diagram.png}
+    \includegraphics[width=0.3\linewidth]{assets/cam-comb/policies/wlr_d-attn-diagram.png}
     \caption{A Cross Attention Mechanism to attend to the important parts of from each extracted feature.}\label{subfig:policies-wrl_d-attn}
   \end{subfigure}
   \caption{Proposed Systems}\label{fig:policies-sep-dep-diagrams}
