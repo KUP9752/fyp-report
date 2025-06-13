@@ -1,7 +1,7 @@
 \section{Reaching with an Obstacle}\label{sec:reach-obs}
 There are two versions of this task, I thought it might be interesting to randomise the object firstly dependently then independently on the obstacle. The `dependent' randomisation called \verb|ReachObs_Random| samples the obstacle, which in turn controls the spawn boundary of where the target can spawn in, meaning the target will always appear behind the obstacle albeit, edges of it can sometimes stick out. Conversely, the `independently' random version, called \verb|ReachObs_IndRandom|\todo[color=green]{also add to appendix and link here}, keeps the target spawn boundary fixed, meaning the target can be anywhere in the visible workspace, but it is not necessarily always covered by the obstacle. I can see that this potentially can be useful to keep the dataset a bit more diverse, and allow the wrist camera initially observe the target sometimes.
 
-\begin{figure}[htpb] % htpb allows all placement
+\begin{figure}[htpb] 
   \centering
   \begin{subfigure}{0.3\textwidth}
     \centering
