@@ -23,7 +23,7 @@ I designed a modular poly-policy which can be instantiated in any fusion configu
 
 \begin{figure}[htpb]
   \centering
-  \includegraphics[scale=0.1]{assets/cam-comb/policies/general-diagram.png}
+  \includegraphics[width=0.2\linewidth]{assets/cam-comb/policies/general-diagram.png}
   \caption{Main Skeleton of the proposed policy structure}\label{fig:policies-skeleton-idea}
 \end{figure}
 
@@ -40,25 +40,25 @@ RGB provides a denser representation of the system and in a configuration with m
   \centering
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=0.7\linewidth]{assets/cam-comb/policies/wlr_d-feats-diagram.png}
+    \includegraphics[width=0.5\linewidth]{assets/cam-comb/policies/wlr_d-feats-diagram.png}
     \caption{Simple concatenation of the features from each CNN}\label{subfig:policies-wlr_d}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=0.7\linewidth]{assets/cam-comb/policies/wlr_d-feats-diagram.png}
+    \includegraphics[width=0.5\linewidth]{assets/cam-comb/policies/wlr_d-feats-diagram.png}
     \caption{A second layer CNN, convolving the outputs in a learnable manner}\label{subfig:policies-wrl_d-feats}
   \end{subfigure}
   \vspace{0.5cm}
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=0.7\linewidth]{assets/cam-comb/policies/wlr_d-gated-diagram.png}
+    \includegraphics[width=0.5\linewidth]{assets/cam-comb/policies/wlr_d-gated-diagram.png}
     \caption{A shallower secondary CNN to learn simple \emph{gating} from already extracted RGB and Depth features.}\label{subfig:policies-wrl_d-gated}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.45\linewidth}
     \centering
-    \includegraphics[width=0.7\linewidth]{assets/cam-comb/policies/wlr_d-attn-diagram.png}
+    \includegraphics[width=0.5\linewidth]{assets/cam-comb/policies/wlr_d-attn-diagram.png}
     \caption{A Cross Attention Mechanism to attend to the important parts of from each extracted feature.}\label{subfig:policies-wrl_d-attn}
   \end{subfigure}
   \caption{Proposed Systems}\label{fig:policies-sep-dep-diagrams}
